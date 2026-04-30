@@ -1,37 +1,33 @@
 'use client';
 
-export default function BookCard({ libroNombre, hebreo, capitulos, isAvailable, slug }) {
-  const handleClick = (e) => {
-    if (!isAvailable) return;
-    e.preventDefault();
-    // Próximamente navegaremos a la vista de capítulos usando el slug
-    alert('Próximamente: vista de capítulos de ' + libroNombre);
-  };
+import Link from 'next/link';
+
+export default function BookCard({ book }) {
+  // Si no hay datos del libro, mostramos un placeholder (evita crashear)
+  if (!book) {
+    return (
+      <div className="block bg-[#f5f5f5] border-2 border-[#e0e0e0] rounded-lg p-5 text-center cursor-default opacity-60">
+        <p className="text-[15px] font-bold text-[#9e9e9e] font-['Georgia',serif] mb-1">
+          Libro no disponible
+        </p>
+        <p className="text-[12px] text-[#9e9e9e] font-['Times_New_Roman',serif]">
+          —
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <a
-      href={isAvailable ? '#' : undefined}
-      onClick={handleClick}
-      className={`
-        block bg-white border-2 rounded-lg py-3 px-3 text-center
-        transition-all duration-200
-        ${isAvailable 
-          ? 'border-[#d4c4a8] cursor-pointer hover:border-[#d4ac0d] hover:shadow-[0_4px_12px_rgba(26,58,92,0.1)] hover:-translate-y-0.5' 
-          : 'border-gray-200 opacity-50 cursor-default'}
-      `}
+    <Link
+      href={`/libro/${book.slug}`}
+      className="block bg-white border-2 border-[#d4c4a8] rounded-lg p-5 text-center transition-all duration-200 hover:border-[#d4ac0d] hover:shadow-md hover:-translate-y-1 cursor-pointer"
     >
-      <span className="block text-[15px] font-bold text-[#1a5276]" style={{ fontFamily: 'Georgia, serif' }}>
-        {libroNombre}
-      </span>
-      {hebreo && (
-        <span 
-          className="block text-xs text-[#757575] mt-0.5"
-          dir="rtl"
-          style={{ fontFamily: '"Times New Roman", serif', unicodeBidi: 'bidi-override' }}
-        >
-          {hebreo}
-        </span>
-      )}
-    </a>
+      <p className="text-[15px] font-bold text-[#1a5276] font-['Georgia',serif] mb-1">
+        {book.nombre}
+      </p>
+      <p className="text-[12px] text-[#757575] font-['Times_New_Roman',serif] dir-rtl">
+        {book.nombre_original || book.nombre}
+      </p>
+    </Link>
   );
 }
