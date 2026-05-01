@@ -44,244 +44,181 @@ margin-top: 40px;
 margin-bottom: 15px;
 }
 
-/* VERSÍCULO EN CAJA */
+/* ============================================
+1. CITA BÍBLICA - Barra doble dorada + comillas decorativas
+============================================ */
 .cita-versiculo {
-background-color: #fef9e7;
-border-left: 5px solid rgb(212, 172, 13);
-border-radius: 4px;
-margin: 25px 0px;
+background: #fefaf0;
+border-left: 4px solid #c4960a;
+border-right: 4px solid #c4960a;
+border-radius: 2px 8px 2px 8px;
+margin: 25px 0;
 padding: 20px;
+position: relative;
 }
-.cita-versiculo h3 {
-color: #b7950b;
-margin-top: 0px;
-font-size: 1.1em;
+.cita-versiculo::before {
+content: "\201C";
+font-size: 3em;
+color: #c4960a;
+position: absolute;
+top: -10px;
+left: 10px;
+opacity: 0.3;
 }
-.cita-versiculo p {
-font-size: 18px;
-font-style: italic;
-margin-bottom: 0px;
-}
+.cita-versiculo h3 { color: #b7950b; margin-top: 0; font-size: 1.1em; }
+.cita-versiculo p { font-size: 18px; font-style: italic; margin-bottom: 0; }
 
 /* ============================================
-CAJA DE CONTEXTO
+2. CONTEXTO - Borde completo azul pizarra + fondo gris azulado
 ============================================ */
 .caja-contexto {
-background: linear-gradient(135deg, #f0f5fa 0%, #e5ecf5 100%);
-border: 2px solid #4682b4;
+background: #e8edf4;
+border: 3px solid #3c5a9a;
 border-radius: 10px;
 margin: 25px 0;
 padding: 25px;
 font-size: 0.95em;
 }
-.caja-contexto h3 {
-color: #1a3a5c;
-margin: 0 0 15px 0;
-font-size: 1.2em;
-text-align: center;
-border-bottom: 1px solid #4682b4;
-padding-bottom: 10px;
-}
-.caja-contexto strong { color: #1a3a5c; }
+.caja-contexto h3 { color: #283593; margin: 0 0 15px 0; font-size: 1.2em; text-align: center; }
+.caja-contexto strong { color: #283593; }
 .caja-contexto ul { list-style: none; margin: 0; padding: 0; }
 .caja-contexto li { margin-bottom: 8px; padding-left: 0; }
-.caja-contexto li::before { content: ""; display: none; }
 
 /* ============================================
-CAJAS DE NOTAS ESPECIALES
+3. LINGÜÍSTICA - Fondo rayado + barra naranja
 ============================================ */
-.caja-linguistica { background: linear-gradient(135deg, #fdf6e3, #f5ecd7); border-left: 5px solid #b8860b; border-radius: 0 8px 8px 0; margin: 20px 0; padding: 18px 20px; }
-.caja-linguistica h4 { color: #8b6914; margin: 0 0 10px 0; font-size: 1.05em; }
+.caja-linguistica {
+background: repeating-linear-gradient(45deg, #fffef8, #fffef8 10px, #fff9e8 10px, #fff9e8 20px);
+border-left: 5px solid #e67e00;
+border-radius: 0 6px 6px 0;
+margin: 20px 0;
+padding: 18px 20px;
+}
+.caja-linguistica h4 { color: #c26700; margin: 0 0 10px 0; font-size: 1.05em; }
 .caja-linguistica p { margin: 5px 0; font-size: .97em; }
-.caja-linguistica .palabra-original { font-size: 1.15em; color: #1a3a5c; font-weight: bold; background: rgba(184,134,11,.12); padding: 3px 10px; border-radius: 4px; display: inline-block; margin: 5px 0; direction: rtl; }
+.caja-linguistica .palabra-original { font-size: 1.15em; color: #1a3a5c; font-weight: bold; background: rgba(230,126,0,.12); padding: 3px 10px; border-radius: 4px; display: inline-block; margin: 5px 0; direction: rtl; }
 
-.caja-arqueologica { background: linear-gradient(135deg, #faf5ef, #f0e8db); border-left: 5px solid #a0522d; border-radius: 0 8px 8px 0; margin: 20px 0; padding: 18px 20px; }
-.caja-arqueologica h4 { color: #a0522d; margin: 0 0 10px 0; font-size: 1.05em; }
+/* ============================================
+4. ARQUEOLÓGICA - Borde punteado marrón + fondo arena
+============================================ */
+.caja-arqueologica {
+background: #faf5ed;
+border: 2px dashed #a0724a;
+border-radius: 6px;
+margin: 20px 0;
+padding: 18px 20px;
+}
+.caja-arqueologica h4 { color: #7a4a2a; margin: 0 0 10px 0; font-size: 1.05em; }
 .caja-arqueologica p { margin: 5px 0; font-size: .97em; }
 
-.caja-geografica { background: linear-gradient(135deg, #f0faf5, #e0f5ec); border-left: 5px solid #2e8b57; border-radius: 0 8px 8px 0; margin: 20px 0; padding: 18px 20px; }
-.caja-geografica h4 { color: #2e8b57; margin: 0 0 10px 0; font-size: 1.05em; }
+/* ============================================
+5. GEOGRÁFICA - Borde superior verde grueso + fondo menta
+============================================ */
+.caja-geografica {
+background: #eaf7f0;
+border-top: 5px solid #2e7d55;
+border-radius: 0 0 8px 8px;
+margin: 20px 0;
+padding: 18px 20px;
+}
+.caja-geografica h4 { color: #1e5e3a; margin: 0 0 10px 0; font-size: 1.05em; }
 .caja-geografica p { margin: 5px 0; font-size: .97em; }
 
-.caja-profetica { background: linear-gradient(135deg, #f8f0ff, #f0e6fa); border-left: 5px solid #6b3fa0; border-radius: 0 8px 8px 0; margin: 20px 0; padding: 18px 20px; }
-.caja-profetica h4 { color: #6b3fa0; margin: 0 0 10px 0; font-size: 1.05em; }
+/* ============================================
+6. PROFÉTICA - Doble borde púrpura + fondo lavanda
+============================================ */
+.caja-profetica {
+background: #f5edf8;
+border: 3px double #7b2d8b;
+border-radius: 8px;
+margin: 20px 0;
+padding: 18px 20px;
+}
+.caja-profetica h4 { color: #5c1d6e; margin: 0 0 10px 0; font-size: 1.05em; }
 .caja-profetica p { margin: 5px 0; font-size: .97em; }
 
-.caja-historica { background: linear-gradient(135deg, #f0f5fa, #e5ecf5); border-left: 5px solid #4682b4; border-radius: 0 8px 8px 0; margin: 20px 0; padding: 18px 20px; }
-.caja-historica h4 { color: #4682b4; margin: 0 0 10px 0; font-size: 1.05em; }
+/* ============================================
+7. HISTÓRICA - Barra lateral azul cielo + fondo azul muy pálido
+============================================ */
+.caja-historica {
+background: #eaf2fa;
+border-left: 5px solid #3a7cc3;
+border-radius: 0 6px 6px 0;
+margin: 20px 0;
+padding: 18px 20px;
+}
+.caja-historica h4 { color: #1a5a9a; margin: 0 0 10px 0; font-size: 1.05em; }
 .caja-historica p { margin: 5px 0; font-size: .97em; }
 
-.caja-simbolismo { background: linear-gradient(135deg, #fefce8, #fef3c7); border-left: 5px solid #8b6914; border-radius: 0 8px 8px 0; margin: 20px 0; padding: 18px 20px; }
-.caja-simbolismo h4 { color: #8b6914; margin: 0 0 10px 0; font-size: 1.05em; }
+/* ============================================
+8. SIMBOLISMO - Barra izquierda mostaza + fondo amarillo limón
+============================================ */
+.caja-simbolismo {
+background: #fffef5;
+border-left: 5px solid #d4a800;
+border-radius: 0 6px 6px 0;
+margin: 20px 0;
+padding: 18px 20px;
+}
+.caja-simbolismo h4 { color: #a08000; margin: 0 0 10px 0; font-size: 1.05em; }
 .caja-simbolismo p { margin: 5px 0; font-size: .97em; }
 
 /* ============================================
-CAJAS DE APLICACIÓN, DOCTRINAS Y APOLOGÉTICA
+9. MEDITAR - Borde completo dorado + fondo melocotón
 ============================================ */
-.caja-aplicacion {
-background: linear-gradient(135deg, #e8f8f5, #d1f2eb);
-border: 2px solid #1abc9c;
-border-radius: 8px;
+.caja-meditar {
+background: #fef6e8;
+border: 2px solid #d4980e;
+border-radius: 12px;
 margin: 30px 0;
 padding: 25px;
-position: relative;
 }
-.caja-aplicacion::before {
-content: "\2696";
-font-size: 2em;
-position: absolute;
-top: -15px;
-left: 25px;
-background: #e8f8f5;
-padding: 0 10px;
-}
-.caja-aplicacion h3 {
-color: #117a65;
-margin-top: 10px;
-margin-bottom: 15px;
-font-size: 1.2em;
-text-align: center;
-}
-.caja-aplicacion ul {
-margin-left: 15px;
-list-style-type: none;
-padding: 0;
-}
-.caja-aplicacion li {
-margin-bottom: 14px;
-line-height: 1.7;
-padding-left: 20px;
-position: relative;
-}
-.caja-aplicacion li::before {
-content: "\2713";
-color: #1abc9c;
-font-weight: bold;
-position: absolute;
-left: 0;
-}
-
-.caja-doctrinas {
-background: linear-gradient(135deg, #f4ecf7, #e8daef);
-border: 2px solid #8e44ad;
-border-radius: 8px;
-margin: 30px 0;
-padding: 25px;
-position: relative;
-}
-.caja-doctrinas::before {
-content: "\2720";
-font-size: 2em;
-position: absolute;
-top: -15px;
-left: 25px;
-background: #f4ecf7;
-padding: 0 10px;
-}
-.caja-doctrinas h3 {
-color: #6c3483;
-margin-top: 10px;
-margin-bottom: 15px;
-font-size: 1.2em;
-text-align: center;
-}
-.caja-doctrinas ul {
-margin-left: 15px;
-list-style-type: none;
-padding: 0;
-}
-.caja-doctrinas li {
-margin-bottom: 14px;
-line-height: 1.7;
-padding-left: 20px;
-position: relative;
-}
-.caja-doctrinas li::before {
-content: "\25C6";
-color: #8e44ad;
-position: absolute;
-left: 0;
-}
-.caja-doctrinas strong { color: #4a235a; }
-
-.caja-apologetica {
-background: linear-gradient(135deg, #fdf2f2, #f9e8e8, #f5dede);
-border: 2px solid #922b21;
-border-radius: 8px;
-margin: 30px 0;
-padding: 25px;
-position: relative;
-}
-.caja-apologetica::before {
-content: "\2694";
-font-size: 2em;
-position: absolute;
-top: -15px;
-left: 25px;
-background: #fdf2f2;
-padding: 0 10px;
-}
-.caja-apologetica h3 {
-color: #7b241c;
-margin-top: 10px;
-margin-bottom: 15px;
-font-size: 1.2em;
-text-align: center;
-}
-.caja-apologetica ul {
-margin-left: 15px;
-list-style-type: none;
-padding: 0;
-}
-.caja-apologetica li {
-margin-bottom: 14px;
-line-height: 1.7;
-padding-left: 20px;
-position: relative;
-}
-.caja-apologetica li::before {
-content: "\2694";
-color: #922b21;
-font-size: 0.85em;
-position: absolute;
-left: 0;
-}
-.caja-apologetica strong { color: #641e16; }
+.caja-meditar h3 { color: #b07808; margin-top: 0; margin-bottom: 15px; font-size: 1.2em; text-align: center; }
+.caja-meditar ul { margin-left: 15px; }
+.caja-meditar li { margin-bottom: 12px; line-height: 1.7; }
 
 /* ============================================
-TABLA COMPARATIVA
+10. APLICACIÓN - Esquina cortada + fondo verde agua
 ============================================ */
-.tabla-comparativa {
-width: 100%;
-border-collapse: collapse;
-margin: 25px 0;
-font-size: 0.95em;
-box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-border-radius: 8px;
-overflow: hidden;
+.caja-aplicacion {
+background: #e6f5ec;
+border: 2px solid #2d7d46;
+border-radius: 0 12px 0 12px;
+margin: 30px 0;
+padding: 25px;
 }
-.tabla-comparativa thead {
-background: linear-gradient(135deg, #1a3a5c, #2d4a6c);
-color: #fff;
+.caja-aplicacion h3 { color: #1e5e32; margin-top: 0; margin-bottom: 15px; font-size: 1.2em; text-align: center; }
+.caja-aplicacion ul { margin-left: 15px; }
+.caja-aplicacion li { margin-bottom: 12px; line-height: 1.7; }
+
+/* ============================================
+11. DOCTRINAS - Banda superior gruesa rosa + fondo rosa pálido
+============================================ */
+.caja-doctrinas {
+background: #fce8ef;
+border-top: 5px solid #b01030;
+border-radius: 0 0 8px 8px;
+margin: 30px 0;
+padding: 25px;
 }
-.tabla-comparativa th {
-padding: 14px 18px;
-text-align: left;
-font-weight: bold;
-font-size: 1em;
-border: 1px solid #2d4a6c;
+.caja-doctrinas h3 { color: #8a0a20; margin-top: 0; margin-bottom: 15px; font-size: 1.2em; text-align: center; }
+.caja-doctrinas ul { margin-left: 15px; }
+.caja-doctrinas li { margin-bottom: 12px; line-height: 1.7; }
+.caja-doctrinas strong { color: #b01030; }
+
+/* ============================================
+12. APOLOGÉTICA - Borde izquierdo dentado + fondo salmón
+============================================ */
+.caja-apologetica {
+background: #fef0ec;
+border-left: 6px dotted #c04020;
+border-radius: 0 6px 6px 0;
+margin: 30px 0;
+padding: 25px;
 }
-.tabla-comparativa td {
-padding: 12px 18px;
-border: 1px solid #ddd;
-vertical-align: top;
-}
-.tabla-comparativa tbody tr:nth-child(even) { background-color: #f8f9fa; }
-.tabla-comparativa tbody tr:nth-child(odd) { background-color: #ffffff; }
-.tabla-comparativa tbody tr:hover {
-background-color: #eaf2f8;
-transition: background-color 0.2s;
-}
+.caja-apologetica h3 { color: #a03018; margin-top: 0; margin-bottom: 15px; font-size: 1.2em; text-align: center; }
+.caja-apologetica ul { margin-left: 15px; }
+.caja-apologetica li { margin-bottom: 12px; line-height: 1.7; }
 
 /* ============================================
 ELEMENTOS ADICIONALES
@@ -300,27 +237,6 @@ border: 2px solid #d4ac0d;
 box-shadow: 0 5px 20px rgba(0,0,0,.3);
 }
 
-.caja-meditar {
-background: linear-gradient(135deg, #fef9e7, #fdebd0);
-border: 2px solid #d4ac0d;
-border-radius: 8px;
-margin: 30px 0;
-padding: 25px;
-position: relative;
-}
-.caja-meditar::before {
-content: "\1F64F";
-font-size: 2em;
-position: absolute;
-top: -15px;
-left: 25px;
-background: #fef9e7;
-padding: 0 10px;
-}
-.caja-meditar h3 { color: #b7950b; margin-top: 10px; margin-bottom: 15px; font-size: 1.2em; text-align: center; }
-.caja-meditar ul { margin-left: 15px; }
-.caja-meditar li { margin-bottom: 12px; line-height: 1.7; }
-
 .caja-fuego {
 background: linear-gradient(135deg, #2c0a0a, #4a1010, #2c0a0a);
 border: 2px solid #d4ac0d;
@@ -330,15 +246,7 @@ padding: 20px;
 border-radius: 6px;
 color: #f0e6d0;
 }
-.caja-fuego strong {
-color: #d4ac0d;
-font-size: 1.1em;
-display: block;
-margin-bottom: 10px;
-text-align: center;
-text-transform: uppercase;
-letter-spacing: 1px;
-}
+.caja-fuego strong { color: #d4ac0d; font-size: 1.1em; display: block; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
 .caja-fuego p { margin: 0; font-style: italic; text-align: center; font-size: 1.05em; }
 
 .recuadro-concepto {
@@ -351,7 +259,6 @@ border-radius: 4px;
 .recuadro-concepto strong { color: #1a5276; font-size: 1.1em; display: block; margin-bottom: 5px; }
 
 .separador { text-align: center; margin: 35px 0; color: #d4ac0d; font-size: 1.5em; letter-spacing: 8px; }
-ul { list-style-type: square; margin-left: 20px; }
 
 /* ============================================
 ÍNDICE DE NAVEGACIÓN
@@ -364,126 +271,36 @@ margin-bottom: 40px;
 border-radius: 12px;
 box-shadow: 0 10px 40px rgba(26, 58, 92, 0.3);
 }
-.indice-nav h3 {
-color: #d4ac0d;
-margin-top: 0;
-margin-bottom: 18px;
-font-size: 1.3em;
-font-family: Georgia, serif;
-text-align: center;
-border-bottom: 1px solid rgba(212, 172, 13, 0.4);
-padding-bottom: 12px;
-}
-.indice-nav .punto-principal {
-margin: 0;
-padding: 0;
-list-style: none;
-}
-.indice-nav .punto-principal > li {
-margin-bottom: 4px;
-}
-.indice-nav .punto-principal > li > a {
-color: #ffffff;
-text-decoration: none;
-display: block;
-padding: 9px 0 5px 0;
-border-bottom: 1px dotted rgba(255,255,255,0.3);
-transition: all 0.3s ease;
-font-size: 0.95em;
-}
-.indice-nav .punto-principal > li > a:hover {
-color: #d4ac0d;
-padding-left: 10px;
-}
-.indice-nav .ref-etiqueta {
-color: #d4ac0d;
-font-weight: bold;
-margin-right: 6px;
-font-size: 0.9em;
-}
-.indice-nav .sub-notas {
-margin: 2px 0 8px 0;
-padding: 0;
-list-style: none;
-}
-.indice-nav .sub-notas li { margin: 0; }
-.indice-nav .sub-notas a {
-color: rgba(255, 255, 255, 0.6);
-text-decoration: none;
-display: block;
-padding: 3px 0 3px 18px;
-font-size: 0.82em;
-border-bottom: none;
-transition: all 0.3s ease;
-line-height: 1.4;
-}
-.indice-nav .sub-notas a:hover {
-color: #d4ac0d;
-padding-left: 24px;
-}
-.indice-nav .sub-notas .emoji-tipo { margin-right: 5px; font-size: 0.95em; }
+.indice-nav h3 { color: #d4ac0d; margin-top: 0; margin-bottom: 18px; font-size: 1.3em; text-align: center; border-bottom: 1px solid rgba(212,172,13,0.4); padding-bottom: 12px; }
+.indice-nav .punto-principal { margin: 0; padding: 0; list-style: none; }
+.indice-nav .punto-principal > li { margin-bottom: 4px; }
+.indice-nav .punto-principal > li > a { color: #ffffff; text-decoration: none; display: block; padding: 9px 0 5px 0; border-bottom: 1px dotted rgba(255,255,255,0.3); font-size: 0.95em; transition: all 0.3s ease; }
+.indice-nav .punto-principal > li > a:hover { color: #d4ac0d; padding-left: 10px; }
+.indice-nav .ref-etiqueta { color: #d4ac0d; font-weight: bold; margin-right: 6px; font-size: 0.9em; }
+.indice-nav .sub-notas { margin: 2px 0 8px 0; padding: 0; list-style: none; }
+.indice-nav .sub-notas li { color: rgba(255,255,255,0.7); padding: 3px 0 3px 18px; font-size: 0.82em; line-height: 1.6; }
 
-.volver-indice {
-display: inline-block;
-text-align: right;
-color: #1a3a5c;
-text-decoration: none;
-font-size: 0.9em;
-margin-top: 35px;
-margin-bottom: 25px;
-font-weight: 600;
-font-family: Georgia, serif;
-border-top: 1px dotted #d4ac0d;
-padding-top: 12px;
-transition: all 0.3s ease;
-width: 100%;
-}
+.volver-indice { display: inline-block; text-align: right; color: #1a3a5c; text-decoration: none; font-size: 0.9em; margin-top: 35px; margin-bottom: 25px; font-weight: 600; border-top: 1px dotted #d4ac0d; padding-top: 12px; transition: all 0.3s ease; width: 100%; }
 .volver-indice:hover { color: #d4ac0d; }
 
-/* VIDEO RESPONSIVE CON THUMBNAIL */
+/* VIDEO */
 .contenedor-video { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; margin: 30px 0; border: 3px solid rgb(212,172,13); box-shadow: rgba(0,0,0,.3) 0 8px 20px; background: #000; cursor: pointer; }
 .contenedor-video img.miniatura { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-.contenedor-video .btn-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 48px; background: rgba(212, 172, 13, 0.9); border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .2s; }
-.contenedor-video .btn-play:hover { background: rgba(212, 172, 13, 1); transform: translate(-50%, -50%) scale(1.1); }
+.contenedor-video .btn-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 68px; height: 48px; background: rgba(212,172,13,0.9); border-radius: 12px; border: none; cursor: pointer; }
 .contenedor-video .btn-play::after { content: ''; border-style: solid; border-width: 11px 0 11px 20px; border-color: transparent transparent transparent #fff; margin-left: 4px; }
-.contenedor-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
 /* TOOLTIPS */
-.biblia-ref { position: relative; color: #1a3a5c; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; transition: color .2s; }
-.biblia-ref:hover { color: #c9a227; }
-.biblia-ref .tooltip-text { visibility: hidden; opacity: 0; position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); width: 320px; max-width: 90vw; background: linear-gradient(135deg, #1a3a5c, #2d4a6c); color: #fff; padding: 15px 18px; border-radius: 8px; font-size: .9em; font-weight: normal; line-height: 1.5; text-align: left; font-style: italic; box-shadow: 0 8px 25px rgba(0,0,0,.3); z-index: 1000; transition: opacity .3s, visibility .3s; border: 2px solid #c9a227; }
-.biblia-ref .tooltip-text::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #2d4a6c; }
-.biblia-ref .tooltip-cita { display: block; color: #c9a227; font-weight: bold; font-style: normal; margin-bottom: 8px; font-size: .85em; text-align: center; border-bottom: 1px solid #4a6a8c; padding-bottom: 8px; }
+.biblia-ref { position: relative; color: #1a3a5c; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+.biblia-ref .tooltip-text { visibility: hidden; opacity: 0; position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); width: 320px; background: linear-gradient(135deg, #1a3a5c, #2d4a6c); color: #fff; padding: 15px 18px; border-radius: 8px; font-size: .9em; border: 2px solid #c9a227; z-index: 1000; }
 .biblia-ref:hover .tooltip-text { visibility: visible; opacity: 1; }
+.biblia-ref .tooltip-cita { color: #c9a227; font-weight: bold; display: block; margin-bottom: 8px; border-bottom: 1px solid #4a6a8c; padding-bottom: 8px; }
 
-/* ============================================
-APÉNDICE - FONDO DISTINTIVO
-============================================ */
-#apendice {
-background-color: #e8e8e8;
-padding: 40px 0;
-margin: 40px 0 0 0;
-border-top: 5px solid #d4ac0d;
-border-bottom: 2px solid #d4ac0d;
-box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
-}
-.contenedor-apendice {
-max-width: 800px;
-margin: 0 auto;
-padding: 20px;
-}
+/* APÉNDICE */
+#apendice { background-color: #e8e8e8; padding: 40px 0; margin: 40px 0 0 0; border-top: 5px solid #d4ac0d; border-bottom: 2px solid #d4ac0d; }
+.contenedor-apendice { max-width: 800px; margin: 0 auto; padding: 20px; }
 
 @media (max-width: 768px) {
 .contenedor-blog { padding: 15px; }
 h1.titulo-entrada { font-size: 24px; }
-.destacado-dramatico { padding: 18px 15px; font-size: 1em; }
-.biblia-ref .tooltip-text { position: fixed; bottom: 20px; left: 15px; right: 15px; width: auto; transform: none; max-width: none; max-height: 50vh; overflow-y: auto; }
-.biblia-ref .tooltip-text::after { display: none; }
-.indice-nav { padding: 20px 20px; }
-.indice-nav .punto-principal > li > a { font-size: 0.88em; }
-.indice-nav .sub-notas a { font-size: 0.78em; padding-left: 12px; }
-.indice-nav .sub-notas a:hover { padding-left: 18px; }
-.tabla-comparativa { font-size: 0.85em; }
-.tabla-comparativa th, .tabla-comparativa td { padding: 8px 10px; }
-.contenedor-apendice { padding: 15px; }
+.biblia-ref .tooltip-text { position: fixed; bottom: 20px; left: 15px; right: 15px; width: auto; }
 }

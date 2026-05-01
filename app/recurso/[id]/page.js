@@ -1,8 +1,8 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import '../../estudios.css';
 
-// Obtener el recurso junto con el capítulo y el libro
 async function getRecursoCompleto(id) {
   const { data: recurso, error } = await supabase
     .from('resources')
@@ -25,6 +25,22 @@ export default async function RecursoPage({ params }) {
   const libro = recurso.chapters?.books;
   const capitulo = recurso.chapters;
   const titulo = recurso.titulo || 'Sin título';
+
+  let portadaUrl = null;
+  let contenidoSinPortada = recurso.contenido_html || '';
+
+  if (recurso.modo === 'markdown') {
+    const match = contenidoSinPortada.match(
+      /<div class="imagen-portada"><img alt=".*?" src="(.*?)" \/><\/div>/
+    );
+    if (match) {
+      portadaUrl = match[1];
+      contenidoSinPortada = contenidoSinPortada.replace(
+        /<div class="imagen-portada">.*?<\/div>\n?/,
+        ''
+      );
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] font-['Georgia',serif] text-[#3e2723]">
@@ -67,24 +83,36 @@ export default async function RecursoPage({ params }) {
           )}
 
           {/* Contenido del recurso */}
-          <div className="bg-white p-8 rounded-xl shadow-md text-justify text-[17px] leading-relaxed font-['Georgia',serif] text-[#333] border border-[#d4c4a8]">
-            <h1 className="text-3xl text-[#1a5276] border-b-2 border-[#d4ac0d] pb-3 mb-6 text-center font-['Georgia',serif]">
-              {titulo}
-            </h1>
-
-            {recurso.contenido_html ? (
-              <div
-                className="contenedor-blog"
-                dangerouslySetInnerHTML={{ __html: recurso.contenido_html }}
-              />
-            ) : (
-              <p className="text-center text-[#757575]">Este recurso no tiene contenido disponible aún.</p>
+          <div className="bg-white p-8 rounded-xl shadow-md border border-[#d4c4a8]">
+            {/* Portada (si existe en modo markdown) */}
+            {portadaUrl && (
+              <div className="imagen-portada">
+                <img alt={titulo} src={portadaUrl} />
+              </div>
             )}
-          </div>
 
+            {/* HTML del contenido */}
+            <div
+              className="contenedor-blog"
+              dangerouslySetInnerHTML={{ __html: contenidoSinPortada }}
+            />
+
+            {/* Pie del estudio */}
+            <div className="mt-8 pt-6 border-t border-[#d4ac0d] text-center text-sm text-[#8d6e63] font-['Georgia',serif]">
+              <p className="mb-1">
+                Estudio bíblico de Mahanaim — Recursos Bíblicos
+              </p>
+              <p className="text-xs text-[#9e9e9e]">
+                © {new Date().getFullYear()} Mahanaim &quot;Campamento de Dios&quot;. 
+                Todos los derechos reservados.
+              </p>
+              <p className="text-xs text-[#9e9e9e] mt-1">
+                Este material puede ser compartido libremente citando la fuente.
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Footer */}
         <footer className="text-center py-5 text-sm text-[#8d6e63] border-t border-[#d4c4a8] mt-0 font-['Georgia',serif]">
           © Mahanaim &quot;Campamento de Dios&quot; —{' '}
           <a href="https://mahanaimcampamentodivino.blogspot.com" className="text-[#5d4037] hover:text-[#bf360c]">
