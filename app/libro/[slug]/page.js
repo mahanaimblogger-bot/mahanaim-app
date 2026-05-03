@@ -70,7 +70,8 @@ export default async function LibroPage({ params }) {
   const { libro, capitulos } = data;
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] font-['Georgia',serif] text-[#3e2723]">
+    // Contenedor externo SIN color de fondo (hereda el pergamino del body)
+    <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0 pb-10">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
           {/* Breadcrumb */}

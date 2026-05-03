@@ -304,3 +304,167 @@ box-shadow: 0 10px 40px rgba(26, 58, 92, 0.3);
 h1.titulo-entrada { font-size: 24px; }
 .biblia-ref .tooltip-text { position: fixed; bottom: 20px; left: 15px; right: 15px; width: auto; }
 }
+/* ─── Tablas comparativas ─── */
+.tabla-comparativa {
+  margin: 20px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabla-comparativa table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #3e2723;
+  font-size: 0.7em;
+  min-width: 600px;
+}
+
+.tabla-comparativa th {
+  background: #1a3a5c;
+  color: #d4ac0d;
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 0.7em;
+  border: 1px solid #3e5a7a;
+}
+
+.tabla-comparativa td {
+  padding: 6px 10px;
+  vertical-align: top;
+  line-height: 1.4;
+  font-size: 0.7em;
+  border: 1px solid #d4c4a8;
+}
+/* ============================================================
+   NUEVAS CAJAS DE NOTAS — PROMPT MAESTRO v5.4.1
+   ============================================================ */
+
+/* --- Científica (🔬) --- */
+.caja-cientifica {
+  background: linear-gradient(135deg, #e8f4f8, #d4eaf0);
+  border-left: 5px solid #2c7a9e;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #1a3a5c;
+  font-family: Georgia, serif;
+}
+.caja-cientifica h4 {
+  color: #1a5276;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Teología Sistemática (📋) --- */
+.caja-teologica {
+  background: linear-gradient(135deg, #f3eef9, #e9dff5);
+  border-left: 5px solid #6b3fa0;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-teologica h4 {
+  color: #4a2c7a;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Crítica Textual (📝) --- */
+.caja-critica {
+  background: linear-gradient(135deg, #f5f0e8, #efe6d9);
+  border-left: 5px solid #7a5a3a;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-critica h4 {
+  color: #5d3e2e;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Pactos (🏹) --- */
+.caja-pactual {
+  background: linear-gradient(135deg, #fdf6e8, #f8ecd4);
+  border-left: 5px solid #b8860b;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-pactual h4 {
+  color: #8b6914;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Estructura Literaria (📐) --- */
+.caja-estructura {
+  background: linear-gradient(135deg, #fafafa, #f0f0f0);
+  border-left: 5px solid #555;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-estructura h4 {
+  color: #333;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Escatológica (🌅) --- */
+.caja-escatologica {
+  background: linear-gradient(135deg, #fef9e7, #fdebd0);
+  border-left: 5px solid #d4ac0d;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-escatologica h4 {
+  color: #b7950b;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Historia de la Interpretación (📚) --- */
+.caja-historia-interpretacion {
+  background: linear-gradient(135deg, #fdf5f0, #fae8dc);
+  border-left: 5px solid #a0522d;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-historia-interpretacion h4 {
+  color: #7a3e1f;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+/* --- Referencias Cruzadas (🔗) --- */
+.caja-referencias {
+  background: linear-gradient(135deg, #f0f5fa, #e0eaf5);
+  border-left: 5px solid #1a5276;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  padding: 18px 20px;
+  color: #3e2723;
+  font-family: Georgia, serif;
+}
+.caja-referencias h4 {
+  color: #1a3a5c;
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}

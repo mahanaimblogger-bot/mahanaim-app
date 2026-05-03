@@ -59,7 +59,7 @@ export default async function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] font-['Georgia',serif] text-[#3e2723]">
+    <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0 pb-10">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
           {/* Banner */}
@@ -95,7 +95,6 @@ export default async function Home() {
               <div className="flex flex-wrap gap-3">
                 {slugs.map((slug) => {
                   const libro = booksBySlug[slug];
-                  // Si no existe, damos null; BookCard mostrará placeholder
                   return <BookCard key={slug} book={libro || null} />;
                 })}
               </div>

@@ -1,33 +1,30 @@
-'use client';
-
-import Link from 'next/link';
+"use client";
+import Link from "next/link";
 
 export default function BookCard({ book }) {
-  // Si no hay datos del libro, mostramos un placeholder (evita crashear)
-  if (!book) {
-    return (
-      <div className="block bg-[#f5f5f5] border-2 border-[#e0e0e0] rounded-lg p-5 text-center cursor-default opacity-60">
-        <p className="text-[15px] font-bold text-[#9e9e9e] font-['Georgia',serif] mb-1">
-          Libro no disponible
-        </p>
-        <p className="text-[12px] text-[#9e9e9e] font-['Times_New_Roman',serif]">
-          —
-        </p>
-      </div>
-    );
-  }
-
   return (
     <Link
       href={`/libro/${book.slug}`}
-      className="block bg-white border-2 border-[#d4c4a8] rounded-lg p-5 text-center transition-all duration-200 hover:border-[#d4ac0d] hover:shadow-md hover:-translate-y-1 cursor-pointer"
+      className="block group rounded-xl bg-[#0f1e2c] border border-[#d4ac0d]/10 hover:border-[#d4ac0d]/30 p-6 transition-all hover:shadow-lg hover:shadow-[#d4ac0d]/5"
     >
-      <p className="text-[15px] font-bold text-[#1a5276] font-['Georgia',serif] mb-1">
+      {/* Nombre en español */}
+      <h3 className="text-xl font-semibold text-[#fdfbf7] group-hover:text-[#d4ac0d] transition-colors font-serif">
         {book.nombre}
-      </p>
-      <p className="text-[12px] text-[#757575] font-['Times_New_Roman',serif] dir-rtl">
-        {book.nombre_original || book.nombre}
-      </p>
+      </h3>
+
+      {/* Nombre original (hebreo/griego) */}
+      {book.nombre_original && (
+        <p className="mt-2 text-base font-normal text-[#d4ac0d]/70 italic tracking-wide font-serif">
+          {book.nombre_original}
+        </p>
+      )}
+
+      {/* Sección bíblica (opcional) */}
+      {book.seccion && (
+        <p className="mt-3 text-xs uppercase tracking-widest text-[#d4ac0d]/50">
+          {book.seccion}
+        </p>
+      )}
     </Link>
   );
 }
