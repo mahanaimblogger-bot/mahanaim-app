@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import '../../estudios.css';
+import ScriptExecutor from './ScriptExecutor';
 
 async function getRecursoCompleto(id) {
   const { data: recurso, error } = await supabase
@@ -92,10 +93,7 @@ export default async function RecursoPage({ params }) {
             )}
 
             {/* HTML del contenido */}
-            <div
-              className="contenedor-blog"
-              dangerouslySetInnerHTML={{ __html: contenidoSinPortada }}
-            />
+            <ScriptExecutor htmlContent={contenidoSinPortada} />
 
             {/* Pie del estudio */}
             <div className="mt-8 pt-6 border-t border-[#d4ac0d] text-center text-sm text-[#8d6e63] font-['Georgia',serif]">
