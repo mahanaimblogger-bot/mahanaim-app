@@ -107,51 +107,37 @@ Usá el siguiente formato de ejemplo, REEMPLAZANDO toda la información de ejemp
   <h1 class="titulo-entrada">Ficha de Personaje: [Nombre del Personaje]</h1>
 
   <h2 class="subtitulo">📜 Nombre y Etimología</h2>
-  <p>[Nombre en español y en hebreo/griego, significado, raíz lingüística. Ej: Adán (אָדָם, 'Adam') significa 'hombre', 'humanidad' o 'rojo', derivado de adamá (אֲדָמָה, 'tierra').]</p>
+  <p>[Nombre en español y en hebreo/griego, significado, raíz lingüística.]</p>
 
   <h2 class="subtitulo">👨‍👩‍👦 Familia y Origen</h2>
   <ul>
-    <li><strong>Padre:</strong> [Nombre o 'No registrado'/'Creado directamente por Dios']</li>
+    <li><strong>Padre:</strong> [Nombre o 'Creado directamente por Dios']</li>
     <li><strong>Madre:</strong> [Nombre o 'No registrada']</li>
     <li><strong>Esposa(s):</strong> [Nombre(s)]</li>
     <li><strong>Hijos:</strong> [Nombres]</li>
-    <li><strong>Tribu:</strong> [Tribu o 'No aplica']</li>
-    <li><strong>Lugar de origen:</strong> [Lugar]</li>
   </ul>
 
-  <h2 class="subtitulo">⏳ Cronología Aproximada</h2>
-  <p>[Período histórico, años aproximados. Ej: "Era Patriarcal, aproximadamente 4000 a.C."]</p>
+  <h2 class="subtitulo">⏳ Cronología</h2>
+  <p>[Período aproximado]</p>
 
-  <h2 class="subtitulo">📖 Eventos Clave de su Vida</h2>
+  <h2 class="subtitulo">📖 Eventos Clave</h2>
   <ol>
-    <li><strong>[Nombre del evento]:</strong> [Descripción breve con referencia bíblica. Ej: "Creación de la mujer (Génesis 2:21-25)"]</li>
-    <li><strong>[Nombre del evento]:</strong> [Descripción breve con referencia bíblica]</li>
-    <!-- Agregar 3-5 eventos clave -->
+    <li><strong>[Evento]:</strong> [Descripción]</li>
   </ol>
 
   <h2 class="subtitulo">🙏 Análisis Espiritual</h2>
-  <p><strong>Fortalezas:</strong> [Describir sus virtudes y actos de fe. Ej: "Caminó con Dios en el huerto antes de la caída."]</p>
-  <p><strong>Debilidades y pecados:</strong> [Describir sus fallos. Ej: "Desobedeció el mandato divino de no comer del árbol."]</p>
-  <p><strong>Relación con Dios:</strong> [Cómo fue su trato con Dios. Ej: "Experimentó comunión directa, pero también el juicio y la expulsión."]</p>
+  <p><strong>Fortalezas:</strong> [Texto]</p>
+  <p><strong>Debilidades:</strong> [Texto]</p>
 
-  <h2 class="subtitulo">✝️ Conexión con Cristo / Tipología</h2>
-  <p>[Explicar si el personaje es un tipo de Cristo, aparece en Su genealogía, o anticipa Su obra redentora. Ej: "Adán es 'figura del que había de venir' (Romanos 5:14). Por el primer Adán entró el pecado y la muerte; por el postrer Adán, Cristo, la justicia y la vida eterna (1 Corintios 15:45-49)."]</p>
+  <h2 class="subtitulo">✝️ Conexión con Cristo</h2>
+  <p>[Tipología o referencia]</p>
 
-  <h2 class="subtitulo">📚 Referencias Bíblicas Clave</h2>
+  <h2 class="subtitulo">📚 Referencias Clave</h2>
   <ul>
-    <li>[Referencia 1 - Ej: Génesis 2:7-25]</li>
-    <li>[Referencia 2 - Ej: Génesis 3]</li>
-    <li>[Referencia 3 - Ej: Romanos 5:12-21]</li>
+    <li>[Ref 1]</li>
+    <li>[Ref 2]</li>
   </ul>
-</div>
-
-**REGLAS ESTRICTAS:**
-- No uses emojis en los títulos (solo en los subtítulos donde ya están).
-- Usá SOLO las clases HTML proporcionadas (contenedor-blog, titulo-entrada, subtitulo...).
-- NUNCA uses backticks (comillas invertidas) ni formateo Markdown dentro del HTML.
-- Asegurate de que todo el HTML sea válido y esté correctamente cerrado.
-- Usá referencias bíblicas exactas (Libro Capítulo:Versículo) y texto de la RVR1960.
-- Si algún dato no es bíblico o no se sabe, indicá "No registrado".`;
+</div>`;
 
         case "glosario":
           return `Generá un glosario de términos bíblicos en HTML para ${ctxStr}.
@@ -161,21 +147,33 @@ Devolvé SOLO un objeto JSON:
 {
   "tipo": "glosario",
   "titulo": "Glosario: ${ctx.libro} ${ctx.cap}",
-  "contenido_html": "[HTML con al menos 5 términos]"
-}`;
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
 
-        case "devocional":
-          return `Generá un devocional completo para ${ctxStr}.
-Título: "${titulo || `Devocional de ${ctxStr}`}"
-Tema: ${tema || "el mensaje central del capítulo"}${extraLine}
+**ESTRUCTURA DEL GLOSARIO (DEBE CONTENER AL MENOS 5 TÉRMINOS):**
+Usá EXACTAMENTE este formato:
 
-Devolvé SOLO un objeto JSON:
-{
-  "tipo": "devocional",
-  "titulo": "...",
-  "contenido_html": "[reflexión]",
-  "aplicacion_html": "[aplicación]"
-}`;
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">Glosario de Términos: ${ctx.libro} ${ctx.cap}</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Palabras clave del capítulo con su significado original y contextual.</p>
+
+  <!-- Repetí este bloque por cada término -->
+  <div class="apendice-nota" style="margin-bottom:18px;">
+    <h4 style="color:#1a5276; margin-bottom:4px; border-bottom:1px dotted #d4ac0d; padding-bottom:4px;">
+      <span class="palabra-original">[PALABRA ORIGINAL]</span> — <strong>[Transliteración]</strong>
+    </h4>
+    <p><strong>Significado:</strong> [Definición]</p>
+    <p><strong>Contexto bíblico:</strong> [Explicación de cómo se usa en el capítulo y en otras partes de la Biblia]</p>
+  </div>
+  <!-- Fin del bloque por término -->
+
+</div>
+
+**REGLAS:**
+- Incluí al menos 5 términos relevantes.
+- Asegurate de que las palabras originales sean correctas (hebreo/griego).
+- No uses emojis en los títulos.
+- Todo el HTML debe estar dentro del string "contenido_html".`;
 
         case "hoja":
           return `Generá una hoja de trabajo para ${ctxStr}.
@@ -185,8 +183,59 @@ Tema: ${tema || "el capítulo completo"}${extraLine}
 Devolvé SOLO un objeto JSON:
 {
   "tipo": "hoja",
+  "titulo": "[TÍTULO]",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DE LA HOJA DE TRABAJO:**
+Usá EXACTAMENTE este formato:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO DE LA HOJA]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Hoja de trabajo para ${ctx.libro} ${ctx.cap}</p>
+
+  <h2 class="subtitulo">📖 Preguntas de Comprensión</h2>
+  <ol>
+    <li>[Pregunta 1]</li>
+    <li>[Pregunta 2]</li>
+    <li>[Pregunta 3]</li>
+    <li>[Pregunta 4]</li>
+    <li>[Pregunta 5]</li>
+  </ol>
+
+  <h2 class="subtitulo">💭 Reflexión Personal</h2>
+  <ol>
+    <li>[Pregunta reflexiva 1]</li>
+    <li>[Pregunta reflexiva 2]</li>
+    <li>[Pregunta reflexiva 3]</li>
+  </ol>
+
+  <h2 class="subtitulo">🔍 Búsqueda Bíblica</h2>
+  <ol>
+    <li>[Actividad 1: buscar y leer un pasaje relacionado]</li>
+    <li>[Actividad 2]</li>
+  </ol>
+
+  <h2 class="subtitulo">✝️ Conexión con el Nuevo Testamento</h2>
+  <p>[Párrafo que explique cómo este capítulo se conecta con el evangelio o la vida cristiana]</p>
+</div>
+
+**REGLAS:**
+- 5 preguntas de comprensión, 3 de reflexión, 2 de búsqueda, 1 de conexión con el NT.
+- No uses emojis en los títulos principales.
+- Todo el HTML debe estar dentro del string "contenido_html".`;
+
+        case "devocional":
+          return `Generá un devocional completo para ${ctxStr}.
+Título: "${titulo || `Devocional de ${ctxStr}`}"
+Tema principal: ${tema || "el mensaje central del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON:
+{
+  "tipo": "devocional",
   "titulo": "...",
-  "contenido_html": "[HTML con actividades]"
+  "contenido_html": "[reflexión]",
+  "aplicacion_html": "[aplicación]"
 }`;
 
         case "plan":
