@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { marked } from 'marked';
+import AsistenteModal from '../AsistenteModal';
 
 export default function NuevoRecursoPage() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function NuevoRecursoPage() {
   const [contenidoHtml, setContenidoHtml] = useState('');
   const [markdownText, setMarkdownText] = useState('');
   const [portadaUrl, setPortadaUrl] = useState('');
+  const [showAsistente, setShowAsistente] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -41,7 +43,7 @@ export default function NuevoRecursoPage() {
     setLoading(true);
     const { data: booksData } = await supabase
       .from('books')
-      .select('id, nombre')
+      .select('id, nombre, slug')
       .order('orden', { ascending: true });
     if (booksData) setBooks(booksData);
     setLoading(false);
@@ -135,6 +137,14 @@ export default function NuevoRecursoPage() {
             <a href="/admin/recursos" className="text-[#1a5276] hover:text-[#d4ac0d] text-lg">←</a>
             <h2 className="text-2xl font-bold text-[#1a5276]">Nuevo Recurso</h2>
           </div>
+
+          {/* Botón del asistente */}
+          <button
+            onClick={() => setShowAsistente(true)}
+            className="bg-[#d4ac0d] text-[#1a3a5c] border-2 border-[#1a3a5c] px-5 py-2 rounded-lg font-bold hover:bg-[#e8c96d] transition mb-2"
+          >
+            ✨ Generar recurso con IA (Asistente)
+          </button>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
@@ -261,6 +271,17 @@ export default function NuevoRecursoPage() {
             </div>
           </form>
         </div>
+
+        {showAsistente && (
+          <AsistenteModal
+            books={books}
+            chapters={chapters}
+            selectedBook={selectedBook}
+            selectedChapter={selectedChapter}
+            onClose={() => setShowAsistente(false)}
+            onResourceCreated={() => router.push('/admin/recursos')}
+          />
+        )}
       </main>
     </div>
   );
