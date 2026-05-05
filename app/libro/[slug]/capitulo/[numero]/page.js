@@ -2,13 +2,17 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-// ─── Iconos y etiquetas (mismos que el proyecto antiguo) ───
+// ─── Iconos y etiquetas (actualizado con nuevos tipos) ───
 const icons = {
   estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
   imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
   cronologia: '⏳', personaje: '👤', glosario: '📚',
   himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
-  hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭'
+  hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
+  // Nuevos recursos automáticos
+  reflexion: '🤔',
+  paralelos: '⛓️',
+  palabras_clave: '🔤'
 };
 
 const labels = {
@@ -21,12 +25,15 @@ const labels = {
   enlace: 'Recurso Externo', quiz: 'Cuestionario',
   devocional: 'Devocional', hoja: 'Hoja de Trabajo',
   testimonio: 'Testimonio', exegesis: 'Comentario Exegético',
-  plan: 'Plan de Lectura'
+  plan: 'Plan de Lectura',
+  // Nuevos recursos automáticos
+  reflexion: 'Preguntas de Reflexión',
+  paralelos: 'Paralelos Bíblicos',
+  palabras_clave: 'Estudio de Palabras Clave'
 };
 
 // ─── Obtener libro, capítulo y recursos ───
 async function getRecursos(slug, numero) {
-  // 1. Buscar libro
   const { data: libro, error: errorLibro } = await supabase
     .from('books')
     .select('*')
@@ -35,7 +42,6 @@ async function getRecursos(slug, numero) {
 
   if (errorLibro || !libro) return null;
 
-  // 2. Buscar capítulo
   const { data: capitulo, error: errorCapitulo } = await supabase
     .from('chapters')
     .select('*')
@@ -45,7 +51,6 @@ async function getRecursos(slug, numero) {
 
   if (errorCapitulo || !capitulo) return null;
 
-  // 3. Buscar recursos asociados
   const { data: recursos, error: errorRecursos } = await supabase
     .from('resources')
     .select('*')
@@ -64,7 +69,7 @@ function ResourceCard({ recurso }) {
 
   return (
     <Link
-      href={`/recurso/${recurso.id}`}   // esto lo crearemos más adelante
+      href={`/recurso/${recurso.id}`}
       className="bg-white border-2 border-[#e8e8e8] rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:border-[#d4ac0d] hover:shadow-[0_10px_30px_rgba(26,58,92,0.15)] hover:-translate-y-1 flex flex-col items-center gap-3"
     >
       <span className="text-5xl">{icon}</span>

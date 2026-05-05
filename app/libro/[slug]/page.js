@@ -2,75 +2,114 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-// Obtener libro y capítulos desde Supabase
+// Mismo mapeo de iconos
+const icons = {
+  estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
+  imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
+  cronologia: '⏳', personaje: '👤', glosario: '📚',
+  himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
+  hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
+  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤'
+};
+
 async function getLibroYCapitulos(slug) {
-  // Buscar libro por slug
   const { data: libro, error: errorLibro } = await supabase
     .from('books')
     .select('*')
     .eq('slug', slug)
     .single();
-
   if (errorLibro || !libro) return null;
 
-  // Buscar capítulos ordenados
   const { data: capitulos, error: errorCapitulos } = await supabase
     .from('chapters')
     .select('*')
     .eq('book_id', libro.id)
     .order('numero', { ascending: true });
-
   if (errorCapitulos) return { libro, capitulos: [] };
 
-  return { libro, capitulos };
+  const chapterIds = capitulos.map(c => c.id);
+  const { data: recursos } = await supabase
+    .from('resources')
+    .select('chapter_id, tipo')
+    .eq('publicado', true)
+    .in('chapter_id', chapterIds);
+
+  const recursosPorCapitulo = {};
+  if (recursos) {
+    recursos.forEach(r => {
+      if (!recursosPorCapitulo[r.chapter_id]) {
+        recursosPorCapitulo[r.chapter_id] = { tipos: new Set(), total: 0 };
+      }
+      recursosPorCapitulo[r.chapter_id].tipos.add(r.tipo);
+      recursosPorCapitulo[r.chapter_id].total++;
+    });
+  }
+
+  const capitulosConRecursos = capitulos.map(cap => ({
+    ...cap,
+    tiposRecursos: recursosPorCapitulo[cap.id] ? Array.from(recursosPorCapitulo[cap.id].tipos) : [],
+    totalRecursos: recursosPorCapitulo[cap.id] ? recursosPorCapitulo[cap.id].total : 0
+  }));
+
+  return { libro, capitulos: capitulosConRecursos };
 }
 
-// Tarjeta de capítulo (cliente)
 function ChapterCard({ capitulo, libroSlug }) {
+  const { numero, tiposRecursos, totalRecursos, resumen } = capitulo;
+  
+  // Mostrar hasta 6 iconos más grandes (tamaño 2xl en lugar de base)
+  const iconosMostrar = tiposRecursos.slice(0, 6).map(tipo => icons[tipo] || '📄');
+  const hayMas = tiposRecursos.length > 6;
+
   return (
     <Link
-      href={`/libro/${libroSlug}/capitulo/${capitulo.numero}`}
-      className="flex items-center gap-4 bg-white border-2 border-[#e8e8e8] rounded-lg p-4 mb-3.5 transition-all duration-200 hover:border-[#d4ac0d] hover:shadow-[0_4px_15px_rgba(26,58,92,0.1)] hover:translate-x-1.5"
+      href={`/libro/${libroSlug}/capitulo/${numero}`}
+      className="block bg-white border-2 border-[#e8e8e8] rounded-lg p-4 transition-all duration-200 hover:border-[#d4ac0d] hover:shadow-[0_4px_15px_rgba(26,58,92,0.1)] hover:translate-x-1"
     >
-      {/* Círculo con número del capítulo */}
-      <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-[#1a3a5c] to-[#2d5a3d] text-[#d4ac0d] text-xl font-bold">
-        {capitulo.numero}
-      </div>
+      <div>
+        {/* Título Capítulo X (sin círculo) */}
+        <h3 className="text-lg font-bold text-[#1a5276] font-['Georgia',serif] m-0 mb-2">
+          Capítulo {numero}
+        </h3>
 
-      {/* Información */}
-      <div className="flex-1 min-w-0">
-        <p className="text-base font-bold text-[#1a5276] font-['Georgia',serif] m-0">
-          Capítulo {capitulo.numero}
-        </p>
-        {capitulo.resumen && (
-          <p className="text-xs text-[#757575] mt-1 line-clamp-2">
-            {capitulo.resumen}
+        {/* Resumen (si existe) */}
+        {resumen && (
+          <p className="text-xs text-[#757575] mt-1 mb-2 line-clamp-2">
+            {resumen}
           </p>
         )}
-        <p className="text-xs text-[#757575] mt-1">
-          Recursos disponibles
-        </p>
+        
+        {/* Iconos grandes de recursos y contador */}
+        {totalRecursos === 0 ? (
+          <p className="text-sm text-gray-400 italic mt-1">Sin recursos aún</p>
+        ) : (
+          <div className="mt-1">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="text-3xl flex items-center gap-1.5">
+                {iconosMostrar.map((icon, idx) => (
+                  <span key={idx} className="inline-block">{icon}</span>
+                ))}
+                {hayMas && <span className="text-sm text-gray-500 ml-1">+{tiposRecursos.length - 6}</span>}
+              </span>
+            </div>
+            <span className="text-xs text-[#757575]">
+              {totalRecursos} recurso{totalRecursos !== 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
       </div>
-
-      {/* Flecha dorada */}
-      <span className="text-[#d4ac0d] text-lg flex-shrink-0">›</span>
     </Link>
   );
 }
 
-// Página principal del libro
 export default async function LibroPage({ params }) {
   const { slug } = await params;
   const data = await getLibroYCapitulos(slug);
-
-  if (!data) {
-    notFound();
-  }
+  if (!data) notFound();
 
   const { libro, capitulos } = data;
 
   return (
-    // Contenedor externo SIN color de fondo (hereda el pergamino del body)
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0 pb-10">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
@@ -94,7 +133,7 @@ export default async function LibroPage({ params }) {
             ← Volver a libros
           </Link>
 
-          {/* Encabezado de sección */}
+          {/* Encabezado */}
           <div className="flex items-center gap-2.5 mb-6 pb-3 border-b-2 border-[#d4ac0d]">
             <span className="text-2xl">📑</span>
             <h2 className="text-[#1a5276] text-xl font-bold font-['Georgia',serif] m-0">
@@ -102,24 +141,16 @@ export default async function LibroPage({ params }) {
             </h2>
           </div>
 
-          {/* Lista de capítulos */}
+          {/* Grid de capítulos: 2 columnas */}
           {capitulos.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-[#757575] text-lg">
-                Aún no hay capítulos disponibles para este libro.
-              </p>
-              <p className="text-[#9e9e9e] text-sm mt-2">
-                Estamos trabajando en agregar contenido pronto.
-              </p>
+              <p className="text-[#757575] text-lg">Aún no hay capítulos disponibles.</p>
+              <p className="text-[#9e9e9e] text-sm mt-2">Estamos trabajando en agregar contenido pronto.</p>
             </div>
           ) : (
-            <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {capitulos.map((cap) => (
-                <ChapterCard
-                  key={cap.id}
-                  capitulo={cap}
-                  libroSlug={libro.slug}
-                />
+                <ChapterCard key={cap.id} capitulo={cap} libroSlug={libro.slug} />
               ))}
             </div>
           )}

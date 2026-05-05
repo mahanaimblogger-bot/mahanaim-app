@@ -9,7 +9,9 @@ const TIPOS = [
   { id: "glosario", icon: "📚", label: "Glosario de Términos" },
   { id: "devocional", icon: "✍️", label: "Devocional" },
   { id: "hoja", icon: "🖨️", label: "Hoja de Trabajo" },
-  { id: "plan", icon: "🧭", label: "Plan de Lectura" },
+  { id: "reflexion", icon: "💭", label: "Preguntas de Reflexión" },
+  { id: "paralelos", icon: "🔗", label: "Paralelos Bíblicos" },
+  { id: "palabras_clave", icon: "📖", label: "Estudio de Palabras Clave" },
 ];
 
 const C = {
@@ -49,6 +51,7 @@ export default function AsistenteModal({
   const [personajes, setPersonajes] = useState("");
   const [numDias, setNumDias] = useState("7");
   const [numPreguntas, setNumPreguntas] = useState("5");
+  const [numTerminos, setNumTerminos] = useState("5");
 
   const [generando, setGenerando] = useState(false);
   const [generado, setGenerado] = useState(null);
@@ -58,8 +61,7 @@ export default function AsistenteModal({
   const [guardando, setGuardando] = useState(false);
 
   const tipoInfo = TIPOS.find((t) => t.id === tipo);
-    // Instrucción común reforzada para todos los prompts
-    const REGLA_ORTOGRAFIA =
+  const REGLA_ORTOGRAFIA =
     "**⛔ REGLA ABSOLUTA DE CORRECCIÓN ⛔**\n" +
     "Antes de entregar el texto final, REALIZÁ UNA REVISIÓN COMPLETA de todo lo escrito y CORREGÍ los siguientes errores comunes:\n\n" +
     "- Palabras mal escritas o con letras faltantes/sobrantes.\n" +
@@ -68,6 +70,7 @@ export default function AsistenteModal({
     "- Nombres propios, ciudades y términos bíblicos mal escritos.\n" +
     "- Comillas, paréntesis o signos mal cerrados.\n\n" +
     "El texto DEBE estar en ESPAÑOL PERFECTO. No se aceptarán errores tipográficos ni ortográficos.\n\n";
+
   const buildPrompt = useCallback(
     (extra = "") => {
       const ctxStr = `${ctx.libro} capítulo ${ctx.cap}`;
@@ -198,8 +201,8 @@ Usá EXACTAMENTE este formato:
 - Asegurate de que el JSON sea válido y no contenga comillas mal escapadas.
 - Si usas comillas dobles dentro del HTML, escapalas con \\" para que el JSON sea válido.`;
 
-       case "hoja":
-  return `Generá una hoja de trabajo seria y exegética para ${ctxStr}.
+        case "hoja":
+          return `Generá una hoja de trabajo seria y exegética para ${ctxStr}.
 Título: "${titulo || `Hoja de trabajo: ${ctxStr}`}"
 Tema: ${tema || "análisis profundo del capítulo"}${extraLine}
 
@@ -259,7 +262,7 @@ Usá EXACTAMENTE este HTML, reemplazando solo los corchetes [] y su contenido po
 - Asegurate de que el JSON sea válido. Si usas comillas dobles dentro del HTML, escapalas con \\".`;
 
         case "devocional":
-  return `Generá un devocional profundo y profesional para ${ctxStr}.
+          return `Generá un devocional profundo y profesional para ${ctxStr}.
 Título: "${titulo || `Devocional: ${ctxStr}`}"
 Tema principal: ${tema || "el mensaje central del capítulo"}${extraLine}
 
@@ -327,11 +330,92 @@ Devolvé SOLO un objeto JSON:
   "dias": [...]
 }`;
 
+        // ================= NUEVOS RECURSOS =================
+        case "reflexion":
+          return `Generá una lista de preguntas de reflexión personal y aplicativa sobre ${ctxStr}.
+Título: "${titulo || `Preguntas de Reflexión: ${ctxStr}`}"
+Tema: ${tema || "el mensaje central del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con la siguiente estructura:
+{
+  "tipo": "reflexion",
+  "titulo": "Preguntas de Reflexión: ${ctx.libro} ${ctx.cap}",
+  "preguntas": [
+    "Pregunta de reflexión 1...",
+    "Pregunta de reflexión 2...",
+    "Pregunta de reflexión 3...",
+    "Pregunta de reflexión 4...",
+    "Pregunta de reflexión 5..."
+  ]
+}
+
+Reglas:
+- Entre 5 y 7 preguntas.
+- Preguntas abiertas (no de sí/no).
+- Conectan el texto bíblico con la vida actual.
+- Incluir una pregunta final de acción concreta.
+- Lenguaje pastoral y cálido.
+- Máxima calidad ortográfica.`;
+
+        case "paralelos":
+          return `Generá referencias cruzadas (paralelos bíblicos) relevantes para ${ctxStr}.
+Título: "${titulo || `Paralelos Bíblicos de ${ctxStr}`}"
+Tema: ${tema || "el contenido del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura:
+{
+  "tipo": "paralelos",
+  "titulo": "Paralelos Bíblicos: ${ctx.libro} ${ctx.cap}",
+  "paralelos": [
+    {
+      "referencia": "Génesis 1:1",
+      "texto_cita": "En el principio creó Dios los cielos y la tierra.",
+      "explicacion": "Conexión con la creación..."
+    }
+  ]
+}
+
+REGLAS IMPORTANTES:
+- Máximo 6 paralelos.
+- Incluir paralelos en el Antiguo y Nuevo Testamento cuando sea posible.
+- El campo "texto_cita" debe contener el texto bíblico exacto según la versión RVR1960 (o una parte relevante del versículo).
+- La explicación debe conectar teológica o temáticamente el pasaje citado con ${ctx.libro} ${ctx.cap}.
+- Cada explicación debe ser clara y concisa (2-3 líneas).
+- Máxima calidad ortográfica y fidelidad al texto bíblico.`;
+
+        case "palabras_clave":
+          return `Generá un estudio de palabras clave en hebreo/griego para ${ctxStr}.
+Título: "${titulo || `Estudio de Palabras Clave: ${ctxStr}`}"
+Tema: ${tema || "términos teológicos importantes del capítulo"}
+Cantidad de términos: ${numTerminos}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura:
+{
+  "tipo": "palabras_clave",
+  "titulo": "Estudio de Palabras Clave: ${ctx.libro} ${ctx.cap}",
+  "terminos": [
+    {
+      "termino_original": "אֱלֹהִים",
+      "transliteracion": "Elohim",
+      "strong": "H430",
+      "significado": "Dios, dioses, jueces, divino",
+      "contexto": "Uso en el capítulo y significado teológico..."
+    }
+  ]
+}
+
+Reglas:
+- Entre ${numTerminos} y ${numTerminos} términos (la cantidad exacta solicitada).
+- Para el AT usar hebreo, para el NT usar griego (indicar idioma).
+- Incluir número de Strong (si no se conoce, escribir "No disponible").
+- El contexto debe explicar cómo la palabra enriquece la comprensión del pasaje.
+- Priorizar términos con riqueza teológica.`;
+
         default:
           return "";
       }
     },
-    [tipo, ctx, titulo, tema, personajes, numDias, numPreguntas]
+    [tipo, ctx, titulo, tema, personajes, numDias, numPreguntas, numTerminos]
   );
 
   const generarConIA = useCallback(
@@ -384,58 +468,143 @@ Devolvé SOLO un objeto JSON:
     [buildPrompt, tipo, titulo, tipoInfo]
   );
 
-  const formatQuizInteractivo = (json) => {
+  // Formateadores específicos para nuevos tipos
+  const formatReflexionHtml = (json) => {
     const preguntas = json.preguntas || [];
-    if (preguntas.length === 0) return `<h2>${json.titulo || "Cuestionario"}</h2><p>No se encontraron preguntas.</p>`;
+    if (preguntas.length === 0) return `<div class="contenedor-blog"><p>No se generaron preguntas.</p></div>`;
 
-    let html = `<div class="quiz-interactivo">`;
-    html += `<h2>${json.titulo || "Cuestionario"}</h2>`;
-
-    preguntas.forEach((p, i) => {
-      const preguntaTexto = p.pregunta || "Pregunta sin texto";
-      html += `<div class="quiz-pregunta" data-pregunta="${i}">`;
-      html += `<p><strong>${i + 1}. ${preguntaTexto}</strong></p><ul class="quiz-opciones">`;
-
-      const opciones = p.opciones || [];
-      opciones.forEach((op, j) => {
-        const opcionTexto = op.texto || op.text || "Opción sin texto";
-        const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
-        html += `<li><label><input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}"> ${opcionTexto}</label></li>`;
-      });
-
-      html += `</ul></div>`;
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Preguntas de Reflexión")}</h1>`;
+    html += `<ol class="list-decimal pl-6 space-y-4" style="margin-top: 1rem;">`;
+    preguntas.forEach((p) => {
+      html += `<li class="text-gray-700 leading-relaxed">${escapeHtml(p)}</li>`;
     });
-
-    html += `<button class="quiz-verificar" style="margin-top:20px; padding:10px 20px; background:#1a3a5c; color:#d4ac0d; border:2px solid #d4ac0d; border-radius:8px; cursor:pointer; font-family:Georgia,serif; font-weight:bold;">Verificar respuestas</button>`;
-    html += `<div class="quiz-resultado" style="margin-top:16px; font-weight:bold; font-family:Georgia,serif;"></div>`;
-
-    html += `<script>
-      (function() {
-        const btn = document.querySelector('.quiz-verificar');
-        const resultado = document.querySelector('.quiz-resultado');
-        if (!btn || !resultado) return;
-
-        btn.addEventListener('click', function() {
-          let correctas = 0;
-          const preguntas = document.querySelectorAll('.quiz-pregunta');
-          preguntas.forEach(function(pregunta) {
-            const seleccionada = pregunta.querySelector('input[type="radio"]:checked');
-            if (seleccionada && seleccionada.getAttribute('data-correcta') === 'true') {
-              correctas++;
-            }
-          });
-          const total = preguntas.length;
-          const porcentaje = Math.round((correctas / total) * 100);
-          resultado.textContent = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)';
-
-          resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
-        });
-      })();
-    </script>`;
-
+    html += `</ol>`;
+    html += `<div class="mt-6 p-4 bg-[#fdfbf7] border-l-4 border-[#d4ac0d] italic text-gray-600">
+      💭 Tómate un momento para escribir tus respuestas en un cuaderno de estudio.
+    </div>`;
     html += `</div>`;
     return html;
   };
+
+  const formatParalelosHtml = (json) => {
+    const paralelos = json.paralelos || [];
+    if (paralelos.length === 0) return `<div class="contenedor-blog"><p>No se encontraron paralelos.</p></div>`;
+
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Paralelos Bíblicos")}</h1>`;
+    html += `<div class="space-y-4 mt-4">`;
+    paralelos.forEach((p) => {
+      html += `<div class="border-l-4 border-[#d4ac0d] pl-4 py-2 bg-[#fdfbf7]">`;
+      html += `<p class="font-bold text-[#1a5276]">${escapeHtml(p.referencia)}</p>`;
+      if (p.texto_cita) {
+        html += `<div class="italic text-gray-700 bg-[#fef9e6] p-2 my-2 border-l-2 border-[#d4ac0d]">“${escapeHtml(p.texto_cita)}”</div>`;
+      }
+      html += `<p class="text-gray-700 mt-2">${escapeHtml(p.explicacion)}</p>`;
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  };
+
+  const formatPalabrasClaveHtml = (json) => {
+    const terminos = json.terminos || [];
+    if (terminos.length === 0) return `<div class="contenedor-blog"><p>No se generaron términos.</p></div>`;
+
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Estudio de Palabras Clave")}</h1>`;
+    html += `<div class="grid gap-4 mt-4">`;
+    terminos.forEach((t) => {
+      html += `<div class="bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8]">`;
+      html += `<div class="flex flex-wrap justify-between items-baseline border-b border-[#d4ac0d] pb-2 mb-2">`;
+      html += `<h3 class="text-xl font-serif text-[#1a5276]">${escapeHtml(t.termino_original)} <span class="text-sm text-gray-500">(${escapeHtml(t.transliteracion)})</span></h3>`;
+      if (t.strong && t.strong !== "No disponible") {
+        html += `<span class="text-xs bg-[#1a3a5c] text-[#d4ac0d] px-2 py-1 rounded">Strong ${escapeHtml(t.strong)}</span>`;
+      }
+      html += `</div>`;
+      html += `<p><strong class="text-[#1a5276]">Significado:</strong> ${escapeHtml(t.significado)}</p>`;
+      html += `<p class="mt-2"><strong class="text-[#1a5276]">Contexto en el capítulo:</strong> ${escapeHtml(t.contexto)}</p>`;
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  };
+
+  // Helper para escapar HTML
+  const escapeHtml = (str) => {
+    if (!str) return "";
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  };
+
+  const formatQuizInteractivo = (json) => {
+  const preguntas = json.preguntas || [];
+  if (preguntas.length === 0) return `<div class="contenedor-blog"><p>No se encontraron preguntas.</p></div>`;
+
+  let html = `<div class="contenedor-blog">`;
+  html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Cuestionario Bíblico")}</h1>`;
+  html += `<p class="text-[#5d4037] italic text-center mb-6">Responde las siguientes preguntas seleccionando la opción correcta.</p>`;
+
+  preguntas.forEach((p, i) => {
+    const preguntaTexto = p.pregunta || "Pregunta sin texto";
+    html += `<div class="quiz-pregunta-card bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8] mb-4">`;
+    html += `<p class="font-bold text-[#1a5276] mb-3">${i+1}. ${escapeHtml(preguntaTexto)}</p>`;
+    html += `<div class="space-y-2">`;
+
+    const opciones = p.opciones || [];
+    opciones.forEach((op, j) => {
+      const opcionTexto = op.texto || op.text || "Opción sin texto";
+      const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
+      html += `<label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#fef9e6] rounded transition">`;
+      html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" class="w-4 h-4 text-[#d4ac0d]">`;
+      html += `<span class="text-gray-700">${escapeHtml(opcionTexto)}</span>`;
+      html += `</label>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  html += `<div class="text-center mt-6">`;
+  html += `<button class="quiz-verificar bg-[#1a3a5c] hover:bg-[#2d5a3d] text-[#d4ac0d] font-bold py-2 px-6 rounded border border-[#d4ac0d] transition cursor-pointer">Verificar respuestas</button>`;
+  html += `</div>`;
+  html += `<div class="quiz-resultado mt-4 text-center font-bold text-lg"></div>`;
+
+  html += `<script>
+    (function() {
+      const btn = document.querySelector('.quiz-verificar');
+      const resultado = document.querySelector('.quiz-resultado');
+      if (!btn || !resultado) return;
+      btn.addEventListener('click', function() {
+        let correctas = 0;
+        const preguntasCards = document.querySelectorAll('.quiz-pregunta-card');
+        preguntasCards.forEach((card, idx) => {
+          const seleccionada = card.querySelector('input[type="radio"]:checked');
+          if (seleccionada && seleccionada.getAttribute('data-correcta') === 'true') {
+            correctas++;
+          }
+        });
+        const total = preguntasCards.length;
+        const porcentaje = Math.round((correctas / total) * 100);
+        
+        let mensaje = '';
+        if (porcentaje === 100) mensaje = '🎉 ¡Excelente! Has comprendido muy bien este pasaje. Sigue así profundizando en la Palabra.';
+        else if (porcentaje >= 80) mensaje = '🙌 Muy bien. Has captado lo esencial. Revisa las preguntas que fallaste para seguir creciendo.';
+        else if (porcentaje >= 50) mensaje = '📖 Buen intento. Te recomiendo volver a leer el capítulo y luego intentarlo de nuevo.';
+        else mensaje = '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma. ¡Tú puedes!';
+        
+        resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span class="text-sm block mt-2">' + mensaje + '</span>';
+        resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
+      });
+    })();
+  </script>`;
+
+  html += `</div>`;
+  return html;
+};
 
   const guardarRecurso = async () => {
     if (!generado) return;
@@ -443,8 +612,13 @@ Devolvé SOLO un objeto JSON:
 
     let htmlFinal = "";
 
-    if (generado.preguntas) {
-      htmlFinal = formatQuizInteractivo(generado);
+    if (generado.preguntas && (tipo === "quiz" || tipo === "reflexion")) {
+      if (tipo === "quiz") htmlFinal = formatQuizInteractivo(generado);
+      else if (tipo === "reflexion") htmlFinal = formatReflexionHtml(generado);
+    } else if (generado.paralelos && tipo === "paralelos") {
+      htmlFinal = formatParalelosHtml(generado);
+    } else if (generado.terminos && tipo === "palabras_clave") {
+      htmlFinal = formatPalabrasClaveHtml(generado);
     } else if (generado.contenido_html) {
       if (tipo === "quiz") {
         const contenido = generado.contenido_html.trim();
@@ -459,7 +633,6 @@ Devolvé SOLO un objeto JSON:
           htmlFinal = contenido;
         }
       } else {
-        // Limpiar entidades escapadas y saltos de línea visibles
         let contenidoLimpio = generado.contenido_html.replace(/```json|```/g, "").trim();
         contenidoLimpio = contenidoLimpio
           .replace(/&quot;/g, '"')
@@ -467,7 +640,6 @@ Devolvé SOLO un objeto JSON:
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
           .replace(/\\n/g, '');
-
         htmlFinal = contenidoLimpio;
       }
     } else {
@@ -502,6 +674,12 @@ Devolvé SOLO un objeto JSON:
     switch (json.tipo) {
       case "quiz":
         return formatQuizInteractivo(json);
+      case "reflexion":
+        return formatReflexionHtml(json);
+      case "paralelos":
+        return formatParalelosHtml(json);
+      case "palabras_clave":
+        return formatPalabrasClaveHtml(json);
       case "plan": {
         const dias = json.dias || [];
         if (dias.length > 0) {
@@ -527,6 +705,7 @@ Devolvé SOLO un objeto JSON:
     }
   };
 
+  // Estilos (igual que antes)
   const inputStyle = {
     width: "100%",
     background: C.surface,
@@ -544,6 +723,7 @@ Devolvé SOLO un objeto JSON:
   const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: 90 };
   const selectStyle = { ...inputStyle };
 
+  // Renderizado (JSX) igual que antes pero con los nuevos campos condicionales
   return (
     <div
       style={{
@@ -633,6 +813,15 @@ Devolvé SOLO un objeto JSON:
               </div>
             )}
 
+            {tipo === "palabras_clave" && (
+              <div>
+                <label style={{ fontSize: 12, color: C.muted, display: "block", marginBottom: 4 }}>Cantidad de términos</label>
+                <select style={selectStyle} value={numTerminos} onChange={(e) => setNumTerminos(e.target.value)}>
+                  {[3, 4, 5, 6, 7, 8, 10].map((n) => <option key={n} value={n}>{n} términos</option>)}
+                </select>
+              </div>
+            )}
+
             <div style={{ marginTop: 14 }}>
               {generado && !errorGen && (
                 <div>
@@ -672,11 +861,11 @@ Devolvé SOLO un objeto JSON:
               {!generado && !errorGen && (
                 <button
                   onClick={() => generarConIA()}
-                  disabled={generando || (!tema && !personajes)}
+                  disabled={generando || (!tema && !personajes && tipo !== "reflexion" && tipo !== "paralelos" && tipo !== "palabras_clave")}
                   style={{
                     background: C.azulOscuro, color: C.goldLight, border: `1px solid ${C.gold}`,
                     borderRadius: 7, padding: "10px 20px", cursor: "pointer", fontSize: 14, fontWeight: "bold",
-                    fontFamily: "Georgia, serif", opacity: generando || (!tema && !personajes) ? 0.5 : 1,
+                    fontFamily: "Georgia, serif", opacity: generando ? 0.5 : 1,
                   }}
                 >
                   {generando ? "⏳ Generando..." : `✨ Generar ${tipoInfo?.label}`}
