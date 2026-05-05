@@ -19,7 +19,7 @@ export async function POST(req) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openrouter/free",
+        model: "openai/gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
         max_tokens: maxTokens,
       }),
