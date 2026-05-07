@@ -51,25 +51,29 @@ export default async function RecursoPage({ params }) {
           {/* Breadcrumb */}
           <div className="bg-white border border-[#d4c4a8] rounded p-2.5 mb-5 text-sm">
             <Link href="/" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Recursos Bíblicos
+              Inicio
             </Link>
             <span className="text-[#9e9e9e] mx-2">›</span>
+            <Link href="/recursos-biblicos" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
+              Recursos Bíblicos
+            </Link>
             {libro && (
               <>
+                <span className="text-[#9e9e9e] mx-2">›</span>
                 <Link href={`/libro/${libro.slug}`} className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
                   {libro.nombre}
                 </Link>
-                <span className="text-[#9e9e9e] mx-2">›</span>
               </>
             )}
             {capitulo && (
               <>
+                <span className="text-[#9e9e9e] mx-2">›</span>
                 <Link href={`/libro/${libro.slug}/capitulo/${capitulo.numero}`} className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
                   Capítulo {capitulo.numero}
                 </Link>
-                <span className="text-[#9e9e9e] mx-2">›</span>
               </>
             )}
+            <span className="text-[#9e9e9e] mx-2">›</span>
             <span className="text-[#8d6e63]">{titulo}</span>
           </div>
 
@@ -110,13 +114,6 @@ export default async function RecursoPage({ params }) {
             </div>
           </div>
         </div>
-
-        <footer className="text-center py-5 text-sm text-[#8d6e63] border-t border-[#d4c4a8] mt-0 font-['Georgia',serif]">
-          © Mahanaim &quot;Campamento de Dios&quot; —{' '}
-          <a href="https://mahanaimcampamentodivino.blogspot.com" className="text-[#5d4037] hover:text-[#bf360c]">
-            Inicio del Blog
-          </a>
-        </footer>
       </div>
     </div>
   );

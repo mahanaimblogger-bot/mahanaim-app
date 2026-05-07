@@ -2,7 +2,6 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-// Mismo mapeo de iconos
 const icons = {
   estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
   imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
@@ -57,7 +56,6 @@ async function getLibroYCapitulos(slug) {
 function ChapterCard({ capitulo, libroSlug }) {
   const { numero, tiposRecursos, totalRecursos, resumen } = capitulo;
   
-  // Mostrar hasta 6 iconos más grandes (tamaño 2xl en lugar de base)
   const iconosMostrar = tiposRecursos.slice(0, 6).map(tipo => icons[tipo] || '📄');
   const hayMas = tiposRecursos.length > 6;
 
@@ -67,19 +65,16 @@ function ChapterCard({ capitulo, libroSlug }) {
       className="block bg-white border-2 border-[#e8e8e8] rounded-lg p-4 transition-all duration-200 hover:border-[#d4ac0d] hover:shadow-[0_4px_15px_rgba(26,58,92,0.1)] hover:translate-x-1"
     >
       <div>
-        {/* Título Capítulo X (sin círculo) */}
         <h3 className="text-lg font-bold text-[#1a5276] font-['Georgia',serif] m-0 mb-2">
           Capítulo {numero}
         </h3>
 
-        {/* Resumen (si existe) */}
         {resumen && (
           <p className="text-xs text-[#757575] mt-1 mb-2 line-clamp-2">
             {resumen}
           </p>
         )}
         
-        {/* Iconos grandes de recursos y contador */}
         {totalRecursos === 0 ? (
           <p className="text-sm text-gray-400 italic mt-1">Sin recursos aún</p>
         ) : (
@@ -111,29 +106,27 @@ export default async function LibroPage({ params }) {
 
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
-      <div className="max-w-[922px] mx-auto px-0 pb-10">
+      <div className="max-w-[922px] mx-auto px-0">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
-          {/* Breadcrumb */}
           <div className="bg-white border border-[#d4c4a8] rounded p-2.5 mb-5 text-sm">
-            <Link
-              href="/"
-              className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]"
-            >
+            <Link href="/" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
+              Inicio
+            </Link>
+            <span className="text-[#9e9e9e] mx-2">›</span>
+            <Link href="/recursos-biblicos" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
               Recursos Bíblicos
             </Link>
             <span className="text-[#9e9e9e] mx-2">›</span>
             <span className="text-[#8d6e63]">{libro.nombre}</span>
           </div>
 
-          {/* Botón volver */}
           <Link
-            href="/"
+            href="/recursos-biblicos"
             className="inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm mb-5 transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
           >
             ← Volver a libros
           </Link>
 
-          {/* Encabezado */}
           <div className="flex items-center gap-2.5 mb-6 pb-3 border-b-2 border-[#d4ac0d]">
             <span className="text-2xl">📑</span>
             <h2 className="text-[#1a5276] text-xl font-bold font-['Georgia',serif] m-0">
@@ -141,7 +134,6 @@ export default async function LibroPage({ params }) {
             </h2>
           </div>
 
-          {/* Grid de capítulos: 2 columnas */}
           {capitulos.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-[#757575] text-lg">Aún no hay capítulos disponibles.</p>
@@ -155,17 +147,6 @@ export default async function LibroPage({ params }) {
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <footer className="text-center py-5 text-sm text-[#8d6e63] border-t border-[#d4c4a8] mt-0 font-['Georgia',serif]">
-          © Mahanaim &quot;Campamento de Dios&quot; —{' '}
-          <a
-            href="https://mahanaimcampamentodivino.blogspot.com"
-            className="text-[#5d4037] hover:text-[#bf360c]"
-          >
-            Inicio del Blog
-          </a>
-        </footer>
       </div>
     </div>
   );
