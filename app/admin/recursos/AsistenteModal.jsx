@@ -12,30 +12,27 @@ const TIPOS = [
   { id: "reflexion", icon: "💭", label: "Preguntas de Reflexión" },
   { id: "paralelos", icon: "🔗", label: "Paralelos Bíblicos" },
   { id: "palabras_clave", icon: "📖", label: "Estudio de Palabras Clave" },
+  // ─── NUEVOS RECURSOS AUTOMÁTICOS ───
+  { id: "bosquejo", icon: "🗣️", label: "Bosquejo Homilético" },
+  { id: "sermon", icon: "🎤", label: "Sermón / Prédica" },
+  { id: "infografia", icon: "📊", label: "Infografía Doctrinal" },
+  { id: "citas_teologos", icon: "🎓", label: "Citas de Teólogos" },
+  { id: "citas_libros", icon: "📘", label: "Citas de Libros" },
+  { id: "contexto_arqueologico", icon: "🏛️", label: "Contexto Histórico‑Arqueológico" },
+  { id: "diagrama_estructura", icon: "📐", label: "Diagrama de Estructura Literaria" },
+  { id: "cronologia", icon: "📅", label: "Cronología del Capítulo" },
+  { id: "conexion_at", icon: "✡️", label: "Conexión con el A.T." },
+  { id: "profecias", icon: "🔮", label: "Profecías cumplidas / por cumplir" },
 ];
 
 const C = {
-  bg: "#fdfbf7",
-  surface: "#ffffff",
-  card: "#fdfbf7",
-  border: "#d4c4a8",
-  gold: "#d4ac0d",
-  goldLight: "#e8c96d",
-  goldDim: "#b7950b",
-  text: "#3e2723",
-  muted: "#8d6e63",
-  accent: "#1a5276",
-  green: "#2d6a4f",
-  azulOscuro: "#1a3a5c",
+  bg: "#fdfbf7", surface: "#ffffff", card: "#fdfbf7", border: "#d4c4a8",
+  gold: "#d4ac0d", goldLight: "#e8c96d", goldDim: "#b7950b", text: "#3e2723",
+  muted: "#8d6e63", accent: "#1a5276", green: "#2d6a4f", azulOscuro: "#1a3a5c",
 };
 
 export default function AsistenteModal({
-  books,
-  chapters,
-  selectedBook,
-  selectedChapter,
-  onClose,
-  onResourceCreated,
+  books, chapters, selectedBook, selectedChapter, onClose, onResourceCreated,
 }) {
   const [step, setStep] = useState(1);
   const [ctx, setCtx] = useState({
@@ -411,13 +408,368 @@ Reglas:
 - El contexto debe explicar cómo la palabra enriquece la comprensión del pasaje.
 - Priorizar términos con riqueza teológica.`;
 
+        // ─── NUEVOS CASOS ───
+        case "bosquejo":
+          return `Generá un bosquejo homilético completo para ${ctxStr}.
+Título: "${titulo || `Bosquejo Homilético de ${ctxStr}`}"
+Tema: ${tema || "el capítulo completo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "bosquejo",
+  "titulo": "Bosquejo Homilético: ${ctx.libro} ${ctx.cap}",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DEL BOSQUEJO:**
+Usá EXACTAMENTE este formato HTML:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO DEL BOSQUEJO]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Bosquejo homilético para ${ctx.libro} ${ctx.cap}</p>
+
+  <h2 class="subtitulo">🎯 Tema Central</h2>
+  <p>[Frase que resume el tema central del capítulo]</p>
+
+  <h2 class="subtitulo">📖 Pasaje Base</h2>
+  <p>${ctx.libro} ${ctx.cap}</p>
+
+  <h2 class="subtitulo">🗣️ Bosquejo</h2>
+  <ol>
+    <li><strong>[Punto principal I]</strong>
+      <ul>
+        <li>[Subpunto A]</li>
+        <li>[Subpunto B]</li>
+      </ul>
+    </li>
+    <li><strong>[Punto principal II]</strong>
+      <ul>
+        <li>[Subpunto A]</li>
+        <li>[Subpunto B]</li>
+      </ul>
+    </li>
+    <li><strong>[Punto principal III]</strong>
+      <ul>
+        <li>[Subpunto A]</li>
+        <li>[Subpunto B]</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2 class="subtitulo">💡 Ilustración sugerida</h2>
+  <p>[Una ilustración o anécdota que se relacione con el tema central]</p>
+
+  <h2 class="subtitulo">🙏 Aplicación</h2>
+  <p>[Cómo aplicar el mensaje del capítulo a la vida del creyente hoy]</p>
+</div>
+
+**REGLAS ESTRICTAS:**
+- El bosquejo debe tener 3 puntos principales con sus respectivos subpuntos.
+- La ilustración sugerida debe ser pertinente y edificante.
+- La aplicación debe ser concreta y basada en el texto.
+- Todo el HTML debe estar dentro del string "contenido_html".
+- Asegurate de que el JSON sea válido. Si usas comillas dobles dentro del HTML, escapalas con \\".`;
+
+        case "sermon":
+          return `Generá un sermón completo basado en ${ctxStr}.
+Título: "${titulo || `Sermón: ${ctxStr}`}"
+Tema: ${tema || "el mensaje central del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "sermon",
+  "titulo": "Sermón: ${ctx.libro} ${ctx.cap}",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DEL SERMÓN:**
+Usá EXACTAMENTE este formato HTML:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO DEL SERMÓN]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Sermón basado en ${ctx.libro} ${ctx.cap}</p>
+
+  <div class="cita-versiculo">
+    <h3>[Referencia del texto principal]</h3>
+    <p>"[Texto bíblico principal en RVR1960]"</p>
+  </div>
+
+  <h2 class="subtitulo">📖 Introducción</h2>
+  <p>[Introducción que capte la atención y presente el tema]</p>
+
+  <h2 class="subtitulo">🗣️ Desarrollo</h2>
+  <p>[Cuerpo del sermón, organizado en párrafos claros]</p>
+
+  <h2 class="subtitulo">🙏 Conclusión y Llamado</h2>
+  <p>[Conclusión que resuma el mensaje y haga un llamado a la acción]</p>
+</div>
+
+**REGLAS ESTRICTAS:**
+- El sermón debe ser expositivo, fiel al texto bíblico.
+- Debe incluir introducción, desarrollo y conclusión.
+- El llamado final debe ser claro y basado en el pasaje.
+- Todo el HTML debe estar dentro del string "contenido_html".
+- Asegurate de que el JSON sea válido. Si usas comillas dobles dentro del HTML, escapalas con \\".`;
+
+                case "infografia":
+          return `Generá una infografía doctrinal profunda en HTML para ${ctxStr}.
+Título: "${titulo || `Infografía Doctrinal de ${ctxStr}`}"
+Tema: ${tema || "las doctrinas principales del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "infografia",
+  "titulo": "Infografía Doctrinal: ${ctx.libro} ${ctx.cap}",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DE LA INFOGRAFÍA (DEBE SER PROFUNDA Y TIPOLÓGICA):**
+Usá EXACTAMENTE este formato HTML, pero con un análisis teológico de peso:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO DE LA INFOGRAFÍA]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Infografía doctrinal basada en ${ctx.libro} ${ctx.cap}</p>
+
+  <div class="tabla-comparativa"><table style="width:100%; border-collapse:collapse; font-size:0.9em; color:#3e2723; font-family:Georgia,serif;">
+    <thead><tr><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Doctrina</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Fundamento Bíblico</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Desarrollo Teológico (incluyendo tipología y conexiones redentoras)</th></tr></thead>
+    <tbody>
+      <tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Doctrina 1]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Referencia bíblica]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Explicación que conecte con el plan de salvación, la persona de Cristo o el desarrollo del Pacto]</td></tr>
+      <tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Doctrina 2]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Referencia bíblica]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Explicación profunda]</td></tr>
+      <tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Doctrina 3]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Referencia bíblica]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Explicación profunda]</td></tr>
+      <tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Doctrina 4]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Referencia bíblica]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Explicación profunda]</td></tr>
+      <tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Doctrina 5]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Referencia bíblica]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Explicación profunda]</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+**REGLAS ESTRICTAS:**
+- Identificar entre 3 y 5 doctrinas realmente significativas. Si el capítulo incluye la promesa del hijo (ej: Isaac), conéctala con Cristo (el Hijo prometido) y la fe (Romanos 4).
+- La columna "Desarrollo Teológico" debe ser la más extensa e incluir referencias cruzadas (por ejemplo, Hebreos 11, Romanos 4, Gálatas).
+- No se limite a hechos superficiales; busca la raíz teológica detrás de la narrativa.
+- Todo el HTML debe estar dentro del string "contenido_html".`;
+
+        case "citas_teologos":
+          return `Generá una recopilación de citas de teólogos y eruditos bíblicos sobre ${ctxStr}.
+Título: "${titulo || `Citas de Teólogos sobre ${ctxStr}`}"
+Tema: ${tema || "el capítulo completo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "citas_teologos",
+  "titulo": "Citas de Teólogos: ${ctx.libro} ${ctx.cap}",
+  "citas": [
+    {
+      "autor": "Nombre del teólogo",
+      "obra": "Obra de referencia (ej: Comentario Bíblico)",
+      "cita": "Texto de la cita textual."
+    }
+  ]
+}
+
+**REGLAS ESTRICTAS:**
+- Entre 3 y 5 citas.
+- SOLO usar teólogos y obras REALES y VERIFICABLES.
+- NUNCA inventar nombres ni citas. Si no estás seguro, no incluyas la cita.
+- La cita debe ser textual (o parafraseada fielmente) y pertinente al capítulo.
+- Incluir el nombre del teólogo y la obra de referencia.
+- Máxima calidad ortográfica.`;
+
+        case "citas_libros":
+          return `Generá una recopilación de citas de libros cristianos (no bíblicos) relevantes a ${ctxStr}.
+Título: "${titulo || `Citas de Libros sobre ${ctxStr}`}"
+Tema: ${tema || "el capítulo completo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "citas_libros",
+  "titulo": "Citas de Libros: ${ctx.libro} ${ctx.cap}",
+  "citas": [
+    {
+      "autor": "Nombre del autor",
+      "titulo_libro": "Título del libro",
+      "cita": "Texto de la cita textual."
+    }
+  ]
+}
+
+**REGLAS ESTRICTAS:**
+- Entre 3 y 5 citas.
+- SOLO usar libros y autores REALES y VERIFICABLES.
+- NUNCA inventar autores ni citas. Si no estás seguro, no incluyas la cita.
+- La cita debe ser textual (o parafraseada fielmente) y pertinente al capítulo.
+- Máxima calidad ortográfica.`;
+
+        case "contexto_arqueologico":
+          return `Generá un contexto histórico y arqueológico para ${ctxStr}.
+Título: "${titulo || `Contexto Histórico-Arqueológico de ${ctxStr}`}"
+Tema: ${tema || "el contexto histórico y cultural del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "contexto_arqueologico",
+  "titulo": "Contexto Histórico-Arqueológico: ${ctx.libro} ${ctx.cap}",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DEL CONTEXTO:**
+Usá EXACTAMENTE este formato HTML:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Contexto histórico y arqueológico de ${ctx.libro} ${ctx.cap}</p>
+
+  <h2 class="subtitulo">⏳ Contexto Histórico</h2>
+  <p>[Explicación del período histórico en que ocurren los hechos del capítulo, incluyendo datos de cronología, política, cultura y sociedad.]</p>
+
+  <h2 class="subtitulo">🏛️ Contexto Arqueológico</h2>
+  <p>[Información sobre hallazgos arqueológicos relevantes al capítulo: ciudades, objetos, inscripciones, costumbres, etc.]</p>
+
+  <h2 class="subtitulo">📖 Implicaciones para la Interpretación</h2>
+  <p>[Cómo el contexto histórico y arqueológico enriquece la comprensión del texto bíblico.]</p>
+</div>
+
+**REGLAS ESTRICTAS:**
+- Usar datos históricos y arqueológicos REALES y VERIFICABLES.
+- NUNCA inventar hallazgos arqueológicos.
+- Todo el HTML debe estar dentro del string "contenido_html".
+- Asegurate de que el JSON sea válido. Si usas comillas dobles dentro del HTML, escapalas con \\".`;
+
+        case "diagrama_estructura":
+          return `Generá un diagrama de estructura literaria para ${ctxStr}.
+Título: "${titulo || `Diagrama de Estructura Literaria de ${ctxStr}`}"
+Tema: ${tema || "la estructura literaria del capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "diagrama_estructura",
+  "titulo": "Diagrama de Estructura Literaria: ${ctx.libro} ${ctx.cap}",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DEL DIAGRAMA:**
+Usá EXACTAMENTE este formato HTML:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Diagrama de estructura literaria de ${ctx.libro} ${ctx.cap}</p>
+
+  <h2 class="subtitulo">📐 Tipo de Estructura</h2>
+  <p>[Indicar si es quiasmo, paralelismo, estructura concéntrica, etc.]</p>
+
+  <h2 class="subtitulo">🗺️ Diagrama</h2>
+  <pre style="background:#fdfbf7; padding:15px; border:1px solid #d4c4a8; border-radius:8px; font-family:monospace; font-size:0.85em; white-space:pre-wrap;">
+[Diagrama textual mostrando la estructura con indentaciones y letras]
+Ejemplo:
+A - Introducción
+  B - Primer discurso
+    C - Punto central
+  B' - Segundo discurso
+A' - Conclusión
+  </pre>
+
+  <h2 class="subtitulo">💡 Significado Teológico de la Estructura</h2>
+  <p>[Explicación de por qué el autor usó esta estructura y qué enseña teológicamente.]</p>
+</div>
+
+**REGLAS ESTRICTAS:**
+- Identificar correctamente la estructura literaria.
+- El diagrama debe ser claro y representado textualmente.
+- Todo el HTML debe estar dentro del string "contenido_html".
+- Asegurate de que el JSON sea válido. Si usas comillas dobles dentro del HTML, escapalas con \\".`;
+
+        case "cronologia":
+          return `Generá una cronología detallada del capítulo ${ctxStr}.
+Título: "${titulo || `Cronología del Capítulo ${ctx.libro} ${ctx.cap}`}"
+Tema: ${tema || "los eventos ordenados cronológicamente"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "cronologia",
+  "titulo": "Cronología del Capítulo: ${ctx.libro} ${ctx.cap}",
+  "contenido_html": "[HTML COMPLETO AQUÍ]"
+}
+
+**ESTRUCTURA DE LA CRONOLOGÍA:**
+Usá EXACTAMENTE este formato HTML:
+
+<div class="contenedor-blog">
+  <h1 class="titulo-entrada">[TÍTULO]</h1>
+  <p class="text-[#5d4037] italic text-center mb-6">Cronología de los eventos de ${ctx.libro} ${ctx.cap}</p>
+
+  <div class="tabla-comparativa"><table style="width:100%; border-collapse:collapse; font-size:0.9em; color:#3e2723; font-family:Georgia,serif;">
+    <thead><tr><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Orden</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Evento</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Referencia</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Detalle</th></tr></thead>
+    <tbody>
+      <tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">1</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Nombre del evento]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Versículo(s)]</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">[Breve descripción]</td></tr>
+      <!-- Repetir por cada evento -->
+    </tbody>
+  </table></div>
+</div>
+
+**REGLAS ESTRICTAS:**
+- Listar los eventos del capítulo en orden cronológico.
+- Cada evento debe tener su referencia bíblica exacta.
+- Todo el HTML debe estar dentro del string "contenido_html".
+- Asegurate de que el JSON sea válido. Si usas comillas dobles dentro del HTML, escapalas con \\".`;
+
+        case "conexion_at":
+          return `Generá una sección de conexión con el Antiguo Testamento para ${ctxStr} (que es un pasaje del Nuevo Testamento).
+Título: "${titulo || `Conexión con el A.T. en ${ctxStr}`}"
+Tema: ${tema || "las conexiones del capítulo con el Antiguo Testamento"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "conexion_at",
+  "titulo": "Conexión con el A.T.: ${ctx.libro} ${ctx.cap}",
+  "conexiones": [
+    {
+      "referencia_at": "Referencia del AT",
+      "texto_cita": "Cita textual del AT en RVR1960",
+      "explicacion": "Cómo se relaciona con ${ctx.libro} ${ctx.cap}"
+    }
+  ]
+}
+
+**REGLAS ESTRICTAS:**
+- Incluir entre 3 y 5 conexiones.
+- Usar referencias REALES y VERIFICABLES del Antiguo Testamento.
+- La cita debe ser textual de la RVR1960.
+- La explicación debe ser clara y concisa.
+- Máxima calidad ortográfica.`;
+
+                       case "profecias":
+          return `Generá una lista de profecías cumplidas o por cumplirse relacionadas con ${ctxStr}.
+Título: "${titulo || `Profecías en ${ctxStr}`}"
+Tema: ${tema || "las profecías presentes en el capítulo"}${extraLine}
+
+Devolvé SOLO un objeto JSON con esta estructura exacta:
+{
+  "tipo": "profecias",
+  "titulo": "Profecías: ${ctx.libro} ${ctx.cap}",
+  "profecias": [
+    {
+      "profecia": "Texto de la profecía o su descripción",
+      "referencia_profecia": "Referencia bíblica de la profecía",
+      "estado": "Cumplida / Parcialmente cumplida / Por cumplirse",
+      "referencia_cumplimiento": "Referencia bíblica del cumplimiento (si aplica)",
+      "explicacion": "Explicación profunda de la profecía, su cumplimiento y su relevancia teológica, conectando con el plan redentor de Dios."
+    }
+  ]
+}
+
+**REGLAS ESTRICTAS PARA UNA DETECCIÓN PROFUNDA:**
+- Incluir al menos 2 profecías. Busca incluso aquellas que están "escondidas" o que son tipológicas (ej: el hijo de la promesa, la tierra prometida, la bendición a las naciones).
+- Las profecías deben ser REALES y VERIFICABLES. No inventes ninguna.
+- El estado debe ser claramente indicado.
+- La explicación debe ir más allá de lo obvio: conecta la profecía con el Cristo, con el plan de salvación y con otros pasajes bíblicos.
+- Para Génesis 18, busca profecías sobre Isaac (cumplida), la destrucción de Sodoma (cumplida), la intercesión de Abraham (modelo de Cristo), y la promesa de que "todas las naciones serán benditas" (cumplida en Cristo).
+- Máxima calidad ortográfica y fidelidad al texto bíblico.`;
+
         default:
-          return "";
+          return null;
       }
     },
-    [tipo, ctx, titulo, tema, personajes, numDias, numPreguntas, numTerminos]
+    [tipo, titulo, tema, personajes, numDias, numPreguntas, numTerminos, ctx]
   );
-
   const generarConIA = useCallback(
     async (extra = "") => {
       setGenerando(true);
@@ -468,69 +820,105 @@ Reglas:
     [buildPrompt, tipo, titulo, tipoInfo]
   );
 
-  // Formateadores específicos para nuevos tipos
-  const formatReflexionHtml = (json) => {
+  // ─── FUNCIONES FORMATEADORAS CORREGIDAS ───
+    const formatReflexionHtml = (json) => {
     const preguntas = json.preguntas || [];
     if (preguntas.length === 0) return `<div class="contenedor-blog"><p>No se generaron preguntas.</p></div>`;
 
     let html = `<div class="contenedor-blog">`;
     html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Preguntas de Reflexión")}</h1>`;
-    html += `<ol class="list-decimal pl-6 space-y-4" style="margin-top: 1rem;">`;
+    html += `<div class="caja-meditar" style="margin-top: 1rem;">`;
+    html += `<h3>💭 Para Meditar</h3><ul>`;
     preguntas.forEach((p) => {
       html += `<li class="text-gray-700 leading-relaxed">${escapeHtml(p)}</li>`;
     });
-    html += `</ol>`;
-    html += `<div class="mt-6 p-4 bg-[#fdfbf7] border-l-4 border-[#d4ac0d] italic text-gray-600">
-      💭 Tómate un momento para escribir tus respuestas en un cuaderno de estudio.
-    </div>`;
+    html += `</ul></div>`;
+    html += `<p style="text-align: center; font-style: italic; color: #8d6e63; margin-top: 20px;">💭 Tómate un momento para escribir tus respuestas en un cuaderno de estudio.</p>`;
     html += `</div>`;
     return html;
   };
 
-  const formatParalelosHtml = (json) => {
+    const formatParalelosHtml = (json) => {
     const paralelos = json.paralelos || [];
     if (paralelos.length === 0) return `<div class="contenedor-blog"><p>No se encontraron paralelos.</p></div>`;
 
     let html = `<div class="contenedor-blog">`;
     html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Paralelos Bíblicos")}</h1>`;
-    html += `<div class="space-y-4 mt-4">`;
+    html += `<div class="tabla-comparativa"><table style="width:100%; border-collapse:collapse; font-size:0.9em; color:#3e2723; font-family:Georgia,serif;">`;
+    html += `<thead><tr><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Referencia</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Cita bíblica</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Conexión con ${ctx.libro} ${ctx.cap}</th></tr></thead><tbody>`;
     paralelos.forEach((p) => {
-      html += `<div class="border-l-4 border-[#d4ac0d] pl-4 py-2 bg-[#fdfbf7]">`;
-      html += `<p class="font-bold text-[#1a5276]">${escapeHtml(p.referencia)}</p>`;
-      if (p.texto_cita) {
-        html += `<div class="italic text-gray-700 bg-[#fef9e6] p-2 my-2 border-l-2 border-[#d4ac0d]">“${escapeHtml(p.texto_cita)}”</div>`;
-      }
-      html += `<p class="text-gray-700 mt-2">${escapeHtml(p.explicacion)}</p>`;
-      html += `</div>`;
+      html += `<tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-weight:bold; font-size:0.85em;">${escapeHtml(p.referencia)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-style:italic; font-size:0.85em;">${escapeHtml(p.texto_cita)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">${escapeHtml(p.explicacion)}</td></tr>`;
     });
-    html += `</div></div>`;
+    html += `</tbody></table></div></div>`;
     return html;
   };
 
-  const formatPalabrasClaveHtml = (json) => {
+    const formatPalabrasClaveHtml = (json) => {
     const terminos = json.terminos || [];
     if (terminos.length === 0) return `<div class="contenedor-blog"><p>No se generaron términos.</p></div>`;
 
     let html = `<div class="contenedor-blog">`;
     html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Estudio de Palabras Clave")}</h1>`;
-    html += `<div class="grid gap-4 mt-4">`;
     terminos.forEach((t) => {
-      html += `<div class="bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8]">`;
-      html += `<div class="flex flex-wrap justify-between items-baseline border-b border-[#d4ac0d] pb-2 mb-2">`;
-      html += `<h3 class="text-xl font-serif text-[#1a5276]">${escapeHtml(t.termino_original)} <span class="text-sm text-gray-500">(${escapeHtml(t.transliteracion)})</span></h3>`;
+      html += `<div class="caja-linguistica" style="margin-bottom: 18px;">`;
+      html += `<h4>`;
+      html += `<span class="palabra-original">${escapeHtml(t.termino_original)}</span> — ${escapeHtml(t.transliteracion)}`;
       if (t.strong && t.strong !== "No disponible") {
-        html += `<span class="text-xs bg-[#1a3a5c] text-[#d4ac0d] px-2 py-1 rounded">Strong ${escapeHtml(t.strong)}</span>`;
+        html += `<span style="margin-left: 20px; font-size: 0.75em; background: #1a3a5c; color: #d4ac0d; padding: 2px 8px; border-radius: 10px;">Strong ${escapeHtml(t.strong)}</span>`;
       }
-      html += `</div>`;
-      html += `<p><strong class="text-[#1a5276]">Significado:</strong> ${escapeHtml(t.significado)}</p>`;
-      html += `<p class="mt-2"><strong class="text-[#1a5276]">Contexto en el capítulo:</strong> ${escapeHtml(t.contexto)}</p>`;
+      html += `</h4>`;
+      html += `<p><strong>Significado:</strong> ${escapeHtml(t.significado)}</p>`;
+      html += `<p><strong>Contexto:</strong> ${escapeHtml(t.contexto)}</p>`;
       html += `</div>`;
     });
-    html += `</div></div>`;
+    html += `</div>`;
     return html;
   };
 
-  // Helper para escapar HTML
+  // Formateadores para los nuevos recursos (cuando el JSON no venga con contenido_html directo)
+  const formatCitasHtml = (json, tipoLabel) => {
+    const citas = json.citas || [];
+    if (citas.length === 0) return `<div class="contenedor-blog"><p>No se encontraron citas.</p></div>`;
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || tipoLabel)}</h1>`;
+    citas.forEach((c) => {
+      html += `<div class="caja-linguistica" style="margin-bottom:16px;">`;
+      html += `<p><strong>${escapeHtml(c.autor || c.autor_libro || "")}</strong>${c.obra ? ` — <em>${escapeHtml(c.obra)}</em>` : ""}${c.titulo_libro ? ` — <em>${escapeHtml(c.titulo_libro)}</em>` : ""}</p>`;
+      html += `<p style="margin-top:6px;">“${escapeHtml(c.cita)}”</p>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+    return html;
+  };
+
+  const formatConexionATHtml = (json) => {
+    const conexiones = json.conexiones || [];
+    if (conexiones.length === 0) return `<div class="contenedor-blog"><p>No se encontraron conexiones.</p></div>`;
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Conexión con el A.T.")}</h1>`;
+    html += `<div class="tabla-comparativa"><table style="width:100%; border-collapse:collapse; font-size:0.9em; color:#3e2723; font-family:Georgia,serif;">`;
+    html += `<thead><tr><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Ref. A.T.</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Texto A.T.</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Conexión con ${ctx.libro} ${ctx.cap}</th></tr></thead><tbody>`;
+    conexiones.forEach((c) => {
+      html += `<tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-weight:bold; font-size:0.85em;">${escapeHtml(c.referencia_at)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-style:italic; font-size:0.85em;">${escapeHtml(c.texto_cita)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">${escapeHtml(c.explicacion)}</td></tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+    return html;
+  };
+
+  const formatProfeciasHtml = (json) => {
+    const profecias = json.profecias || [];
+    if (profecias.length === 0) return `<div class="contenedor-blog"><p>No se encontraron profecías.</p></div>`;
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Profecías")}</h1>`;
+    html += `<div class="tabla-comparativa"><table style="width:100%; border-collapse:collapse; font-size:0.9em; color:#3e2723; font-family:Georgia,serif;">`;
+    html += `<thead><tr><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Profecía</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Ref. Profecía</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Estado</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Cumplimiento</th><th style="background:#1a3a5c; color:#d4ac0d; padding:8px 10px; text-align:left; font-weight:bold; font-size:0.85em; border:1px solid #3e5a7a;">Explicación</th></tr></thead><tbody>`;
+    profecias.forEach((p) => {
+      html += `<tr><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">${escapeHtml(p.profecia)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-weight:bold; font-size:0.85em;">${escapeHtml(p.referencia_profecia)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">${escapeHtml(p.estado)}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">${escapeHtml(p.referencia_cumplimiento || "—")}</td><td style="padding:6px 8px; border:1px solid #d4c4a8; vertical-align:top; font-size:0.85em;">${escapeHtml(p.explicacion)}</td></tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+    return html;
+  };
+
   const escapeHtml = (str) => {
     if (!str) return "";
     return str
@@ -542,69 +930,69 @@ Reglas:
   };
 
   const formatQuizInteractivo = (json) => {
-  const preguntas = json.preguntas || [];
-  if (preguntas.length === 0) return `<div class="contenedor-blog"><p>No se encontraron preguntas.</p></div>`;
+    const preguntas = json.preguntas || [];
+    if (preguntas.length === 0) return `<div class="contenedor-blog"><p>No se encontraron preguntas.</p></div>`;
 
-  let html = `<div class="contenedor-blog">`;
-  html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Cuestionario Bíblico")}</h1>`;
-  html += `<p class="text-[#5d4037] italic text-center mb-6">Responde las siguientes preguntas seleccionando la opción correcta.</p>`;
+    let html = `<div class="contenedor-blog">`;
+    html += `<h1 class="titulo-entrada">${escapeHtml(json.titulo || "Cuestionario Bíblico")}</h1>`;
+    html += `<p class="text-[#5d4037] italic text-center mb-6">Responde las siguientes preguntas seleccionando la opción correcta.</p>`;
 
-  preguntas.forEach((p, i) => {
-    const preguntaTexto = p.pregunta || "Pregunta sin texto";
-    html += `<div class="quiz-pregunta-card bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8] mb-4">`;
-    html += `<p class="font-bold text-[#1a5276] mb-3">${i+1}. ${escapeHtml(preguntaTexto)}</p>`;
-    html += `<div class="space-y-2">`;
+    preguntas.forEach((p, i) => {
+      const preguntaTexto = p.pregunta || "Pregunta sin texto";
+      html += `<div class="quiz-pregunta-card bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8] mb-4">`;
+      html += `<p class="font-bold text-[#1a5276] mb-3">${i + 1}. ${escapeHtml(preguntaTexto)}</p>`;
+      html += `<div class="space-y-2">`;
 
-    const opciones = p.opciones || [];
-    opciones.forEach((op, j) => {
-      const opcionTexto = op.texto || op.text || "Opción sin texto";
-      const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
-      html += `<label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#fef9e6] rounded transition">`;
-      html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" class="w-4 h-4 text-[#d4ac0d]">`;
-      html += `<span class="text-gray-700">${escapeHtml(opcionTexto)}</span>`;
-      html += `</label>`;
+      const opciones = p.opciones || [];
+      opciones.forEach((op, j) => {
+        const opcionTexto = op.texto || op.text || "Opción sin texto";
+        const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
+        html += `<label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#fef9e6] rounded transition">`;
+        html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" class="w-4 h-4 text-[#d4ac0d]">`;
+        html += `<span class="text-gray-700">${escapeHtml(opcionTexto)}</span>`;
+        html += `</label>`;
+      });
+
+      html += `</div></div>`;
     });
 
-    html += `</div></div>`;
-  });
+    html += `<div class="text-center mt-6">`;
+    html += `<button class="quiz-verificar bg-[#1a3a5c] hover:bg-[#2d5a3d] text-[#d4ac0d] font-bold py-2 px-6 rounded border border-[#d4ac0d] transition cursor-pointer">Verificar respuestas</button>`;
+    html += `</div>`;
+    html += `<div class="quiz-resultado mt-4 text-center font-bold text-lg"></div>`;
 
-  html += `<div class="text-center mt-6">`;
-  html += `<button class="quiz-verificar bg-[#1a3a5c] hover:bg-[#2d5a3d] text-[#d4ac0d] font-bold py-2 px-6 rounded border border-[#d4ac0d] transition cursor-pointer">Verificar respuestas</button>`;
-  html += `</div>`;
-  html += `<div class="quiz-resultado mt-4 text-center font-bold text-lg"></div>`;
-
-  html += `<script>
-    (function() {
-      const btn = document.querySelector('.quiz-verificar');
-      const resultado = document.querySelector('.quiz-resultado');
-      if (!btn || !resultado) return;
-      btn.addEventListener('click', function() {
-        let correctas = 0;
-        const preguntasCards = document.querySelectorAll('.quiz-pregunta-card');
-        preguntasCards.forEach((card, idx) => {
-          const seleccionada = card.querySelector('input[type="radio"]:checked');
-          if (seleccionada && seleccionada.getAttribute('data-correcta') === 'true') {
-            correctas++;
-          }
+    html += `<script>
+      (function() {
+        const btn = document.querySelector('.quiz-verificar');
+        const resultado = document.querySelector('.quiz-resultado');
+        if (!btn || !resultado) return;
+        btn.addEventListener('click', function() {
+          let correctas = 0;
+          const preguntasCards = document.querySelectorAll('.quiz-pregunta-card');
+          preguntasCards.forEach((card, idx) => {
+            const seleccionada = card.querySelector('input[type="radio"]:checked');
+            if (seleccionada && seleccionada.getAttribute('data-correcta') === 'true') {
+              correctas++;
+            }
+          });
+          const total = preguntasCards.length;
+          const porcentaje = Math.round((correctas / total) * 100);
+          
+          let mensaje = '';
+          if (porcentaje === 100) mensaje = '🎉 ¡Excelente! Has comprendido muy bien este pasaje. Sigue así profundizando en la Palabra.';
+          else if (porcentaje >= 80) mensaje = '🙌 Muy bien. Has captado lo esencial. Revisa las preguntas que fallaste para seguir creciendo.';
+          else if (porcentaje >= 50) mensaje = '📖 Buen intento. Te recomiendo volver a leer el capítulo y luego intentarlo de nuevo.';
+          else mensaje = '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma. ¡Tú puedes!';
+          
+          resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span class="text-sm block mt-2">' + mensaje + '</span>';
+          resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
         });
-        const total = preguntasCards.length;
-        const porcentaje = Math.round((correctas / total) * 100);
-        
-        let mensaje = '';
-        if (porcentaje === 100) mensaje = '🎉 ¡Excelente! Has comprendido muy bien este pasaje. Sigue así profundizando en la Palabra.';
-        else if (porcentaje >= 80) mensaje = '🙌 Muy bien. Has captado lo esencial. Revisa las preguntas que fallaste para seguir creciendo.';
-        else if (porcentaje >= 50) mensaje = '📖 Buen intento. Te recomiendo volver a leer el capítulo y luego intentarlo de nuevo.';
-        else mensaje = '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma. ¡Tú puedes!';
-        
-        resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span class="text-sm block mt-2">' + mensaje + '</span>';
-        resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
-      });
-    })();
-  </script>`;
+      })();
+    </script>`;
 
-  html += `</div>`;
-  return html;
-};
+    html += `</div>`;
+    return html;
+  };
 
   const guardarRecurso = async () => {
     if (!generado) return;
@@ -612,14 +1000,33 @@ Reglas:
 
     let htmlFinal = "";
 
+    // Casos con preguntas
     if (generado.preguntas && (tipo === "quiz" || tipo === "reflexion")) {
       if (tipo === "quiz") htmlFinal = formatQuizInteractivo(generado);
       else if (tipo === "reflexion") htmlFinal = formatReflexionHtml(generado);
-    } else if (generado.paralelos && tipo === "paralelos") {
+    }
+    // Casos con paralelos
+    else if (generado.paralelos && tipo === "paralelos") {
       htmlFinal = formatParalelosHtml(generado);
-    } else if (generado.terminos && tipo === "palabras_clave") {
+    }
+    // Casos con términos
+    else if (generado.terminos && tipo === "palabras_clave") {
       htmlFinal = formatPalabrasClaveHtml(generado);
-    } else if (generado.contenido_html) {
+    }
+    // Casos con citas (teólogos o libros)
+    else if (generado.citas && (tipo === "citas_teologos" || tipo === "citas_libros")) {
+      htmlFinal = formatCitasHtml(generado, tipoInfo?.label);
+    }
+    // Casos con conexiones AT
+    else if (generado.conexiones && tipo === "conexion_at") {
+      htmlFinal = formatConexionATHtml(generado);
+    }
+    // Casos con profecías
+    else if (generado.profecias && tipo === "profecias") {
+      htmlFinal = formatProfeciasHtml(generado);
+    }
+    // Si ya tiene contenido_html
+    else if (generado.contenido_html) {
       if (tipo === "quiz") {
         const contenido = generado.contenido_html.trim();
         if (contenido.startsWith("{")) {
@@ -645,7 +1052,7 @@ Reglas:
     } else {
       htmlFinal = formatContenidoHtml(generado);
     }
-
+   
     const payload = {
       titulo: generado.titulo || titulo || tipoInfo?.label,
       tipo,
@@ -680,32 +1087,44 @@ Reglas:
         return formatParalelosHtml(json);
       case "palabras_clave":
         return formatPalabrasClaveHtml(json);
-      case "plan": {
-        const dias = json.dias || [];
-        if (dias.length > 0) {
-          let html = `<h2>${json.titulo || "Plan de lectura"}</h2>`;
-          dias.forEach((d) => {
-            const diaTitulo = d.titulo || d.title || d.dia || "";
-            const diaPasaje = d.pasaje || d.passage || d.ref || "";
-            const diaNota = d.nota || d.note || d.desc || "";
-            html += `<p><strong>${diaTitulo}</strong> — ${diaPasaje}</p><p>${diaNota}</p><hr/>`;
-          });
-          return html;
+      case "citas_teologos":
+      case "citas_libros":
+        return formatCitasHtml(json, TIPOS.find(t => t.id === json.tipo)?.label || "Citas");
+             case "conexion_at":
+          return formatConexionATHtml(json);
+        case "profecias":
+          return formatProfeciasHtml(json);
+        case "plan": {
+          const dias = json.dias || [];
+          if (dias.length > 0) {
+            let html = `<h2>${json.titulo || "Plan de lectura"}</h2>`;
+            dias.forEach((d) => {
+              const diaTitulo = d.titulo || d.title || d.dia || "";
+              const diaPasaje = d.pasaje || d.passage || d.ref || "";
+              const diaNota = d.nota || d.note || d.desc || "";
+              html += `<p><strong>${diaTitulo}</strong> — ${diaPasaje}</p><p>${diaNota}</p><hr/>`;
+            });
+            return html;
+          }
+          return `<h2>${json.titulo || "Plan de lectura"}</h2><p>No se encontraron detalles.</p>`;
         }
-        return `<h2>${json.titulo || "Plan de lectura"}</h2><p>No se encontraron detalles.</p>`;
+        case "devocional":
+          return (json.contenido_html || "") + (json.aplicacion_html ? `<h3>Aplicación</h3>${json.aplicacion_html}` : "");
+        case "personaje":
+        case "glosario":
+        case "hoja":
+        case "bosquejo":
+        case "sermon":
+        case "infografia":
+        case "contexto_arqueologico":
+        case "diagrama_estructura":
+        case "cronologia":
+          return json.contenido_html || `<h2>${json.titulo || "Sin título"}</h2><p>Contenido generado, pero no hay vista previa automática.</p>`;
+        default:
+          return `<pre>${JSON.stringify(json, null, 2)}</pre>`;
       }
-      case "devocional":
-        return (json.contenido_html || "") + (json.aplicacion_html ? `<h3>Aplicación</h3>${json.aplicacion_html}` : "");
-      case "personaje":
-      case "glosario":
-      case "hoja":
-        return json.contenido_html || `<h2>${json.titulo || "Sin título"}</h2><p>Contenido generado, pero no hay vista previa automática.</p>`;
-      default:
-        return `<pre>${JSON.stringify(json, null, 2)}</pre>`;
-    }
-  };
+    };
 
-  // Estilos (igual que antes)
   const inputStyle = {
     width: "100%",
     background: C.surface,
@@ -723,7 +1142,6 @@ Reglas:
   const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: 90 };
   const selectStyle = { ...inputStyle };
 
-  // Renderizado (JSX) igual que antes pero con los nuevos campos condicionales
   return (
     <div
       style={{

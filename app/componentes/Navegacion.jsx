@@ -11,6 +11,11 @@ const enlaces = [
 export default function Navegacion() {
   const pathname = usePathname();
 
+  // No mostrar el menú en ninguna página del panel de administración
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <nav className="max-w-[922px] mx-auto bg-[#1a3a5c] border-b-2 border-[#d4ac0d] rounded-b-lg shadow-md">
       <ul className="flex justify-center gap-0">

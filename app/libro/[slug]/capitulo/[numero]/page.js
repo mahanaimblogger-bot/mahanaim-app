@@ -9,7 +9,12 @@ const icons = {
   cronologia: '⏳', personaje: '👤', glosario: '📚',
   himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
   hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
-  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤'
+  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤',
+  // ─── Nuevos recursos ───
+  bosquejo: '🗣️', infografia: '📋', citas_teologos: '🎓',
+  citas_libros: '📘', contexto_arqueologico: '🏛️',
+  diagrama_estructura: '📐', conexion_at: '✡️',
+  profecias: '🔮'
 };
 
 const labels = {
@@ -25,7 +30,17 @@ const labels = {
   plan: 'Plan de Lectura',
   reflexion: 'Preguntas de Reflexión',
   paralelos: 'Paralelos Bíblicos',
-  palabras_clave: 'Estudio de Palabras Clave'
+  palabras_clave: 'Estudio de Palabras Clave',
+  // ─── Nuevos recursos ───
+  bosquejo: 'Bosquejo Homilético',
+  infografia: 'Infografía Doctrinal',
+  citas_teologos: 'Citas de Teólogos',
+  citas_libros: 'Citas de Libros',
+  contexto_arqueologico: 'Contexto Histórico‑Arqueológico',
+  diagrama_estructura: 'Diagrama de Estructura Literaria',
+  cronologia: 'Cronología del Capítulo',
+  conexion_at: 'Conexión con el A.T.',
+  profecias: 'Profecías'
 };
 
 // ─── Obtener libro, capítulo y recursos ───
@@ -90,6 +105,22 @@ export default async function RecursosPage({ params }) {
 
   const { libro, capitulo, recursos } = data;
 
+  // Prioridad de los tipos para mostrar
+  const ordenPrioridad = [
+    'estudio', 'cronologia', 'bosquejo', 'personaje', 'exegesis',
+    'contexto_arqueologico', 'paralelos', 'palabras_clave', 'profecias',
+    'citas_teologos', 'citas_libros', 'glosario', 'infografia',
+    'diagrama_estructura', 'devocional', 'hoja', 'reflexion',
+    'sermon', 'quiz', 'plan', 'imagen', 'video', 'audio',
+    'diapositiva', 'pdf', 'mapa', 'himno', 'testimonio', 'enlace'
+  ];
+
+  const recursosOrdenados = [...recursos].sort((a, b) => {
+    const prioridadA = ordenPrioridad.indexOf(a.tipo) !== -1 ? ordenPrioridad.indexOf(a.tipo) : 999;
+    const prioridadB = ordenPrioridad.indexOf(b.tipo) !== -1 ? ordenPrioridad.indexOf(b.tipo) : 999;
+    return prioridadA - prioridadB;
+  });
+
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0">
@@ -133,7 +164,7 @@ export default async function RecursosPage({ params }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {recursos.map((rec) => (
+              {recursosOrdenados.map((rec) => (
                 <ResourceCard key={rec.id} recurso={rec} />
               ))}
             </div>

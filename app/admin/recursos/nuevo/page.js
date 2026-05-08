@@ -188,17 +188,8 @@ export default function NuevoRecursoPage() {
                   <option value="diapositiva">Diapositivas</option>
                   <option value="pdf">PDF / Documento</option>
                   <option value="mapa">Mapa Interactivo</option>
-                  <option value="cronologia">Línea de Tiempo</option>
-                  <option value="personaje">Ficha de Personaje</option>
-                  <option value="glosario">Glosario de Términos</option>
-                  <option value="himno">Himno / Alabanza</option>
                   <option value="enlace">Recurso Externo</option>
-                  <option value="quiz">Cuestionario</option>
-                  <option value="devocional">Devocional</option>
-                  <option value="hoja">Hoja de Trabajo</option>
-                  <option value="testimonio">Testimonio</option>
                   <option value="exegesis">Comentario Exegético</option>
-                  <option value="plan">Plan de Lectura</option>
                 </select>
               </div>
               <div className="flex items-end">
