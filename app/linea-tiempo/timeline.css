@@ -1,0 +1,34 @@
+/* app/linea-tiempo/timeline.css */
+
+/* Forzar que en esta ruta no haya pergamino ni márgenes en html y body */
+html, body {
+  background-color: #fdfbf7 !important;
+  background-image: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Anular cualquier contenedor del layout raíz que limite el ancho */
+body > div:first-child {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Clases comunes que puedan estar limitando el ancho (como las de tu layout raíz) */
+.max-w-\[922px\],
+.mx-auto,
+.container {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Nuestro contenedor principal */
+.timeline-root {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fdfbf7;
+  margin: 0;
+  padding: 0;
+}

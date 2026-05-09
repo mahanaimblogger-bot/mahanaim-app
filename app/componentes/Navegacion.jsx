@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 const enlaces = [
   { href: "/", label: "Inicio" },
   { href: "/recursos-biblicos", label: "Recursos Bíblicos" },
+  { href: "/linea-tiempo", label: "Línea de Tiempo" },   // <-- NUEVO
   { href: "/contacto", label: "Contacto" },
 ];
 

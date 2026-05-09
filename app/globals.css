@@ -29,3 +29,22 @@ body {
   font-family: Georgia, 'Times New Roman', serif;
   min-height: 100vh;
 }
+
+/* Botones de salto rápido para la Línea de Tiempo */
+/* Botones de saltos rápidos para la línea de tiempo */
+.jump-btn {
+  background: #1a3a5c;
+  border: none;
+  color: #fdfbf7;
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: bold;
+}
+.jump-btn:hover {
+  background: #2c5a7a;
+  transform: scale(1.02);
+}
