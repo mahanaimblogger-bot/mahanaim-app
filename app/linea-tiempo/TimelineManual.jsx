@@ -10,11 +10,11 @@ const TOTAL_YEARS = MAX_YEAR - MIN_YEAR;
 const TIMELINE_WIDTH = TOTAL_YEARS * PX_PER_YEAR;
 
 // Configuración de apilamiento vertical
-const CONTAINER_HEIGHT = 280;       // altura total del área de eventos (píxeles)
-const MAJOR_TOP = 20;               // posición Y para eventos principales (épocas)
-const MINOR_BASE_TOP = 70;          // primer evento secundario desde arriba
-const MINOR_STEP = 35;              // espacio entre eventos secundarios del mismo año
-const MAX_MINOR_TOP = 240;          // posición máxima para un evento secundario (no bajar más)
+const CONTAINER_HEIGHT = 280;
+const MAJOR_TOP = 20;
+const MINOR_BASE_TOP = 70;
+const MINOR_STEP = 35;
+const MAX_MINOR_TOP = 240;
 
 // Función para identificar eventos principales (épocas o hitos importantes)
 function isMajorEvent(event) {
@@ -85,7 +85,7 @@ export default function TimelineManual({ events }) {
     window.__timelineJumpToYear = jumpToYear;
   }, [jumpToYear]);
 
-  // --- Generar marcas de la regla (sin scroll vertical) ---
+  // --- Generar marcas de la regla ---
   const rulerMarks = [];
   for (let year = MIN_YEAR; year <= MAX_YEAR; year += 10) {
     const x = (year - MIN_YEAR) * PX_PER_YEAR;
@@ -135,7 +135,7 @@ export default function TimelineManual({ events }) {
   eventsByYear.forEach((group, year) => {
     const baseX = (year - MIN_YEAR) * PX_PER_YEAR;
 
-    // Eventos principales (épocas) – se colocan en la parte superior
+    // Eventos principales (sin orden especial, normalmente uno por año)
     group.majors.forEach(event => {
       const isActive = activeEvent && activeEvent.id === event.id;
       eventItems.push(
@@ -176,8 +176,15 @@ export default function TimelineManual({ events }) {
       );
     });
 
-    // Eventos secundarios – se apilan verticalmente
-    group.minors.forEach((event, idx) => {
+    // Eventos secundarios: ordenar por 'order' (campo de la BD) y luego por id
+    const sortedMinors = [...group.minors].sort((a, b) => {
+      const orderA = a.order ?? 0;
+      const orderB = b.order ?? 0;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.id - b.id;
+    });
+
+    sortedMinors.forEach((event, idx) => {
       const topPos = Math.min(MINOR_BASE_TOP + idx * MINOR_STEP, MAX_MINOR_TOP);
       const isActive = activeEvent && activeEvent.id === event.id;
       eventItems.push(
@@ -221,7 +228,7 @@ export default function TimelineManual({ events }) {
 
   return (
     <div style={{ width: '100%', fontFamily: 'Georgia, Times New Roman, serif' }}>
-      {/* Regla superior (sin scroll horizontal, altura suficiente para que se vean las marcas) */}
+      {/* Regla superior */}
       <div
         ref={rulerRef}
         style={{
@@ -253,7 +260,7 @@ export default function TimelineManual({ events }) {
         </div>
       </div>
 
-      {/* Contenedor de eventos (scroll horizontal solamente) */}
+      {/* Contenedor de eventos (scroll horizontal) */}
       <div
         ref={eventsRef}
         onScroll={handleEventsScroll}
@@ -275,7 +282,7 @@ export default function TimelineManual({ events }) {
         </div>
       </div>
 
-      {/* Panel de información inferior */}
+      {/* Panel de información */}
       <div style={{
         marginTop: '20px',
         backgroundColor: '#fef3dd',

@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import CharacterDetector from './CharacterDetector';
 
 // ─── Iconos y etiquetas (actualizado con nuevos tipos) ───
 const icons = {
@@ -10,7 +11,6 @@ const icons = {
   himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
   hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
   reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤',
-  // ─── Nuevos recursos ───
   bosquejo: '🗣️', infografia: '📋', citas_teologos: '🎓',
   citas_libros: '📘', contexto_arqueologico: '🏛️',
   diagrama_estructura: '📐', conexion_at: '✡️',
@@ -31,14 +31,12 @@ const labels = {
   reflexion: 'Preguntas de Reflexión',
   paralelos: 'Paralelos Bíblicos',
   palabras_clave: 'Estudio de Palabras Clave',
-  // ─── Nuevos recursos ───
   bosquejo: 'Bosquejo Homilético',
   infografia: 'Infografía Doctrinal',
   citas_teologos: 'Citas de Teólogos',
   citas_libros: 'Citas de Libros',
   contexto_arqueologico: 'Contexto Histórico‑Arqueológico',
   diagrama_estructura: 'Diagrama de Estructura Literaria',
-  cronologia: 'Cronología del Capítulo',
   conexion_at: 'Conexión con el A.T.',
   profecias: 'Profecías'
 };
@@ -71,7 +69,7 @@ async function getRecursos(slug, numero) {
   return { libro, capitulo, recursos: recursos || [] };
 }
 
-// ─── Tarjeta de recurso (cliente) ───
+// ─── Tarjeta de recurso ───
 function ResourceCard({ recurso }) {
   const tipo = recurso.tipo || 'estudio';
   const icon = icons[tipo] || '📄';
@@ -105,7 +103,6 @@ export default async function RecursosPage({ params }) {
 
   const { libro, capitulo, recursos } = data;
 
-  // Prioridad de los tipos para mostrar
   const ordenPrioridad = [
     'estudio', 'cronologia', 'bosquejo', 'personaje', 'exegesis',
     'contexto_arqueologico', 'paralelos', 'palabras_clave', 'profecias',
@@ -163,12 +160,15 @@ export default async function RecursosPage({ params }) {
               <p className="text-[#9e9e9e] text-sm mt-2">Estamos preparando contenido.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
               {recursosOrdenados.map((rec) => (
                 <ResourceCard key={rec.id} recurso={rec} />
               ))}
             </div>
           )}
+
+          {/* 👇 DETECTOR DE PERSONAJES - COLOCADO AQUÍ (dentro del return) */}
+          <CharacterDetector bookId={libro.id} chapterNum={parseInt(numero)} />
         </div>
       </div>
     </div>
