@@ -118,6 +118,9 @@ export default async function RecursosPage({ params }) {
     return prioridadA - prioridadB;
   });
 
+  // 🔥 Paso 2: Excluir los recursos de tipo 'personaje' de la cuadrícula
+  const recursosSinPersonajes = recursosOrdenados.filter(rec => rec.tipo !== 'personaje');
+
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0">
@@ -153,21 +156,21 @@ export default async function RecursosPage({ params }) {
           </h2>
           <p className="text-center text-[#757575] mb-6">Elige qué recurso querés ver:</p>
 
-          {/* Cuadrícula de recursos */}
-          {recursos.length === 0 ? (
+          {/* 🔥 Cuadrícula de recursos (excluye personajes) */}
+          {recursosSinPersonajes.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-[#757575] text-lg">Aún no hay recursos para este capítulo.</p>
               <p className="text-[#9e9e9e] text-sm mt-2">Estamos preparando contenido.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-              {recursosOrdenados.map((rec) => (
+              {recursosSinPersonajes.map((rec) => (
                 <ResourceCard key={rec.id} recurso={rec} />
               ))}
             </div>
           )}
 
-          {/* 👇 DETECTOR DE PERSONAJES - COLOCADO AQUÍ (dentro del return) */}
+          {/* Detector de personajes (incluye bloque de existentes con enlaces y botón crear) */}
           <CharacterDetector bookId={libro.id} chapterNum={parseInt(numero)} />
         </div>
       </div>

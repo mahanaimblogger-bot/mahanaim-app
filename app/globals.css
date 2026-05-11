@@ -48,3 +48,41 @@ body {
   background: #2c5a7a;
   transform: scale(1.02);
 }
+
+/* Estilos para ficha de personaje */
+.caja-personaje {
+  background: #fefbf6;
+  border-left: 5px solid #d4ac0d;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.caja-personaje h2 {
+  color: #1a5276;
+  border-bottom: 1px solid #d4ac0d;
+  padding-bottom: 6px;
+}
+.caja-personaje h3 {
+  color: #1a3a5c;
+  margin-top: 20px;
+  font-size: 1.2rem;
+}
+.caja-personaje p {
+  line-height: 1.6;
+}
+.caja-personaje ul {
+  list-style: none;
+  padding-left: 0;
+}
+.caja-personaje li {
+  margin-bottom: 6px;
+  padding-left: 20px;
+  position: relative;
+}
+.caja-personaje li::before {
+  content: "📌";
+  position: absolute;
+  left: 0;
+  color: #d4ac0d;
+}
