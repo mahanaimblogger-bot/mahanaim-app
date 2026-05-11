@@ -13,10 +13,12 @@ export default function CharacterDetector({ bookId, chapterNum }) {
       setLoading(true);
       setError('');
       try {
+        // 1. Obtener texto del capítulo
         const chapterRes = await fetch(`/api/chapter-text?bookId=${bookId}&chapter=${chapterNum}`);
         const { text: chapterText, error: chapterError } = await chapterRes.json();
         if (chapterError) throw new Error(chapterError);
 
+        // 2. Detectar personajes con IA
         const detectRes = await fetch('/api/detect-characters', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -30,6 +32,7 @@ export default function CharacterDetector({ bookId, chapterNum }) {
           return;
         }
 
+        // 3. Consultar personajes existentes
         const personsRes = await fetch('/api/persons/check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -73,10 +76,35 @@ export default function CharacterDetector({ bookId, chapterNum }) {
       )}
       {missing.length > 0 && (
         <div>
-          <strong>✨ Sin ficha aún:</strong>
+          <strong>✨ Sin ficha aún (puedes crearlas):</strong>
           <ul className="list-disc ml-6 mt-1">
             {missing.map(name => (
-              <li key={name}>{name}</li>
+              <li key={name}>
+                {name}
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/create-character', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, bookId, chapterNum }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        alert(`✅ Ficha de "${name}" creada correctamente.`);
+                        window.location.reload();
+                      } else {
+                        alert(`❌ Error: ${data.error}`);
+                      }
+                    } catch (err) {
+                      alert('Error de red. Intenta de nuevo.');
+                    }
+                  }}
+                  className="ml-2 text-xs bg-[#1a3a5c] text-white px-2 py-0.5 rounded hover:bg-[#2c5a7a]"
+                >
+                  + Crear ficha
+                </button>
+              </li>
             ))}
           </ul>
         </div>
