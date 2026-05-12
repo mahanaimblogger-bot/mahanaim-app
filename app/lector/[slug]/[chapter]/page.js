@@ -15,6 +15,8 @@ export default function LectorCapituloPage() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [hasStudy, setHasStudy] = useState(false);
+  const [capitulos, setCapitulos] = useState([]);      // Lista de números de capítulo del libro
+  const [currentIndex, setCurrentIndex] = useState(-1); // Índice del capítulo actual
 
   useEffect(() => {
     if (!slug || !chapterNum) return;
@@ -32,6 +34,26 @@ export default function LectorCapituloPage() {
         return;
       }
       setLibro(libroData);
+
+      // Obtener la lista de capítulos del libro (desde la tabla `chapters`)
+      const { data: capitulosData, error: capitulosError } = await supabase
+        .from('chapters')
+        .select('numero')
+        .eq('book_id', libroData.id)
+        .order('numero', { ascending: true });
+      if (capitulosError) {
+        console.error(capitulosError);
+      } else if (capitulosData && capitulosData.length > 0) {
+        const nums = capitulosData.map(c => c.numero);
+        setCapitulos(nums);
+        const idx = nums.indexOf(chapterNum);
+        setCurrentIndex(idx);
+      } else {
+        // Fallback: si no hay capítulos en la tabla, asumir hasta 150 (máximo bíblico)
+        const fallbackNums = Array.from({ length: 150 }, (_, i) => i + 1);
+        setCapitulos(fallbackNums);
+        setCurrentIndex(chapterNum - 1);
+      }
 
       // Obtener los versículos
       const { data: versosData, error: versosError } = await supabase
@@ -68,6 +90,12 @@ export default function LectorCapituloPage() {
     })();
   }, [slug, chapterNum]);
 
+  const handleChapterChange = (e) => {
+    const newChapter = parseInt(e.target.value);
+    // Navegar al nuevo capítulo
+    window.location.href = `/lector/${slug}/${newChapter}`;
+  };
+
   if (cargando) return <div className="max-w-3xl mx-auto px-4 py-12 text-center">Cargando...</div>;
   if (error) return (
     <div className="max-w-3xl mx-auto px-4 py-12 text-center">
@@ -77,12 +105,51 @@ export default function LectorCapituloPage() {
   );
   if (!libro) return null;
 
+  const prevChapter = currentIndex > 0 ? capitulos[currentIndex - 1] : null;
+  const nextChapter = currentIndex < capitulos.length - 1 ? capitulos[currentIndex + 1] : null;
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="flex justify-between items-center mb-8">
-        <Link href={`/lector/${slug}`} className="text-[#d4ac0d] hover:underline">← {libro.nombre}</Link>
+      {/* Navegación superior: título del libro, selector y botones */}
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <Link href={`/lector/${slug}`} className="text-[#d4ac0d] hover:underline">
+          ← {libro.nombre}
+        </Link>
+        <div className="flex gap-2 items-center">
+          {prevChapter && (
+            <Link
+              href={`/lector/${slug}/${prevChapter}`}
+              className="bg-[#1a3a5c] text-white px-4 py-2 rounded-lg hover:bg-[#2d4a6c] transition text-sm"
+            >
+              ← Cap. {prevChapter}
+            </Link>
+          )}
+          <select
+            value={chapterNum}
+            onChange={handleChapterChange}
+            className="border border-[#d4c4a8] rounded-lg p-2 text-sm bg-white text-[#1a5276] font-bold"
+          >
+            {capitulos.map(num => (
+              <option key={num} value={num}>Capítulo {num}</option>
+            ))}
+          </select>
+          {nextChapter && (
+            <Link
+              href={`/lector/${slug}/${nextChapter}`}
+              className="bg-[#1a3a5c] text-white px-4 py-2 rounded-lg hover:bg-[#2d4a6c] transition text-sm"
+            >
+              Cap. {nextChapter} →
+            </Link>
+          )}
+        </div>
       </div>
-      <h1 className="text-3xl font-bold text-[#1a5276] text-center mb-8">{libro.nombre} {chapterNum}</h1>
+
+      {/* Título del capítulo */}
+      <h1 className="text-3xl font-bold text-[#1a5276] text-center mb-8">
+        {libro.nombre} {chapterNum}
+      </h1>
+
+      {/* Versículos */}
       <div className="space-y-4 text-[#3e2723] text-lg leading-relaxed">
         {versos.map(v => (
           <div key={v.verse}>
@@ -91,6 +158,8 @@ export default function LectorCapituloPage() {
           </div>
         ))}
       </div>
+
+      {/* Botón a estudios si existen */}
       {hasStudy && (
         <div className="mt-12 text-center">
           <Link
@@ -101,8 +170,16 @@ export default function LectorCapituloPage() {
           </Link>
         </div>
       )}
+
+      {/* Navegación inferior (opcional) */}
       <div className="flex justify-between mt-8 pt-8 border-t border-[#d4c4a8]">
-        <Link href={`/lector/${slug}`} className="text-[#1a5276] hover:underline">← Ver todos los capítulos</Link>
+        {prevChapter && (
+          <Link href={`/lector/${slug}/${prevChapter}`} className="text-[#1a5276] hover:underline">← Capítulo {prevChapter}</Link>
+        )}
+        <Link href={`/lector/${slug}`} className="text-[#d4ac0d] hover:underline">Ver todos los capítulos</Link>
+        {nextChapter && (
+          <Link href={`/lector/${slug}/${nextChapter}`} className="text-[#1a5276] hover:underline">Capítulo {nextChapter} →</Link>
+        )}
       </div>
     </div>
   );
