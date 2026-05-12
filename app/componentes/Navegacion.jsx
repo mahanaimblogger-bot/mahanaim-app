@@ -5,14 +5,14 @@ import { usePathname } from "next/navigation";
 const enlaces = [
   { href: "/", label: "Inicio" },
   { href: "/recursos-biblicos", label: "Recursos Bíblicos" },
-  { href: "/linea-tiempo", label: "Línea de Tiempo" },   // <-- NUEVO
+  { href: "/linea-tiempo", label: "Línea de Tiempo" },
+  { href: "/lector", label: "Lector Bíblico" },
   { href: "/contacto", label: "Contacto" },
 ];
 
 export default function Navegacion() {
   const pathname = usePathname();
 
-  // No mostrar el menú en ninguna página del panel de administración
   if (pathname.startsWith("/admin")) {
     return null;
   }

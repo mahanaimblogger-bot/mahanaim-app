@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CharacterDetector from './CharacterDetector';
 
-// ─── Iconos y etiquetas (actualizado con nuevos tipos) ───
+// ─── Iconos y etiquetas ───
 const icons = {
   estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
   imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
@@ -92,7 +92,7 @@ function ResourceCard({ recurso }) {
   );
 }
 
-// ─── Página principal de recursos del capítulo ───
+// ─── Página principal ───
 export default async function RecursosPage({ params }) {
   const { slug, numero } = await params;
   const data = await getRecursos(slug, numero);
@@ -118,7 +118,6 @@ export default async function RecursosPage({ params }) {
     return prioridadA - prioridadB;
   });
 
-  // 🔥 Paso 2: Excluir los recursos de tipo 'personaje' de la cuadrícula
   const recursosSinPersonajes = recursosOrdenados.filter(rec => rec.tipo !== 'personaje');
 
   return (
@@ -142,13 +141,21 @@ export default async function RecursosPage({ params }) {
             <span className="text-[#8d6e63]">Capítulo {capitulo.numero}</span>
           </div>
 
-          {/* Botón volver */}
-          <Link
-            href={`/libro/${libro.slug}`}
-            className="inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm mb-5 transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
-          >
-            ← Volver a capítulos
-          </Link>
+          {/* Botones dobles: Volver + Ir a lectura bíblica */}
+          <div className="flex justify-between items-center gap-4 mb-5">
+            <Link
+              href={`/libro/${libro.slug}`}
+              className="inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
+            >
+              ← Volver a capítulos
+            </Link>
+            <Link
+              href={`/lector/${slug}/${capitulo.numero}`}
+              className="inline-flex items-center gap-1.5 bg-[#d4ac0d] text-[#1a3a5c] border border-[#d4ac0d] px-4 py-2 rounded-md text-sm font-bold transition-all hover:bg-[#e0b820]"
+            >
+              📖 Ir a la lectura bíblica
+            </Link>
+          </div>
 
           {/* Encabezado */}
           <h2 className="text-2xl text-[#1a5276] text-center mb-2 pb-4 border-b-2 border-[#d4ac0d] font-['Georgia',serif]">
@@ -156,7 +163,7 @@ export default async function RecursosPage({ params }) {
           </h2>
           <p className="text-center text-[#757575] mb-6">Elige qué recurso querés ver:</p>
 
-          {/* 🔥 Cuadrícula de recursos (excluye personajes) */}
+          {/* Cuadrícula de recursos (excluye personajes) */}
           {recursosSinPersonajes.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-[#757575] text-lg">Aún no hay recursos para este capítulo.</p>
@@ -170,7 +177,7 @@ export default async function RecursosPage({ params }) {
             </div>
           )}
 
-          {/* Detector de personajes (incluye bloque de existentes con enlaces y botón crear) */}
+          {/* Detector de personajes */}
           <CharacterDetector bookId={libro.id} chapterNum={parseInt(numero)} />
         </div>
       </div>
