@@ -131,38 +131,91 @@ export default function EditarRecursoPage() {
     return html;
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!titulo.trim() || !selectedChapter) {
-      alert('Completa al menos título y capítulo.');
-      return;
-    }
+  // Función para generar HTML automático a partir de la URL, según el tipo
+function generarHtmlDesdeUrl(url, tipo, titulo) {
+  if (!url || url.trim() === '') return '';
 
-    const contenidoFinal = generarHtmlFinal();
+  url = url.trim();
+  const lowerUrl = url.toLowerCase();
 
-    setSaving(true);
-    const { error } = await supabase
-      .from('resources')
-      .update({
-        titulo: titulo.trim(),
-        tipo,
-        contenido_html: contenidoFinal,
-        chapter_id: parseInt(selectedChapter, 10),
-        recurso_url: recursoUrl,
-        publicado,
-        modo,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id);
+  // Imagen
+  if (tipo === 'imagen' || /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url)) {
+    return `<img src="${url}" alt="${titulo}" style="max-width:100%; border-radius:12px; margin:1rem 0; box-shadow:0 4px 12px rgba(0,0,0,0.1);" />`;
+  }
 
-    setSaving(false);
-
-    if (error) {
-      alert('Error al guardar: ' + error.message);
+  // YouTube
+  if (lowerUrl.includes('youtube.com/watch') || lowerUrl.includes('youtu.be/')) {
+    let videoId = '';
+    if (lowerUrl.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split(/[?#]/)[0];
     } else {
-      router.push('/admin/recursos');
+      const urlParams = new URLSearchParams(url.split('?')[1]);
+      videoId = urlParams.get('v');
     }
-  };
+    if (videoId) {
+      return `<div style="position:relative; padding-bottom:56.25%; height:0; margin:1rem 0;"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;"></iframe></div>`;
+    }
+  }
+
+  // Vimeo
+  if (lowerUrl.includes('vimeo.com/')) {
+    const vimeoId = url.split('vimeo.com/')[1]?.split(/[?#]/)[0];
+    if (vimeoId) {
+      return `<div style="position:relative; padding-bottom:56.25%; height:0; margin:1rem 0;"><iframe src="https://player.vimeo.com/video/${vimeoId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;"></iframe></div>`;
+    }
+  }
+
+  // PDF
+  if (lowerUrl.endsWith('.pdf')) {
+    return `<embed src="${url}" type="application/pdf" width="100%" height="600px" style="border-radius:12px; margin:1rem 0;" />`;
+  }
+
+  // Mapa de Google Maps (compartir > incrustar un mapa)
+  if (lowerUrl.includes('google.com/maps') && lowerUrl.includes('embed')) {
+    return `<iframe src="${url}" width="100%" height="450" style="border:0; border-radius:12px; margin:1rem 0;" allowfullscreen></iframe>`;
+  }
+
+  // Otro iframe (si la URL parece ser de un embed)
+  if (lowerUrl.includes('iframe') || lowerUrl.includes('embed')) {
+    return `<iframe src="${url}" width="100%" height="500" style="border-radius:12px; margin:1rem 0;" frameborder="0"></iframe>`;
+  }
+
+  // Por defecto: enlace clicable
+  return `<div style="margin:1rem 0; padding:1rem; background:#f5f2eb; border-left:4px solid #d4ac0d; border-radius:8px;">
+    <p>🔗 <strong>Recurso externo:</strong> <a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#1a5276; text-decoration:underline;">${url}</a></p>
+  </div>`;
+}
+
+  const handleSave = async (e) => {
+  e.preventDefault();
+  if (!titulo.trim() || !selectedChapter) {
+    alert('Completa al menos título y capítulo.');
+    return;
+  }
+
+  let contenidoFinal = generarHtmlFinal();
+
+  // Si el contenido HTML está vacío pero hay URL, generar automáticamente
+  if ((!contenidoFinal || contenidoFinal.trim() === '') && recursoUrl.trim()) {
+    contenidoFinal = generarHtmlDesdeUrl(recursoUrl, tipo, titulo);
+  }
+
+  setSaving(true);
+  const { error } = await supabase
+    .from('resources')
+    .update({
+      titulo: titulo.trim(),
+      tipo,
+      contenido_html: contenidoFinal,
+      chapter_id: parseInt(selectedChapter, 10),
+      recurso_url: recursoUrl,
+      publicado,
+      modo,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+  // ... resto igual
+};
 
   if (!session) return null;
   if (loading) {
