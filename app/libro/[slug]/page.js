@@ -97,6 +97,28 @@ function ChapterCard({ capitulo, libroSlug }) {
   );
 }
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const { data: libro } = await supabase
+    .from('books')
+    .select('nombre')
+    .eq('slug', slug)
+    .single();
+
+  const titulo = libro ? `${libro.nombre} – Recursos Bíblicos | Mahanaim` : 'Libro | Mahanaim';
+  const descripcion = libro ? `Estudios, sermones y materiales del libro de ${libro.nombre}.` : 'Recursos bíblicos';
+
+  return {
+    title: titulo,
+    description: descripcion,
+    openGraph: {
+      title: titulo,
+      description: descripcion,
+      type: 'website',
+    },
+  };
+}
+
 export default async function LibroPage({ params }) {
   const { slug } = await params;
   const data = await getLibroYCapitulos(slug);
