@@ -1,11 +1,5 @@
 import { NextResponse } from "next/server";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
-
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -26,19 +20,32 @@ export async function POST(req) {
     });
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || "No se recibió respuesta.";
 
-    return new NextResponse(JSON.stringify({ success: true, text }), {
-      headers: corsHeaders,
-    });
+    // Verificar si hay error en la respuesta de OpenRouter
+    if (data.error) {
+      console.error("OpenRouter error:", data.error);
+      return NextResponse.json(
+        { success: false, error: data.error.message || "Error de OpenRouter" },
+        { status: 500 }
+      );
+    }
+
+    const text = data.choices?.[0]?.message?.content;
+    if (!text) {
+      throw new Error("Respuesta vacía de OpenRouter");
+    }
+
+    return NextResponse.json({ success: true, text });
   } catch (error) {
-    return new NextResponse(
-      JSON.stringify({ success: false, error: "Error al generar contenido" }),
-      { status: 500, headers: corsHeaders }
+    console.error("Error en /api/generate:", error);
+    return NextResponse.json(
+      { success: false, error: error.message || "Error interno del servidor" },
+      { status: 500 }
     );
   }
 }
 
+// Responder a preflight requests (CORS)
 export async function OPTIONS() {
-  return new NextResponse(null, { headers: corsHeaders });
+  return new NextResponse(null, { status: 204 });
 }

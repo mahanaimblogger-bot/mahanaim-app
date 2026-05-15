@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { supabaseBrowser } from '@/lib/supabaseBrowserClient';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
@@ -10,23 +10,28 @@ export default function AdminLoginPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const supabase = supabaseBrowser(); // cliente con cookies
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
+    console.log("Login response:", { data, error });
 
     if (error) {
       setError(error.message);
+      setLoading(false);
     } else {
-      router.push('/admin');
+      // Esperar un momento para que la cookie se establezca
+      setTimeout(() => {
+        window.location.href = '/admin';
+      }, 100);
     }
   };
 
@@ -42,10 +47,12 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-[#3e2723] mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-[#3e2723] mb-1">
               Correo electrónico
             </label>
             <input
+              id="email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -56,10 +63,12 @@ export default function AdminLoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#3e2723] mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-[#3e2723] mb-1">
               Contraseña
             </label>
             <input
+              id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
