@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CharacterDetector from './CharacterDetector';
+import { ICONS, LABELS } from '@/lib/tiposRecursos';
 
 export async function generateMetadata({ params }) {
   const { slug, numero } = await params;
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }) {
 
 
 // ─── Iconos y etiquetas ───
-const icons = {
+/*const icons = {
   estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
   imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
   cronologia: '⏳', personaje: '👤', glosario: '📚',
@@ -62,7 +63,7 @@ const labels = {
   diagrama_estructura: 'Diagrama de Estructura Literaria',
   conexion_at: 'Conexión con el A.T.',
   profecias: 'Profecías'
-};
+};*/
 
 // ─── Obtener libro, capítulo y recursos ───
 async function getRecursos(slug, numero) {
@@ -95,8 +96,8 @@ async function getRecursos(slug, numero) {
 // ─── Tarjeta de recurso ───
 function ResourceCard({ recurso }) {
   const tipo = recurso.tipo || 'estudio';
-  const icon = icons[tipo] || '📄';
-  const label = labels[tipo] || tipo;
+  const icon = ICONS[tipo] || '📄';
+  const label = LABELS[tipo] || tipo;
   const titulo = recurso.titulo || label;
 
   return (

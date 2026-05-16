@@ -1,8 +1,9 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ICONS, LABELS, ORDEN_PRIORIDAD } from '@/lib/tiposRecursos';
 
-const icons = {
+/*const icons = {
   estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
   imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
   cronologia: '⏳', personaje: '👤', glosario: '📚',
@@ -12,7 +13,7 @@ const icons = {
   bosquejo: '🗣️', infografia: '📋', citas_teologos: '🎓',
   citas_libros: '📘', contexto_arqueologico: '🏛️',
   diagrama_estructura: '📐', conexion_at: '✡️', profecias: '🔮'
-};
+};*/
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const { data: libro } = await supabase
@@ -76,7 +77,7 @@ async function getLibroYCapitulos(slug) {
 function ChapterCard({ capitulo, libroSlug }) {
   const { numero, tiposRecursos, totalRecursos, resumen } = capitulo;
   
-  const iconosMostrar = tiposRecursos.slice(0, 6).map(tipo => icons[tipo] || '📄');
+  const iconosMostrar = tiposRecursos.slice(0, 6).map(tipo => ICONS[tipo] || '📄');
   const hayMas = tiposRecursos.length > 6;
 
   return (
