@@ -11,6 +11,24 @@ const icons = {
   reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤'
 };
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const { data: libro } = await supabase
+    .from('books')
+    .select('nombre')
+    .eq('slug', slug)
+    .single();
+
+  const titulo = libro ? `${libro.nombre} – Recursos Bíblicos | Mahanaim` : 'Libro | Mahanaim';
+  const descripcion = libro ? `Estudios, sermones y materiales del libro de ${libro.nombre}.` : 'Recursos bíblicos';
+
+  return {
+    title: titulo,
+    description: descripcion,
+    openGraph: { title: titulo, description: descripcion, type: 'website' },
+  };
+}
+
 async function getLibroYCapitulos(slug) {
   const { data: libro, error: errorLibro } = await supabase
     .from('books')
