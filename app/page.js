@@ -1,3 +1,14 @@
+export const metadata = {
+  title: 'Inicio | Mahanaim - Centro de Recursos Bíblicos',
+  description: 'Bienvenido a Mahanaim, plataforma de estudios bíblicos profundos, sermones y recursos para enseñar la Palabra de Dios.',
+  keywords: 'Biblia, estudios bíblicos, sermones, recursos cristianos, Mahanaim',
+  openGraph: {
+    title: 'Mahanaim - Centro de Recursos Bíblicos',
+    description: 'Estudios bíblicos profundos, sermones y materiales para enseñar la Palabra de Dios.',
+    type: 'website',
+  },
+};
+
 export default function Inicio() {
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">

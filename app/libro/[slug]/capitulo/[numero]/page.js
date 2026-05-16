@@ -3,6 +3,29 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CharacterDetector from './CharacterDetector';
 
+export async function generateMetadata({ params }) {
+  const { slug, numero } = await params;
+  const { data: libro } = await supabase
+    .from('books')
+    .select('nombre')
+    .eq('slug', slug)
+    .single();
+
+  const titulo = libro 
+    ? `${libro.nombre} capítulo ${numero} – Recursos | Mahanaim` 
+    : `Capítulo ${numero} | Mahanaim`;
+  const descripcion = libro 
+    ? `Estudios, sermones, videos y materiales del capítulo ${numero} de ${libro.nombre}.` 
+    : `Recursos bíblicos del capítulo ${numero}.`;
+
+  return {
+    title: titulo,
+    description: descripcion,
+    openGraph: { title: titulo, description: descripcion, type: 'website' },
+  };
+}
+
+
 // ─── Iconos y etiquetas ───
 const icons = {
   estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
