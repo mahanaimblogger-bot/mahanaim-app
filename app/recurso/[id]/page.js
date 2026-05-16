@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import '../../estudios.css';
 import ScriptExecutor from './ScriptExecutor';
 import AudioPlayer from '@/app/componentes/AudioPlayer';
+import ShareButtons from '@/app/componentes/ShareButtons';
 
 // ============================================================
 // Función para generar HTML automático a partir de una URL según el tipo
@@ -209,6 +210,9 @@ export default async function RecursoPage({ params }) {
             ) : (
               <ScriptExecutor htmlContent={contenidoMostrar} />
             )}
+
+            {/* Botones de compartir */}
+            <ShareButtons title={titulo} />  
 
             {/* Pie del estudio */}
             <div className="mt-8 pt-6 border-t border-[#d4ac0d] text-center text-sm text-[#8d6e63] font-['Georgia',serif]">
