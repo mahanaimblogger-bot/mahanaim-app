@@ -3,17 +3,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ICONS, LABELS, ORDEN_PRIORIDAD } from '@/lib/tiposRecursos';
 
-/*const icons = {
-  estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
-  imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
-  cronologia: '⏳', personaje: '👤', glosario: '📚',
-  himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
-  hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
-  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤',
-  bosquejo: '🗣️', infografia: '📋', citas_teologos: '🎓',
-  citas_libros: '📘', contexto_arqueologico: '🏛️',
-  diagrama_estructura: '📐', conexion_at: '✡️', profecias: '🔮'
-};*/
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const { data: libro } = await supabase
@@ -171,4 +160,15 @@ export default async function LibroPage({ params }) {
       </div>
     </div>
   );
+}
+
+// ============================================================
+// generateStaticParams para prerenderizar todos los libros
+// ============================================================
+export async function generateStaticParams() {
+  const { data: books } = await supabase
+    .from('books')
+    .select('slug');
+  if (!books) return [];
+  return books.map((book) => ({ slug: book.slug }));
 }
