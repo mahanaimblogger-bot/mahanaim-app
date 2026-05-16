@@ -4,22 +4,23 @@ import { useState } from 'react';
 export default function ShareButtons({ title }) {
   const [copied, setCopied] = useState(false);
 
-  // Obtener la URL actual del navegador
-  const url = typeof window !== 'undefined' ? window.location.href : '';
-
   const shareOnFacebook = () => {
+    const url = window.location.href;
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
   };
 
   const shareOnTwitter = () => {
+    const url = window.location.href;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
   };
 
   const shareOnWhatsApp = () => {
+    const url = window.location.href;
     window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank');
   };
 
   const copyToClipboard = async () => {
+    const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
