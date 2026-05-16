@@ -8,9 +8,11 @@ const icons = {
   cronologia: '⏳', personaje: '👤', glosario: '📚',
   himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
   hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
-  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤'
+  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤',
+  bosquejo: '🗣️', infografia: '📋', citas_teologos: '🎓',
+  citas_libros: '📘', contexto_arqueologico: '🏛️',
+  diagrama_estructura: '📐', conexion_at: '✡️', profecias: '🔮'
 };
-
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const { data: libro } = await supabase
