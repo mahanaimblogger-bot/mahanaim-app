@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import BookCard from '../BookCard';
+import Image from 'next/image';
 
 const secciones = {
   "Pentateuco": [
@@ -65,11 +66,13 @@ export default async function Home() {
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8] rounded-xl">
           {/* Banner */}
           <div className="text-center mb-6">
-            <img
-              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1470&auto=format&fit=crop"
-              alt="Biblioteca Antigua y Escrituras"
-              className="w-full h-auto rounded-lg border-4 border-[#5d4037] shadow-lg"
-            />
+            <Image
+  src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1470&auto=format&fit=crop"
+  alt="Biblioteca Antigua y Escrituras"
+  width={922}
+  height={300}
+  className="w-full h-auto rounded-lg border-4 border-[#5d4037] shadow-lg"
+/>
             <h1 className="text-3xl text-[#1b5e20] uppercase tracking-wider mt-3">
               Centro de Recursos Bíblicos
             </h1>
