@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 
 export default async function sitemap() {
-  const baseUrl = 'http://localhost:3000/'; // Cambia por tu dominio final o deja localhost para pruebas
+  const baseUrl = 'http://localhost:3000'; // Cambia por tu dominio final o deja localhost para pruebas
 
   // Páginas estáticas
   const staticPages = [
