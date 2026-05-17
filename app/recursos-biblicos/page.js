@@ -72,6 +72,7 @@ export default async function Home() {
   width={922}
   height={300}
   className="w-full h-auto rounded-lg border-4 border-[#5d4037] shadow-lg"
+  priority
 />
             <h1 className="text-3xl text-[#1b5e20] uppercase tracking-wider mt-3">
               Centro de Recursos Bíblicos

@@ -26,45 +26,6 @@ export async function generateMetadata({ params }) {
   };
 }
 
-
-// ─── Iconos y etiquetas ───
-/*const icons = {
-  estudio: '📖', sermon: '🛐', video: '🎬', audio: '🎧',
-  imagen: '🖼️', diapositiva: '📊', pdf: '📄', mapa: '🗺️',
-  cronologia: '⏳', personaje: '👤', glosario: '📚',
-  himno: '🎵', enlace: '🔗', quiz: '🧩', devocional: '✍️',
-  hoja: '🖨️', testimonio: '🎙️', exegesis: '🔬', plan: '🧭',
-  reflexion: '🤔', paralelos: '⛓️', palabras_clave: '🔤',
-  bosquejo: '🗣️', infografia: '📋', citas_teologos: '🎓',
-  citas_libros: '📘', contexto_arqueologico: '🏛️',
-  diagrama_estructura: '📐', conexion_at: '✡️',
-  profecias: '🔮'
-};
-
-const labels = {
-  estudio: 'Estudio Bíblico', sermon: 'Sermón / Prédica',
-  video: 'Video Resumen', audio: 'Audio / Podcast',
-  imagen: 'Imagen / Ilustración', diapositiva: 'Diapositivas',
-  pdf: 'PDF / Documento', mapa: 'Mapa Interactivo',
-  cronologia: 'Línea de Tiempo', personaje: 'Ficha de Personaje',
-  glosario: 'Glosario de Términos', himno: 'Himno / Alabanza',
-  enlace: 'Recurso Externo', quiz: 'Cuestionario',
-  devocional: 'Devocional', hoja: 'Hoja de Trabajo',
-  testimonio: 'Testimonio', exegesis: 'Comentario Exegético',
-  plan: 'Plan de Lectura',
-  reflexion: 'Preguntas de Reflexión',
-  paralelos: 'Paralelos Bíblicos',
-  palabras_clave: 'Estudio de Palabras Clave',
-  bosquejo: 'Bosquejo Homilético',
-  infografia: 'Infografía Doctrinal',
-  citas_teologos: 'Citas de Teólogos',
-  citas_libros: 'Citas de Libros',
-  contexto_arqueologico: 'Contexto Histórico‑Arqueológico',
-  diagrama_estructura: 'Diagrama de Estructura Literaria',
-  conexion_at: 'Conexión con el A.T.',
-  profecias: 'Profecías'
-};*/
-
 // ─── Obtener libro, capítulo y recursos ───
 async function getRecursos(slug, numero) {
   const { data: libro, error: errorLibro } = await supabase
@@ -207,4 +168,28 @@ export default async function RecursosPage({ params }) {
       </div>
     </div>
   );
+}
+
+// ============================================================
+// generateStaticParams para prerenderizar todos los capítulos
+// ============================================================
+export async function generateStaticParams() {
+  const { data: books } = await supabase
+    .from('books')
+    .select('id, slug');
+  if (!books) return [];
+  
+  const params = [];
+  for (const book of books) {
+    const { data: chapters } = await supabase
+      .from('chapters')
+      .select('numero')
+      .eq('book_id', book.id);
+    if (chapters) {
+      chapters.forEach((ch) => {
+        params.push({ slug: book.slug, numero: ch.numero.toString() });
+      });
+    }
+  }
+  return params;
 }
