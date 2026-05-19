@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import BookCard from '../BookCard';
 import Image from 'next/image';
+import Breadcrumb from '@/app/componentes/Breadcrumb';
 
 const secciones = {
   "Pentateuco": [
@@ -67,13 +68,13 @@ export default async function Home() {
           {/* Banner */}
           <div className="text-center mb-6">
             <Image
-  src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1470&auto=format&fit=crop"
-  alt="Biblioteca Antigua y Escrituras"
-  width={922}
-  height={300}
-  className="w-full h-auto rounded-lg border-4 border-[#5d4037] shadow-lg"
-  priority
-/>
+              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1470&auto=format&fit=crop"
+              alt="Biblioteca Antigua y Escrituras"
+              width={922}
+              height={300}
+              className="w-full h-auto rounded-lg border-4 border-[#5d4037] shadow-lg"
+              priority
+            />
             <h1 className="text-3xl text-[#1b5e20] uppercase tracking-wider mt-3">
               Centro de Recursos Bíblicos
             </h1>
@@ -82,16 +83,11 @@ export default async function Home() {
             </p>
           </div>
 
-          {/* Breadcrumb */}
-          <div className="bg-white border border-[#d4c4a8] rounded p-2.5 mb-5 text-sm">
-            <Link href="/" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Inicio
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <span className="text-[#8d6e63]">Recursos Bíblicos</span>
-          </div>
+          <Breadcrumb items={[
+            { name: 'Inicio', href: '/' },
+            { name: 'Recursos Bíblicos', href: null }
+          ]} />
 
-          {/* Secciones y libros */}
           {Object.entries(secciones).map(([nombreSeccion, slugs]) => (
             <div
               key={nombreSeccion}

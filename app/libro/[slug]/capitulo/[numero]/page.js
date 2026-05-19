@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CharacterDetector from './CharacterDetector';
 import { ICONS, LABELS } from '@/lib/tiposRecursos';
+import Breadcrumb from '@/app/componentes/Breadcrumb';
 
 export async function generateMetadata({ params }) {
   const { slug, numero } = await params;
@@ -26,7 +27,6 @@ export async function generateMetadata({ params }) {
   };
 }
 
-// ─── Obtener libro, capítulo y recursos ───
 async function getRecursos(slug, numero) {
   const { data: libro, error: errorLibro } = await supabase
     .from('books')
@@ -54,7 +54,6 @@ async function getRecursos(slug, numero) {
   return { libro, capitulo, recursos: recursos || [] };
 }
 
-// ─── Tarjeta de recurso ───
 function ResourceCard({ recurso }) {
   const tipo = recurso.tipo || 'estudio';
   const icon = ICONS[tipo] || '📄';
@@ -77,14 +76,11 @@ function ResourceCard({ recurso }) {
   );
 }
 
-// ─── Página principal ───
 export default async function RecursosPage({ params }) {
   const { slug, numero } = await params;
   const data = await getRecursos(slug, numero);
 
-  if (!data) {
-    notFound();
-  }
+  if (!data) notFound();
 
   const { libro, capitulo, recursos } = data;
 
@@ -109,24 +105,13 @@ export default async function RecursosPage({ params }) {
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
-          {/* Breadcrumb */}
-          <div className="bg-white border border-[#d4c4a8] rounded p-2.5 mb-5 text-sm">
-            <Link href="/" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Inicio
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <Link href="/recursos-biblicos" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Recursos Bíblicos
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <Link href={`/libro/${libro.slug}`} className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              {libro.nombre}
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <span className="text-[#8d6e63]">Capítulo {capitulo.numero}</span>
-          </div>
+          <Breadcrumb items={[
+            { name: 'Inicio', href: '/' },
+            { name: 'Recursos Bíblicos', href: '/recursos-biblicos' },
+            { name: libro.nombre, href: `/libro/${libro.slug}` },
+            { name: `Capítulo ${capitulo.numero}`, href: null }
+          ]} />
 
-          {/* Botones dobles: Volver + Ir a lectura bíblica */}
           <div className="flex justify-between items-center gap-4 mb-5">
             <Link
               href={`/libro/${libro.slug}`}
@@ -142,13 +127,11 @@ export default async function RecursosPage({ params }) {
             </Link>
           </div>
 
-          {/* Encabezado */}
           <h2 className="text-2xl text-[#1a5276] text-center mb-2 pb-4 border-b-2 border-[#d4ac0d] font-['Georgia',serif]">
             {libro.nombre} — Capítulo {capitulo.numero}
           </h2>
           <p className="text-center text-[#757575] mb-6">Elige qué recurso querés ver:</p>
 
-          {/* Cuadrícula de recursos (excluye personajes) */}
           {recursosSinPersonajes.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-[#757575] text-lg">Aún no hay recursos para este capítulo.</p>
@@ -162,34 +145,9 @@ export default async function RecursosPage({ params }) {
             </div>
           )}
 
-          {/* Detector de personajes */}
           <CharacterDetector bookId={libro.id} chapterNum={parseInt(numero)} />
         </div>
       </div>
     </div>
   );
-}
-
-// ============================================================
-// generateStaticParams para prerenderizar todos los capítulos
-// ============================================================
-export async function generateStaticParams() {
-  const { data: books } = await supabase
-    .from('books')
-    .select('id, slug');
-  if (!books) return [];
-  
-  const params = [];
-  for (const book of books) {
-    const { data: chapters } = await supabase
-      .from('chapters')
-      .select('numero')
-      .eq('book_id', book.id);
-    if (chapters) {
-      chapters.forEach((ch) => {
-        params.push({ slug: book.slug, numero: ch.numero.toString() });
-      });
-    }
-  }
-  return params;
 }

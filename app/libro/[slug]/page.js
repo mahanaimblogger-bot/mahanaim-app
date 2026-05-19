@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ICONS, LABELS, ORDEN_PRIORIDAD } from '@/lib/tiposRecursos';
+import Breadcrumb from '@/app/componentes/Breadcrumb';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -118,17 +119,11 @@ export default async function LibroPage({ params }) {
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
-          <div className="bg-white border border-[#d4c4a8] rounded p-2.5 mb-5 text-sm">
-            <Link href="/" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Inicio
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <Link href="/recursos-biblicos" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Recursos Bíblicos
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <span className="text-[#8d6e63]">{libro.nombre}</span>
-          </div>
+          <Breadcrumb items={[
+            { name: 'Inicio', href: '/' },
+            { name: 'Recursos Bíblicos', href: '/recursos-biblicos' },
+            { name: libro.nombre, href: null }
+          ]} />
 
           <Link
             href="/recursos-biblicos"
@@ -162,9 +157,6 @@ export default async function LibroPage({ params }) {
   );
 }
 
-// ============================================================
-// generateStaticParams para prerenderizar todos los libros
-// ============================================================
 export async function generateStaticParams() {
   const { data: books } = await supabase
     .from('books')

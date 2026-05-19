@@ -5,6 +5,7 @@ import '../../estudios.css';
 import ScriptExecutor from './ScriptExecutor';
 import AudioPlayer from '@/app/componentes/AudioPlayer';
 import ShareButtons from '@/app/componentes/ShareButtons';
+import Breadcrumb from '@/app/componentes/Breadcrumb';
 
 // ============================================================
 // Función para generar HTML automático a partir de una URL según el tipo
@@ -153,34 +154,14 @@ export default async function RecursoPage({ params }) {
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
       <div className="max-w-[922px] mx-auto px-0">
         <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
-          {/* Breadcrumb */}
-          <div className="bg-white border border-[#d4c4a8] rounded p-2.5 mb-5 text-sm">
-            <Link href="/" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Inicio
-            </Link>
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <Link href="/recursos-biblicos" className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-              Recursos Bíblicos
-            </Link>
-            {libro && (
-              <>
-                <span className="text-[#9e9e9e] mx-2">›</span>
-                <Link href={`/libro/${libro.slug}`} className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-                  {libro.nombre}
-                </Link>
-              </>
-            )}
-            {capitulo && (
-              <>
-                <span className="text-[#9e9e9e] mx-2">›</span>
-                <Link href={`/libro/${libro.slug}/capitulo/${capitulo.numero}`} className="text-[#5d4037] hover:text-[#bf360c] border-b border-dotted border-[#8d6e63]">
-                  Capítulo {capitulo.numero}
-                </Link>
-              </>
-            )}
-            <span className="text-[#9e9e9e] mx-2">›</span>
-            <span className="text-[#8d6e63]">{titulo}</span>
-          </div>
+          {/* Breadcrumb con schema */}
+          <Breadcrumb items={[
+            { name: 'Inicio', href: '/' },
+            { name: 'Recursos Bíblicos', href: '/recursos-biblicos' },
+            ...(libro ? [{ name: libro.nombre, href: `/libro/${libro.slug}` }] : []),
+            ...(capitulo ? [{ name: `Capítulo ${capitulo.numero}`, href: `/libro/${libro.slug}/capitulo/${capitulo.numero}` }] : []),
+            { name: titulo, href: null }
+          ]} />
 
           {/* Botón volver */}
           {capitulo && libro && (
