@@ -1,4 +1,4 @@
-// app/linea-tiempo/TimelineAvanzado.jsx - RANGOS CORREGIDOS
+// app/linea-tiempo/TimelineAvanzado.jsx - VERSIÓN CORREGIDA (sin errores de sintaxis)
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -9,7 +9,7 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
   const [filterEra, setFilterEra] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [yearRange, setYearRange] = useState({ min: -4100, max: 150 });
+  const [yearRange, setYearRange] = useState({ min: -4100, max: 200 });
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
@@ -18,31 +18,8 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
   const containerRef = useRef(null);
   const timelineRef = useRef(null);
   const intervalRef = useRef(null);
+  const lastEventIdRef = useRef(null);
 
-  // PERÍODOS CON RANGOS CORREGIDOS (basados en años reales de los eventos)
-  const periods = [
-    { range: [-4100, -3500], name: 'Creación', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/creacion.jpg' },
-    { range: [-3500, -2500], name: 'Antediluviano', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/antediluviano.jpg' },
-    { range: [-2500, -2100], name: 'Postdiluvio - Babel', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/babel.jpg' },
-    // Patriarcas: desde Abraham (-2091) hasta antes del Éxodo (-1500)
-    { range: [-2100, -1500], name: 'Patriarcas', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/patriarcas.jpg' },
-    // Éxodo y Conquista: desde Moisés (-1526) hasta antes de los Jueces (-1200)
-    { range: [-1500, -1200], name: 'Éxodo y Conquista', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/exodo.jpg' },
-    // Jueces: desde el inicio del período de jueces hasta antes de la monarquía
-    { range: [-1200, -1050], name: 'Jueces', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/jueces.jpg' },
-    // Monarquía Unida: desde Saúl/David hasta la división del reino
-    { range: [-1050, -930], name: 'Monarquía Unida', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/monarquia.jpg' },
-    // Reinos Divididos y Profetas: desde la división hasta el exilio
-    { range: [-930, -586], name: 'Reinos Divididos y Profetas', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/profetas.jpg' },
-    // Exilio y Restauración: desde la caída de Jerusalén hasta el fin del AT
-    { range: [-586, -400], name: 'Exilio y Restauración', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/exilio.jpg' },
-    // Intertestamentario: desde Malaquías hasta el nacimiento de Jesús
-    { range: [-400, -5], name: 'Intertestamentario', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/intertestamentario.jpg' },
-    // Nuevo Testamento: desde el nacimiento de Jesús hasta el fin del siglo I
-    { range: [-5, 150], name: 'Nuevo Testamento', image: 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/periodos/nuevo_testamento.jpg' },
-  ];
-
-  // Detectar móvil
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -50,10 +27,8 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Obtener categorías únicas
   const categories = useMemo(() => [...new Set(events.map(e => e.category).filter(Boolean))], [events]);
 
-  // Filtrar eventos
   const filteredEvents = useMemo(() => {
     return events.filter(event => {
       if (filterEra === 'ac' && event.start_year >= 0) return false;
@@ -69,34 +44,39 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
     });
   }, [events, filterEra, filterCategory, searchTerm, yearRange]);
 
-  // Función para actualizar fondo según el año central
-  const updateBackgroundByYear = (centerYear) => {
-    const period = periods.find(p => centerYear >= p.range[0] && centerYear <= p.range[1]);
-    if (period && period.image) {
-      if (backgroundImage !== period.image) {
-        setBackgroundImage(period.image);
+  const findClosestEvent = (centerYear) => {
+    if (filteredEvents.length === 0) return null;
+    let closest = null;
+    let minDist = Infinity;
+    filteredEvents.forEach(event => {
+      const dist = Math.abs(event.start_year - centerYear);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = event;
       }
+    });
+    return closest;
+  };
+
+  const updateBackgroundFromEvent = (event) => {
+    if (event && event.image_url) {
+      setBackgroundImage(event.image_url);
     } else {
-      if (backgroundImage !== 'https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/mahanaim_fondo_papiro_opt.jpg') {
-        setBackgroundImage('https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/mahanaim_fondo_papiro_opt.jpg');
-      }
+      setBackgroundImage(defaultBackground);
     }
   };
 
-  // Configurar timeline
   useEffect(() => {
-    if (!containerRef.current || filteredEvents.length === 0) {
-      if (timelineRef.current) {
-        timelineRef.current.destroy();
-        timelineRef.current = null;
-      }
-      return;
-    }
-
     if (timelineRef.current) {
       timelineRef.current.destroy();
       timelineRef.current = null;
     }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (!containerRef.current || filteredEvents.length === 0) return;
 
     const items = filteredEvents.map(ev => ({
       id: ev.id,
@@ -118,7 +98,7 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
       start: new Date(Date.UTC(-500, 0, 1)),
       end: new Date(Date.UTC(200, 0, 1)),
       min: new Date(Date.UTC(-4100, 0, 1)),
-      max: new Date(Date.UTC(150, 0, 1)),
+      max: new Date(Date.UTC(200, 0, 1)),
       timeAxis: { scale: 'year', step: 50 },
       orientation: 'top',
       stack: true,
@@ -126,40 +106,58 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
       tooltip: { followMouse: true },
       height: isMobile ? '300px' : '450px',
       width: '100%',
-      style: 'background-color: transparent;',
     };
 
     try {
       const timeline = new Timeline(containerRef.current, dataset, options);
       timelineRef.current = timeline;
 
-      // Al hacer clic en un evento (solo panel de detalles)
       timeline.on('select', function (properties) {
         if (properties.items.length) {
           const eventId = properties.items[0];
           const event = filteredEvents.find(e => e.id === eventId);
           setSelectedEvent(event);
+          updateBackgroundFromEvent(event);
         }
       });
 
-      // Centrar en Jesús al inicio
-      timeline.setWindow(new Date(Date.UTC(-5, 0, 1)), new Date(Date.UTC(100, 0, 1)), { animation: false });
-      
-      // Establecer fondo inicial (Nuevo Testamento)
-      updateBackgroundByYear(47);
+      timeline.on('timechange', () => {
+        if (!timelineRef.current) return;
+        const windowRange = timelineRef.current.getWindow();
+        if (windowRange.start && windowRange.end) {
+          const centerMs = (windowRange.start.getTime() + windowRange.end.getTime()) / 2;
+          const centerYear = new Date(centerMs).getUTCFullYear();
+          const closest = findClosestEvent(centerYear);
+          if (closest && closest.id !== lastEventIdRef.current) {
+            lastEventIdRef.current = closest.id;
+            updateBackgroundFromEvent(closest);
+          }
+        }
+      });
 
-      // Intervalo para actualizar fondo según el año central
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      timeline.setWindow(new Date(Date.UTC(-2091, 0, 1)), new Date(Date.UTC(-1991, 0, 1)), { animation: false });
+      const initialWindow = timeline.getWindow();
+      if (initialWindow.start && initialWindow.end) {
+        const centerMs = (initialWindow.start.getTime() + initialWindow.end.getTime()) / 2;
+        const centerYear = new Date(centerMs).getUTCFullYear();
+        const closest = findClosestEvent(centerYear);
+        if (closest) updateBackgroundFromEvent(closest);
+      }
+
       intervalRef.current = setInterval(() => {
         if (timelineRef.current) {
           const windowRange = timelineRef.current.getWindow();
           if (windowRange.start && windowRange.end) {
             const centerMs = (windowRange.start.getTime() + windowRange.end.getTime()) / 2;
             const centerYear = new Date(centerMs).getUTCFullYear();
-            updateBackgroundByYear(centerYear);
+            const closest = findClosestEvent(centerYear);
+            if (closest && closest.id !== lastEventIdRef.current) {
+              lastEventIdRef.current = closest.id;
+              updateBackgroundFromEvent(closest);
+            }
           }
         }
-      }, 300);
+      }, 100);
 
       window.__timelineJumpToYear = (year) => {
         if (timelineRef.current) {
@@ -185,12 +183,12 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
     setFilterEra('');
     setFilterCategory('');
     setSearchTerm('');
-    setYearRange({ min: -4100, max: 150 });
+    setYearRange({ min: -4100, max: 200 });
   };
 
   const jumpToYear = (year) => {
     if (window.__timelineJumpToYear) window.__timelineJumpToYear(year);
-    const event = events.find(e => e.start_year === year);
+    const event = filteredEvents.find(e => e.start_year === year);
     if (event) setSelectedEvent(event);
   };
 
@@ -207,7 +205,7 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
 
   return (
     <div className="w-full font-serif text-[#3e2723]">
-      {/* Barra de filtros */}
+      {/* Filtros */}
       <div className="bg-[#fef7e0] border-b border-[#d4ac0d] p-4">
         {isMobile && (
           <button onClick={() => setShowFiltersMobile(!showFiltersMobile)} className="mb-3 w-full bg-[#1a3a5c] text-[#d4ac0d] py-2 rounded-lg font-bold">
@@ -242,11 +240,11 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
           <div>
             <label className="block text-sm font-bold mb-1">Rango de años</label>
             <div className="flex gap-4 items-center">
-              <input type="range" min="-4100" max="150" value={yearRange.min} onChange={(e) => setYearRange({ ...yearRange, min: parseInt(e.target.value) })} className="w-full" />
+              <input type="range" min="-4100" max="200" value={yearRange.min} onChange={(e) => setYearRange({ ...yearRange, min: parseInt(e.target.value) })} className="w-full" />
               <span className="text-sm whitespace-nowrap">{yearRange.min < 0 ? `${Math.abs(yearRange.min)} a.C.` : `${yearRange.min} d.C.`}</span>
             </div>
             <div className="flex gap-4 items-center mt-2">
-              <input type="range" min="-4100" max="150" value={yearRange.max} onChange={(e) => setYearRange({ ...yearRange, max: parseInt(e.target.value) })} className="w-full" />
+              <input type="range" min="-4100" max="200" value={yearRange.max} onChange={(e) => setYearRange({ ...yearRange, max: parseInt(e.target.value) })} className="w-full" />
               <span className="text-sm whitespace-nowrap">{yearRange.max < 0 ? `${Math.abs(yearRange.max)} a.C.` : `${yearRange.max} d.C.`}</span>
             </div>
           </div>
@@ -262,7 +260,7 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
         ))}
       </div>
 
-      {/* Contenedor del timeline con fondo dinámico por período */}
+      {/* Timeline */}
       <div className="relative w-full overflow-hidden" style={{ backgroundColor: '#fdfbf7' }}>
         <div
           className="absolute inset-0 pointer-events-none bg-cover bg-center transition-all duration-700"
@@ -291,7 +289,9 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
             <h3 className="text-2xl font-bold text-[#1a5276] mb-2">{selectedEvent.title}</h3>
             <p className="text-[#5d4037] text-sm mb-3">
               <strong>Año:</strong> {selectedEvent.start_year < 0 ? `${Math.abs(selectedEvent.start_year)} a.C.` : `${selectedEvent.start_year} d.C.`}
-              {selectedEvent.end_year && ` – ${selectedEvent.end_year < 0 ? `${Math.abs(selectedEvent.end_year)} a.C.` : `${selectedEvent.end_year} d.C.`}`}
+              {selectedEvent.end_year && (
+                <span> – {selectedEvent.end_year < 0 ? `${Math.abs(selectedEvent.end_year)} a.C.` : `${selectedEvent.end_year} d.C.`}</span>
+              )}
             </p>
             <p className="text-[#3e2723] leading-relaxed mb-4">{selectedEvent.description}</p>
             {selectedEvent.bible_references && (
@@ -311,7 +311,7 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
         )}
       </div>
 
-      {/* Lista adicional en móvil */}
+      {/* Lista móvil */}
       {isMobile && filteredEvents.length > 0 && (
         <div className="mt-6 p-4 border-t border-[#d4c4a8]">
           <h3 className="text-xl font-bold text-[#1a5276] mb-3">Eventos filtrados</h3>
