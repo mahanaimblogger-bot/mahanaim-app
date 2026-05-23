@@ -5,6 +5,12 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { DataSet, Timeline } from 'vis-timeline/standalone';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 
+const toTimelineDate = (year) => {
+  const d = new Date(0);
+  d.setUTCFullYear(year, 0, 1);
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+};
 export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.app' }) {
   const [filterEra, setFilterEra] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
@@ -79,11 +85,12 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
     if (!containerRef.current || filteredEvents.length === 0) return;
 
     const items = filteredEvents.map(ev => ({
-      id: ev.id,
-      content: ev.title,
-      start: new Date(Date.UTC(ev.start_year, 0, 1)),
-      title: ev.description || '',
-    }));
+  id: ev.id,
+  content: ev.title,
+  start: toTimelineDate(ev.start_year),
+  ...(ev.end_year != null && { end: toTimelineDate(ev.end_year) }),
+  title: ev.description || '',
+}));
 
     const dataset = new DataSet(items);
     const options = {
@@ -95,10 +102,10 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
       zoomMax: 1000 * 365 * 24 * 60 * 60 * 1000,
       moveable: true,
       showCurrentTime: false,
-      start: new Date(Date.UTC(-500, 0, 1)),
-      end: new Date(Date.UTC(200, 0, 1)),
-      min: new Date(Date.UTC(-4100, 0, 1)),
-      max: new Date(Date.UTC(200, 0, 1)),
+      start: toTimelineDate(-500),
+      end: toTimelineDate(200),
+      min: toTimelineDate(-4100),
+      max: toTimelineDate(1000),
       timeAxis: { scale: 'year', step: 50 },
       orientation: 'top',
       stack: true,
@@ -135,7 +142,7 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
         }
       });
 
-      timeline.setWindow(new Date(Date.UTC(-2091, 0, 1)), new Date(Date.UTC(-1991, 0, 1)), { animation: false });
+      timeline.setWindow(toTimelineDate(25), toTimelineDate(35), { animation: false });
       const initialWindow = timeline.getWindow();
       if (initialWindow.start && initialWindow.end) {
         const centerMs = (initialWindow.start.getTime() + initialWindow.end.getTime()) / 2;
@@ -161,8 +168,8 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
 
       window.__timelineJumpToYear = (year) => {
         if (timelineRef.current) {
-          const startDate = new Date(Date.UTC(year, 0, 1));
-          const endDate = new Date(Date.UTC(year + 100, 0, 1));
+          const startDate = toTimelineDate(year);
+const endDate = toTimelineDate(year + 100);
           timelineRef.current.setWindow(startDate, endDate, { animation: true });
         }
       };
