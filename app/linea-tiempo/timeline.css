@@ -32,3 +32,11 @@ body > div:first-child {
   margin: 0;
   padding: 0;
 }
+
+/* Evitar que vis-timeline corte el texto de los eventos */
+.vis-item .vis-item-content {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 12px; /* opcional, ajusta el tamaño si quieres */
+}

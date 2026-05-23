@@ -5,6 +5,8 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { DataSet, Timeline } from 'vis-timeline/standalone';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 
+import 'react-tooltip/dist/react-tooltip.css';
+
 const toTimelineDate = (year) => {
   const d = new Date(0);
   d.setUTCFullYear(year, 0, 1);
@@ -25,6 +27,126 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
   const timelineRef = useRef(null);
   const intervalRef = useRef(null);
   const lastEventIdRef = useRef(null);
+
+const parseBibleReferences = (references) => {
+  if (!references) return null;
+  const refs = references.split(/[;,]/).map(r => r.trim());
+  return refs.map((ref, idx) => {
+    // Expresión regular que captura: (opcional: número y espacio) + nombre del libro + capítulo:versículo
+    const match = ref.match(/^(\d*\s*[a-zA-Záéíóúñ]+(?:\s+[a-zA-Záéíóúñ]+)*)\s+(\d+):(\d+)(?:-(\d+))?$/i);
+    if (!match) {
+      console.warn('Referencia no parseada:', ref);
+      return <span key={idx}>{ref}</span>;
+    }
+    let [, bookName, chapter, verseStart, verseEnd] = match;
+    bookName = bookName.trim().toLowerCase();
+
+    // Mapeo exacto según tu tabla de libros
+    const bookSlugMap = {
+      'génesis': 'genesis',
+      'éxodo': 'exodo',
+      'levítico': 'levitico',
+      'números': 'numeros',
+      'deuteronomio': 'deuteronomio',
+      'josué': 'josue',
+      'jueces': 'jueces',
+      'rut': 'rut',
+      '1 samuel': '1-samuel',
+      '2 samuel': '2-samuel',
+      '1 reyes': '1-reyes',
+      '2 reyes': '2-reyes',
+      '1 crónicas': '1-cronicas',
+      '2 crónicas': '2-cronicas',
+      'esdras': 'esdras',
+      'nehemías': 'nehemias',
+      'ester': 'ester',
+      'job': 'job',
+      'salmos': 'salmos',
+      'proverbios': 'proverbios',
+      'eclesiastés': 'eclesiastes',
+      'cantares': 'cantares',
+      'isaías': 'isaias',
+      'jeremías': 'jeremias',
+      'lamentaciones': 'lamentaciones',
+      'ezequiel': 'ezequiel',
+      'daniel': 'daniel',
+      'oseas': 'oseas',
+      'joel': 'joel',
+      'amos': 'amos',
+      'abdías': 'abdias',
+      'jonás': 'jonas',
+      'miqueas': 'miqueas',
+      'nahúm': 'nahum',
+      'habacuc': 'habacuc',
+      'sofonías': 'sofonias',
+      'hageo': 'hageo',
+      'zacarías': 'zacarias',
+      'malaquías': 'malaquias',
+      'mateo': 'mateo',
+      'marcos': 'marcos',
+      'lucas': 'lucas',
+      'juan': 'juan',
+      'hechos': 'hechos',
+      'romanos': 'romanos',
+      '1 corintios': '1-corintios',
+      '2 corintios': '2-corintios',
+      'gálatas': 'galatas',
+      'efesios': 'efesios',
+      'filipenses': 'filipenses',
+      'colosenses': 'colosenses',
+      '1 tesalonicenses': '1-tesalonicenses',
+      '2 tesalonicenses': '2-tesalonicenses',
+      '1 timoteo': '1-timoteo',
+      '2 timoteo': '2-timoteo',
+      'tito': 'tito',
+      'filemón': 'filemon',
+      'hebreos': 'hebreos',
+      'santiago': 'santiago',
+      '1 pedro': '1-pedro',
+      '2 pedro': '2-pedro',
+      '1 juan': '1-juan',
+      '2 juan': '2-juan',
+      '3 juan': '3-juan',
+      'judas': 'judas',
+      'apocalipsis': 'apocalipsis'
+    };
+
+    const slug = bookSlugMap[bookName];
+    if (!slug) {
+      console.warn('Libro no mapeado:', bookName);
+      return <span key={idx}>{ref}</span>;
+    }
+
+    return (
+      <span key={idx}>
+        <a
+          style={{ cursor: 'pointer', textDecoration: 'underline dotted', color: '#1a5276' }}
+          title="Cargando versículo..."
+          onMouseEnter={async (e) => {
+            const target = e.currentTarget;
+            if (!target) return;
+            try {
+              const params = new URLSearchParams({
+                book: slug,
+                chapter: chapter,
+                verseStart: verseStart,
+                verseEnd: verseEnd || verseStart
+              });
+              const res = await fetch(`/api/bible-verse?${params.toString()}`);
+              const data = await res.json();
+              if (target) target.title = data.text || 'Versículo no encontrado';
+            } catch (err) {
+              console.error('Error al cargar versículo:', err);
+              if (target) target.title = 'Error al cargar';
+            }
+          }}
+        >
+          {ref}
+        </a>
+      </span>
+    );
+  });
+};
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -93,27 +215,27 @@ export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.a
 }));
 
     const dataset = new DataSet(items);
-    const options = {
-      horizontalScroll: true,
-      verticalScroll: false,
-      zoomable: true,
-      zoomKey: 'ctrlKey',
-      zoomMin: 100 * 365 * 24 * 60 * 60 * 1000,
-      zoomMax: 1000 * 365 * 24 * 60 * 60 * 1000,
-      moveable: true,
-      showCurrentTime: false,
-      start: toTimelineDate(-500),
-      end: toTimelineDate(200),
-      min: toTimelineDate(-4100),
-      max: toTimelineDate(1000),
-      timeAxis: { scale: 'year', step: 50 },
-      orientation: 'top',
-      stack: true,
-      showTooltips: true,
-      tooltip: { followMouse: true },
-      height: isMobile ? '300px' : '450px',
-      width: '100%',
-    };
+   const options = {
+  horizontalScroll: true,
+  verticalScroll: false,   // <-- desactivado
+  zoomable: true,
+  zoomKey: 'ctrlKey',
+  zoomMin: 100 * 365 * 24 * 60 * 60 * 1000,
+  zoomMax: 1000 * 365 * 24 * 60 * 60 * 1000,
+  moveable: true,
+  showCurrentTime: false,
+  start: toTimelineDate(-500),
+  end: toTimelineDate(200),
+  min: toTimelineDate(-4100),
+  max: toTimelineDate(1000),
+  timeAxis: { scale: 'year', step: 50 },
+  orientation: 'top',
+  stack: true,
+  showTooltips: true,
+  tooltip: { followMouse: true },
+  height: isMobile ? '400px' : '550px',   // <-- aumentado
+  width: '100%',
+};
 
     try {
       const timeline = new Timeline(containerRef.current, dataset, options);
@@ -268,26 +390,27 @@ const endDate = toTimelineDate(year + 100);
       </div>
 
       {/* Timeline */}
-      <div className="relative w-full overflow-hidden" style={{ backgroundColor: '#fdfbf7' }}>
-        <div
-          className="absolute inset-0 pointer-events-none bg-cover bg-center transition-all duration-700"
-          style={{
-            backgroundImage: `url('${backgroundImage || defaultBackground}')`,
-            opacity: 0.25,
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-          }}
-        />
-        <div className="relative z-10">
-          <div className="text-center text-xs text-[#8d6e63] py-1 bg-white/50 backdrop-blur-sm">
-            {selectedEvent ? `Evento seleccionado: ${selectedEvent.title}` : 'Desplázate para explorar períodos'}
-          </div>
-          <div ref={containerRef} />
-        </div>
-        {filteredEvents.length === 0 && (
-          <div className="text-center py-10 text-[#8d6e63] relative z-10">No hay eventos con los filtros seleccionados.</div>
-        )}
-      </div>
+      {/* Timeline */}
+<div className="relative w-full overflow-auto" style={{ backgroundColor: '#fdfbf7', maxHeight: isMobile ? '600px' : '800px' }}>
+  <div
+    className="absolute inset-0 pointer-events-none bg-cover bg-center transition-all duration-700"
+    style={{
+      backgroundImage: `url('${backgroundImage || defaultBackground}')`,
+      opacity: 0.25,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+    }}
+  />
+  <div className="relative z-10">
+    <div className="text-center text-xs text-[#8d6e63] py-1 bg-white/50 backdrop-blur-sm">
+      {selectedEvent ? `Evento seleccionado: ${selectedEvent.title}` : 'Desplázate para explorar períodos'}
+    </div>
+    <div ref={containerRef} />
+  </div>
+  {filteredEvents.length === 0 && (
+    <div className="text-center py-10 text-[#8d6e63] relative z-10">No hay eventos con los filtros seleccionados.</div>
+  )}
+</div>
 
       {/* Panel de detalles */}
       <div className="mx-auto max-w-4xl my-6 p-5 bg-white border-l-4 border-[#d4ac0d] shadow-md rounded-r-lg">
@@ -300,10 +423,13 @@ const endDate = toTimelineDate(year + 100);
                 <span> – {selectedEvent.end_year < 0 ? `${Math.abs(selectedEvent.end_year)} a.C.` : `${selectedEvent.end_year} d.C.`}</span>
               )}
             </p>
-            <p className="text-[#3e2723] leading-relaxed mb-4">{selectedEvent.description}</p>
+            <p className="text-[#3e2723] leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: selectedEvent.description }} />
             {selectedEvent.bible_references && (
-              <p className="text-sm text-[#1a5276]"><strong>Referencias bíblicas:</strong> {selectedEvent.bible_references}</p>
-            )}
+  <p className="text-sm text-[#1a5276]">
+    <strong>Referencias bíblicas:</strong> {parseBibleReferences(selectedEvent.bible_references)}
+  </p>
+)}
+           
             {selectedEvent.related_book_slug && (
               <a href={`${baseUrl}/libro/${selectedEvent.related_book_slug}`} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition">
                 📖 Ver recursos relacionados
