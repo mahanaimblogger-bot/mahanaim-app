@@ -5,8 +5,6 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { DataSet, Timeline } from 'vis-timeline/standalone';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 
-import 'react-tooltip/dist/react-tooltip.css';
-
 const toTimelineDate = (year) => {
   const d = new Date(0);
   d.setUTCFullYear(year, 0, 1);
