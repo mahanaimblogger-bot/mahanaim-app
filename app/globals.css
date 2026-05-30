@@ -86,3 +86,9 @@ body {
   left: 0;
   color: #d4ac0d;
 }
+
+.description-content a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}

@@ -421,7 +421,7 @@ const endDate = toTimelineDate(year + 100);
                 <span> – {selectedEvent.end_year < 0 ? `${Math.abs(selectedEvent.end_year)} a.C.` : `${selectedEvent.end_year} d.C.`}</span>
               )}
             </p>
-            <p className="text-[#3e2723] leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: selectedEvent.description }} />
+            <div className="text-[#3e2723] leading-relaxed mb-4 description-content" dangerouslySetInnerHTML={{ __html: selectedEvent.description }} />
             {selectedEvent.bible_references && (
   <p className="text-sm text-[#1a5276]">
     <strong>Referencias bíblicas:</strong> {parseBibleReferences(selectedEvent.bible_references)}
