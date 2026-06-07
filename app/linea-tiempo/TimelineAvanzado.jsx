@@ -153,6 +153,17 @@ const parseBibleReferences = (references) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+  window.tog = function(h) {
+    const b = h.nextElementSibling;
+    const c = h.querySelector('.ficha-chev');
+    if (!b) return;
+    const o = b.style.display === 'none';
+    b.style.display = o ? 'block' : 'none';
+    if (c) c.classList.toggle('open', o);
+  };
+}, []);
+
   const categories = useMemo(() => [...new Set(events.map(e => e.category).filter(Boolean))], [events]);
 
   const filteredEvents = useMemo(() => {
