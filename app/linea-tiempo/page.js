@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import Breadcrumb from '@/app/componentes/Breadcrumb';
-import TimelineAvanzado from './TimelineAvanzado';
-import TimelineMobile from './TimelineMobile';
+import TimelineWrapper from './TimelineWrapper';
 
 const supabaseUrl = 'https://ngvfllkbdnmezikxxyzd.supabase.co';
 const supabaseAnonKey = 'sb_publishable_qAFVH9JgX4Nl5PiW27NUwA_qSWqizeD';
@@ -33,15 +32,7 @@ export default async function TimelinePage() {
           Explora los eventos más importantes de la historia bíblica
         </p>
 
-        {/* Desktop: timeline visual */}
-        <div className="hidden md:block">
-          <TimelineAvanzado events={events} />
-        </div>
-
-        {/* Mobile: vista cards */}
-        <div className="block md:hidden">
-          <TimelineMobile events={events} />
-        </div>
+        <TimelineWrapper events={events} />
 
       </div>
     </div>

@@ -92,3 +92,51 @@ body {
   text-decoration: underline;
   font-weight: 500;
 }
+
+/* ============================================
+   LÍNEA DE TIEMPO - TABLAS RESPONSIVE
+   ============================================ */
+
+/* Las tablas dentro de las fichas deben hacer scroll horizontal en móvil */
+.description-content .ftable,
+.ficha-body .ftable {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+/* En móvil, mejorar la legibilidad */
+@media (max-width: 768px) {
+  .description-content .ftable td,
+  .ficha-body .ftable td {
+    white-space: normal;
+    min-width: 120px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .description-content .ftable th,
+  .ficha-body .ftable th {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .ficha-body {
+    font-size: 0.9rem;
+  }
+  
+  .pill {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    white-space: nowrap;
+  }
+  
+  /* Las celdas de la tabla que tienen mucho texto */
+  .description-content .ftable td:first-child,
+  .ficha-body .ftable td:first-child {
+    font-weight: 600;
+    background-color: #fef9e6;
+  }
+}

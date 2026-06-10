@@ -17,6 +17,7 @@ export default function LectorCapituloPage() {
   const [hasStudy, setHasStudy] = useState(false);
   const [capitulos, setCapitulos] = useState([]);      // Lista de números de capítulo del libro
   const [currentIndex, setCurrentIndex] = useState(-1); // Índice del capítulo actual
+  const [timelineEvent, setTimelineEvent] = useState(null);
 
   useEffect(() => {
     if (!slug || !chapterNum) return;
@@ -85,6 +86,32 @@ export default function LectorCapituloPage() {
           .limit(1);
         setHasStudy(resources && resources.length > 0);
       }
+
+      // Buscar evento exacto del capítulo
+const { data: timelineExacto } = await supabase
+  .from('timeline_events')
+  .select('id, title, start_year, category, image_url')
+  .eq('related_book_slug', slug)
+  .eq('related_chapter', chapterNum)
+  .maybeSingle();
+
+if (timelineExacto) {
+  setTimelineEvent(timelineExacto);
+} else {
+  // Si no hay exacto, buscar el evento más cercano anterior del mismo libro
+  const { data: timelineCercano } = await supabase
+    .from('timeline_events')
+    .select('id, title, start_year, category, image_url')
+    .eq('related_book_slug', slug)
+    .lt('related_chapter', chapterNum)
+    .order('related_chapter', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (timelineCercano) {
+    setTimelineEvent({ ...timelineCercano, esCercano: true });
+  }
+}
 
       setCargando(false);
     })();
@@ -159,6 +186,25 @@ export default function LectorCapituloPage() {
         ))}
       </div>
 
+     {/* Botón a línea de tiempo */}
+{timelineEvent && (
+  <div className="mt-8 text-center">
+    
+      <a href={`/linea-tiempo?evento=${timelineEvent.id}`}
+      className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] font-bold px-6 py-3 rounded-lg hover:bg-[#2d4a6c] transition"
+    >
+      {timelineEvent.esCercano
+        ? `Ver en linea de tiempo: ${timelineEvent.title}`
+        : 'Ver este evento en la linea de tiempo'}
+    </a>
+    {timelineEvent.esCercano && (
+      <p className="text-xs text-[#8d6e63] mt-2">
+        No hay evento exacto para este capitulo. Mostrando el mas cercano anterior.
+      </p>
+    )}
+  </div>
+)}
+        
       {/* Botón a estudios si existen */}
       {hasStudy && (
         <div className="mt-12 text-center">

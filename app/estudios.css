@@ -468,3 +468,33 @@ h1.titulo-entrada { font-size: 24px; }
   margin: 0 0 10px;
   font-size: 1.1em;
 }
+
+.ficha { font-family: inherit; padding: .2rem 0; }
+.ficha-seccion { border-radius: 8px; border: .5px solid rgba(0,0,0,.1); margin-bottom: 8px; overflow: hidden; }
+.ficha-header { display: flex; align-items: center; gap: 9px; padding: 9px 12px; cursor: pointer; user-select: none; background: rgba(0,0,0,.02); }
+.ficha-header:hover { background: rgba(0,0,0,.05); }
+.fi { width: 24px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+.ficha-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #666; flex: 1; }
+.ficha-chev { font-size: 11px; color: #999; transition: transform .2s; display: inline-block; }
+.ficha-chev.open { transform: rotate(180deg); }
+.ficha-body { padding: 11px 12px 13px; border-top: .5px solid rgba(0,0,0,.07); font-size: 13.5px; line-height: 1.75; }
+.ficha-body p { margin: 0 0 8px; }
+.ficha-body p:last-child { margin: 0; }
+.ficha-body a { color: #1a6fc4; text-decoration: underline; font-weight: 500; }
+.ficha-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 9px; }
+.pill { font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 99px; }
+.p-periodo { background: #E6F1FB; color: #0C447C; }
+.p-era { background: #F1EFE8; color: #444; }
+.p-region { background: #E1F5EE; color: #085041; }
+.p-dinastia { background: #FAEEDA; color: #633806; }
+.ftable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ftable td { padding: 5px 0; vertical-align: top; }
+.ftable td:first-child { color: #777; width: 34%; padding-right: 8px; font-weight: 500; }
+.ftable tr+tr td { border-top: .5px solid rgba(0,0,0,.07); }
+.i-resumen { background: #dbeafe; }
+.i-mundo { background: #dcfce7; }
+.i-costumbres { background: #fef9c3; }
+.i-natural { background: #ffedd5; }
+.i-arqueologia { background: #ede9fe; }
+.i-biblica { background: #fce7f3; }
+.i-conexiones { background: #f1f5f9; }

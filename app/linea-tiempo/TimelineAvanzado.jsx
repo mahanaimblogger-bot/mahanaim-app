@@ -4,6 +4,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { DataSet, Timeline } from 'vis-timeline/standalone';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
+import DOMPurify from 'dompurify';
+const sanitize = DOMPurify.default?.sanitize || DOMPurify.sanitize;
 
 const toTimelineDate = (year) => {
   const d = new Date(0);
@@ -11,7 +13,7 @@ const toTimelineDate = (year) => {
   d.setUTCHours(0, 0, 0, 0);
   return d;
 };
-export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.app' }) {
+export default function TimelineAvanzado({ events, baseUrl = 'https://mahanaim.app', initialEventId = null }) {
   const [filterEra, setFilterEra] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -153,7 +155,7 @@ const parseBibleReferences = (references) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
   window.tog = function(h) {
     const b = h.nextElementSibling;
     const c = h.querySelector('.ficha-chev');
@@ -162,6 +164,21 @@ const parseBibleReferences = (references) => {
     b.style.display = o ? 'block' : 'none';
     if (c) c.classList.toggle('open', o);
   };
+
+  // Event delegation como respaldo
+  const handler = (e) => {
+    const h = e.target.closest('.ficha-header');
+    if (!h) return;
+    const b = h.nextElementSibling;
+    const c = h.querySelector('.ficha-chev');
+    if (!b) return;
+    const o = b.style.display === 'none';
+    b.style.display = o ? 'block' : 'none';
+    if (c) c.classList.toggle('open', o);
+  };
+
+  document.addEventListener('click', handler);
+  return () => document.removeEventListener('click', handler);
 }, []);
 
   const categories = useMemo(() => [...new Set(events.map(e => e.category).filter(Boolean))], [events]);
@@ -282,6 +299,21 @@ const parseBibleReferences = (references) => {
         if (closest) updateBackgroundFromEvent(closest);
       }
 
+      // Leer parámetro ?evento= de la URL y seleccionar ese evento
+const params = new URLSearchParams(window.location.search);
+const eventoId = params.get('evento');
+if (eventoId) {
+  const evento = filteredEvents.find(e => String(e.id) === eventoId);
+  if (evento) {
+    setSelectedEvent(evento);
+    updateBackgroundFromEvent(evento);
+    // Centrar la vista en ese evento
+    const startDate = toTimelineDate(evento.start_year - 50);
+    const endDate = toTimelineDate(evento.start_year + 50);
+    timeline.setWindow(startDate, endDate, { animation: true });
+  }
+}
+
       intervalRef.current = setInterval(() => {
         if (timelineRef.current) {
           const windowRange = timelineRef.current.getWindow();
@@ -316,6 +348,29 @@ const endDate = toTimelineDate(year + 100);
       }
     };
   }, [filteredEvents, isMobile]);
+
+  // Seleccionar evento automáticamente si viene desde URL
+useEffect(() => {
+  if (initialEventId && filteredEvents.length > 0 && timelineRef.current) {
+    const event = filteredEvents.find(e => e.id === initialEventId);
+    if (event) {
+      setSelectedEvent(event);
+      updateBackgroundFromEvent(event);
+      
+      // Hacer zoom al evento en el timeline
+      const startDate = toTimelineDate(event.start_year - 50);
+      const endDate = toTimelineDate(event.start_year + 50);
+      timelineRef.current.setWindow(startDate, endDate, { animation: true });
+      
+      // Seleccionar visualmente el evento
+      setTimeout(() => {
+        if (timelineRef.current) {
+          timelineRef.current.setSelection([event.id]);
+        }
+      }, 500);
+    }
+  }
+}, [initialEventId, filteredEvents]);
 
   const clearFilters = () => {
     setFilterEra('');
@@ -432,18 +487,37 @@ const endDate = toTimelineDate(year + 100);
                 <span> – {selectedEvent.end_year < 0 ? `${Math.abs(selectedEvent.end_year)} a.C.` : `${selectedEvent.end_year} d.C.`}</span>
               )}
             </p>
-            <div className="text-[#3e2723] leading-relaxed mb-4 description-content" dangerouslySetInnerHTML={{ __html: selectedEvent.description }} />
+          
+            <div className="text-[#3e2723] leading-relaxed mb-4 description-content" dangerouslySetInnerHTML={{ __html: sanitize(selectedEvent.description) }} />
+
             {selectedEvent.bible_references && (
   <p className="text-sm text-[#1a5276]">
     <strong>Referencias bíblicas:</strong> {parseBibleReferences(selectedEvent.bible_references)}
   </p>
 )}
            
-            {selectedEvent.related_book_slug && (
-              <a href={`${baseUrl}/libro/${selectedEvent.related_book_slug}`} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition">
-                📖 Ver recursos relacionados
-              </a>
-            )}
+           {/* Enlace al lector bíblico (solo si tiene capítulo específico) */}
+{selectedEvent.related_book_slug && selectedEvent.related_chapter && (
+  <a 
+    href={`/lector/${selectedEvent.related_book_slug}/${selectedEvent.related_chapter}`}
+    className="inline-flex items-center gap-2 mt-4 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition"
+  >
+    📖 Leer {selectedEvent.related_book_slug} capítulo {selectedEvent.related_chapter}
+    <span>→</span>
+  </a>
+)}
+
+{/* Enlace a recursos del libro (solo si NO tiene capítulo específico - eventos históricos) */}
+{selectedEvent.related_book_slug && !selectedEvent.related_chapter && (
+  <a 
+    href={`/libro/${selectedEvent.related_book_slug}`}
+    className="inline-flex items-center gap-2 mt-4 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition"
+  >
+    📖 Ver recursos de {selectedEvent.related_book_slug}
+    <span>→</span>
+  </a>
+)}
+
             {selectedEvent.image_url && (
               <img src={selectedEvent.image_url} alt={selectedEvent.title} className="mt-4 max-w-full rounded-lg shadow-md" />
             )}

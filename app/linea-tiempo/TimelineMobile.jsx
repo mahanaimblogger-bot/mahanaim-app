@@ -1,6 +1,6 @@
- 'use client'
+'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { EventoCard } from './EventoCard'
 
 const CATEGORIAS = [
@@ -13,10 +13,12 @@ const CATEGORIAS = [
 
 const TESTAMENTOS = ['Todos', 'AT', 'NT']
 
-export default function TimelineMobile({ events }) {
+export default function TimelineMobile({ events, initialEventId = null }) {
   const [categoria, setCategoria] = useState('Todos')
   const [testamento, setTestamento] = useState('Todos')
   const [busqueda, setBusqueda] = useState('')
+  const [selectedEventId, setSelectedEventId] = useState(null)
+  const cardRefs = useRef({})
 
   const eventosFiltrados = useMemo(() => {
     return events.filter(ev => {
@@ -28,6 +30,39 @@ export default function TimelineMobile({ events }) {
       return okCategoria && okTestamento && okBusqueda
     })
   }, [events, categoria, testamento, busqueda])
+
+  // Seleccionar automáticamente el evento cuando viene desde URL
+  useEffect(() => {
+    if (initialEventId && eventosFiltrados.length > 0) {
+      const eventExists = eventosFiltrados.find(ev => ev.id === initialEventId)
+      if (eventExists) {
+        setSelectedEventId(initialEventId)
+        // Hacer scroll al elemento
+        setTimeout(() => {
+          const element = cardRefs.current[initialEventId]
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            // Resaltar visualmente (opcional)
+            element.classList.add('ring-2', 'ring-amber-400', 'ring-offset-2')
+            setTimeout(() => {
+              element.classList.remove('ring-2', 'ring-amber-400', 'ring-offset-2')
+            }, 2000)
+          }
+        }, 100)
+      }
+    }
+  }, [initialEventId, eventosFiltrados])
+
+  // Limpiar selección cuando cambian filtros
+  useEffect(() => {
+    if (selectedEventId) {
+      // Verificar si el evento seleccionado sigue en los filtrados
+      const stillExists = eventosFiltrados.find(ev => ev.id === selectedEventId)
+      if (!stillExists) {
+        setSelectedEventId(null)
+      }
+    }
+  }, [eventosFiltrados, selectedEventId])
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
@@ -94,7 +129,15 @@ export default function TimelineMobile({ events }) {
       {eventosFiltrados.length > 0 ? (
         <div className="flex flex-col gap-4">
           {eventosFiltrados.map(ev => (
-            <EventoCard key={ev.id} evento={ev} />
+            <div
+              key={ev.id}
+              ref={el => cardRefs.current[ev.id] = el}
+              className={`transition-all duration-300 ${
+                selectedEventId === ev.id ? 'scale-[1.02] shadow-lg' : ''
+              }`}
+            >
+              <EventoCard evento={ev} />
+            </div>
           ))}
         </div>
       ) : (
