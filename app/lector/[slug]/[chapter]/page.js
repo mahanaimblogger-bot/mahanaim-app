@@ -15,28 +15,34 @@ export default function LectorCapituloPage() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [hasStudy, setHasStudy] = useState(false);
-  const [capitulos, setCapitulos] = useState([]);      // Lista de números de capítulo del libro
-  const [currentIndex, setCurrentIndex] = useState(-1); // Índice del capítulo actual
+  const [capitulos, setCapitulos] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(-1);
   const [timelineEvent, setTimelineEvent] = useState(null);
+  const [debugInfo, setDebugInfo] = useState({});
 
   useEffect(() => {
     if (!slug || !chapterNum) return;
     (async () => {
       setCargando(true);
-      // Obtener el libro
+      
+      // 🔧 Limpiar slug (por si tiene espacios o mayúsculas)
+      const cleanSlug = slug.trim().toLowerCase();
+      console.log(`📌 Slug original: "${slug}" → Limpio: "${cleanSlug}"`);
+
+      // 1. Obtener el libro
       const { data: libroData, error: libroError } = await supabase
         .from('books')
-        .select('id, nombre')
-        .eq('slug', slug)
+        .select('id, nombre, testamento')
+        .eq('slug', cleanSlug)
         .single();
       if (libroError || !libroData) {
-        setError(`Libro no encontrado: ${slug}`);
+        setError(`Libro no encontrado: ${cleanSlug}`);
         setCargando(false);
         return;
       }
       setLibro(libroData);
 
-      // Obtener la lista de capítulos del libro (desde la tabla `chapters`)
+      // 2. Obtener la lista de capítulos del libro
       const { data: capitulosData, error: capitulosError } = await supabase
         .from('chapters')
         .select('numero')
@@ -50,13 +56,12 @@ export default function LectorCapituloPage() {
         const idx = nums.indexOf(chapterNum);
         setCurrentIndex(idx);
       } else {
-        // Fallback: si no hay capítulos en la tabla, asumir hasta 150 (máximo bíblico)
         const fallbackNums = Array.from({ length: 150 }, (_, i) => i + 1);
         setCapitulos(fallbackNums);
         setCurrentIndex(chapterNum - 1);
       }
 
-      // Obtener los versículos
+      // 3. Obtener los versículos
       const { data: versosData, error: versosError } = await supabase
         .from('verses')
         .select('verse, text')
@@ -71,7 +76,7 @@ export default function LectorCapituloPage() {
         setVersos(versosData);
       }
 
-      // Verificar si hay recursos de estudio para este capítulo
+      // 4. Verificar si hay recursos de estudio
       const { data: chapterData } = await supabase
         .from('chapters')
         .select('id')
@@ -87,31 +92,77 @@ export default function LectorCapituloPage() {
         setHasStudy(resources && resources.length > 0);
       }
 
-      // Buscar evento exacto del capítulo
-const { data: timelineExacto } = await supabase
-  .from('timeline_events')
-  .select('id, title, start_year, category, image_url')
-  .eq('related_book_slug', slug)
-  .eq('related_chapter', chapterNum)
-  .maybeSingle();
+      // ============================================================
+      // 5. 🔍 BÚSQUEDA DEL EVENTO (versión robusta con todos los eventos)
+      // ============================================================
+      console.log('🔍 Buscando evento para:', { cleanSlug, chapterNum });
 
-if (timelineExacto) {
-  setTimelineEvent(timelineExacto);
-} else {
-  // Si no hay exacto, buscar el evento más cercano anterior del mismo libro
-  const { data: timelineCercano } = await supabase
-    .from('timeline_events')
-    .select('id, title, start_year, category, image_url')
-    .eq('related_book_slug', slug)
-    .lt('related_chapter', chapterNum)
-    .order('related_chapter', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+      // 📥 Traer TODOS los eventos del libro (sin filtrar por capítulo)
+      const { data: eventosDelLibro, error: errorEventos } = await supabase
+        .from('timeline_events')
+        .select('id, title, start_year, category, image_url, related_chapter')
+        .ilike('related_book_slug', cleanSlug)
+        .order('related_chapter', { ascending: true, nullsLast: true });
 
-  if (timelineCercano) {
-    setTimelineEvent({ ...timelineCercano, esCercano: true });
-  }
-}
+      console.log('📚 Eventos del libro (todos):', eventosDelLibro);
+      if (errorEventos) console.error('❌ errorEventos:', errorEventos);
+
+      let encontrado = null;
+
+      if (eventosDelLibro && eventosDelLibro.length > 0) {
+        console.log(`✅ Se encontraron ${eventosDelLibro.length} eventos para el libro`);
+        
+        // Buscar el capítulo exacto
+        const exacto = eventosDelLibro.find(e => e.related_chapter === chapterNum);
+        if (exacto) {
+          console.log('🎯 Evento exacto encontrado:', exacto);
+          encontrado = exacto;
+        } else {
+          // Buscar el más cercano anterior (menor que el capítulo actual)
+          const anteriores = eventosDelLibro
+            .filter(e => e.related_chapter !== null && e.related_chapter < chapterNum)
+            .sort((a, b) => b.related_chapter - a.related_chapter);
+          
+          if (anteriores.length > 0) {
+            console.log('🔄 Evento cercano anterior encontrado:', anteriores[0]);
+            encontrado = { ...anteriores[0], esCercano: true };
+          } else {
+            // Si no hay anterior, usar el primero de la lista (el más antiguo del libro)
+            console.log('📌 Usando el primer evento del libro:', eventosDelLibro[0]);
+            encontrado = { ...eventosDelLibro[0], esCercano: true };
+          }
+        }
+      } else {
+        console.log('💔 No hay eventos para este libro. Buscando por testamento...');
+        
+        // Fallback: buscar por testamento
+        const { data: eventoTestamento, error: testamentoError } = await supabase
+          .from('timeline_events')
+          .select('id, title, start_year, category, image_url')
+          .eq('testament', libroData.testamento)
+          .order('start_year', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        console.log('📦 eventoTestamento:', eventoTestamento);
+        if (testamentoError) console.error('❌ testamentoError:', testamentoError);
+
+        if (eventoTestamento) {
+          console.log('📌 Evento por testamento encontrado (el más reciente)');
+          encontrado = { ...eventoTestamento, esCercano: true, esTestamento: true };
+        } else {
+          console.log('❌ No hay eventos para este testamento');
+          encontrado = { id: 0, title: 'Línea de tiempo general', esCercano: false, esFallback: true };
+        }
+      }
+
+      setTimelineEvent(encontrado);
+      setDebugInfo({ 
+        slug: cleanSlug, 
+        chapterNum, 
+        totalEventosLibro: eventosDelLibro?.length || 0,
+        encontrado 
+      });
 
       setCargando(false);
     })();
@@ -119,7 +170,6 @@ if (timelineExacto) {
 
   const handleChapterChange = (e) => {
     const newChapter = parseInt(e.target.value);
-    // Navegar al nuevo capítulo
     window.location.href = `/lector/${slug}/${newChapter}`;
   };
 
@@ -137,7 +187,7 @@ if (timelineExacto) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      {/* Navegación superior: título del libro, selector y botones */}
+      {/* Navegación superior */}
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <Link href={`/lector/${slug}`} className="text-[#d4ac0d] hover:underline">
           ← {libro.nombre}
@@ -186,25 +236,41 @@ if (timelineExacto) {
         ))}
       </div>
 
-     {/* Botón a línea de tiempo */}
-{timelineEvent && (
-  <div className="mt-8 text-center">
-    
-      <a href={`/linea-tiempo?evento=${timelineEvent.id}`}
-      className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] font-bold px-6 py-3 rounded-lg hover:bg-[#2d4a6c] transition"
-    >
-      {timelineEvent.esCercano
-        ? `Ver en linea de tiempo: ${timelineEvent.title}`
-        : 'Ver este evento en la linea de tiempo'}
-    </a>
-    {timelineEvent.esCercano && (
-      <p className="text-xs text-[#8d6e63] mt-2">
-        No hay evento exacto para este capitulo. Mostrando el mas cercano anterior.
-      </p>
-    )}
-  </div>
-)}
-        
+      {/* ============================================================
+          BOTÓN A LÍNEA DE TIEMPO (SIEMPRE VISIBLE)
+          ============================================================ */}
+      <div className="mt-8 text-center">
+        {timelineEvent ? (
+          <a
+            href={timelineEvent.id > 0 ? `/linea-tiempo?evento=${timelineEvent.id}` : '/linea-tiempo'}
+            className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] font-bold px-6 py-3 rounded-lg hover:bg-[#2d4a6c] transition"
+          >
+            {timelineEvent.esTestamento && '📜 '}
+            {timelineEvent.esFallback ? '📜 Ver toda la línea de tiempo' :
+             timelineEvent.esCercano && !timelineEvent.esTestamento
+               ? `⏳ Evento cercano: ${timelineEvent.title}`
+               : timelineEvent.title ? `📖 ${timelineEvent.title}` : '📖 Ver en línea de tiempo'}
+          </a>
+        ) : (
+          <a
+            href="/linea-tiempo"
+            className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] font-bold px-6 py-3 rounded-lg hover:bg-[#2d4a6c] transition"
+          >
+            📜 Ver línea de tiempo completa
+          </a>
+        )}
+        {timelineEvent?.esCercano && !timelineEvent.esTestamento && !timelineEvent.esFallback && (
+          <p className="text-xs text-[#8d6e63] mt-2">
+            No hay evento exacto para este capítulo. Mostrando el más cercano anterior.
+          </p>
+        )}
+        {timelineEvent?.esTestamento && (
+          <p className="text-xs text-[#8d6e63] mt-2">
+            No hay eventos para este libro específico. Mostrando el evento más reciente del {libro.testamento === 'AT' ? 'Antiguo' : 'Nuevo'} Testamento.
+          </p>
+        )}
+      </div>
+
       {/* Botón a estudios si existen */}
       {hasStudy && (
         <div className="mt-12 text-center">
@@ -217,7 +283,7 @@ if (timelineExacto) {
         </div>
       )}
 
-      {/* Navegación inferior (opcional) */}
+      {/* Navegación inferior */}
       <div className="flex justify-between mt-8 pt-8 border-t border-[#d4c4a8]">
         {prevChapter && (
           <Link href={`/lector/${slug}/${prevChapter}`} className="text-[#1a5276] hover:underline">← Capítulo {prevChapter}</Link>
@@ -226,6 +292,16 @@ if (timelineExacto) {
         {nextChapter && (
           <Link href={`/lector/${slug}/${nextChapter}`} className="text-[#1a5276] hover:underline">Capítulo {nextChapter} →</Link>
         )}
+      </div>
+
+      {/* ============================================================
+          🐞 BLOQUE DE DEPURACIÓN VISUAL (eliminar después de resolver)
+          ============================================================ */}
+      <div className="mt-8 p-4 bg-gray-100 border border-gray-300 rounded-lg text-xs font-mono text-left overflow-auto">
+        <details>
+          <summary className="cursor-pointer font-bold text-[#1a5276]">🐞 Debug: timelineEvent</summary>
+          <pre className="mt-2 whitespace-pre-wrap">{JSON.stringify(debugInfo, null, 2)}</pre>
+        </details>
       </div>
     </div>
   );
