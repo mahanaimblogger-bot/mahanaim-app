@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import DOMPurify from 'dompurify';
 
 const CATEGORY_EMOJI = {
@@ -31,7 +31,11 @@ function formatYear(year) {
 function sanitizeHTML(html) {
   if (!html) return '';
   try {
-    return DOMPurify.default?.sanitize(html) || DOMPurify.sanitize(html) || html;
+    const clean = DOMPurify.sanitize(html, { 
+      ADD_ATTR: ['target', 'rel'],
+      ADD_TAGS: ['style']
+    });
+    return clean || html;
   } catch (e) {
     console.error('Error sanitizando HTML:', e);
     return html;
@@ -46,20 +50,38 @@ function CollapsibleContent({ html }) {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isClient || !containerRef.current) return;
-
     const headers = containerRef.current.querySelectorAll('.ficha-header');
+
     const handleClick = (e) => {
-      const header = e.currentTarget;
-      const body = header.nextElementSibling;
-      const chevron = header.querySelector('.ficha-chev');
-      if (body) {
-        const isHidden = body.style.display === 'none';
-        body.style.display = isHidden ? 'block' : 'none';
-        if (chevron) chevron.classList.toggle('open', isHidden);
-      }
-    };
+  const header = e.currentTarget;
+  console.log('CLICK EN HEADER:', header.querySelector('.ficha-label')?.textContent);
+
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.ficha-chev');
+
+  console.log('body es null?', body === null);
+  console.log('chevron es null?', chevron === null);
+  console.log('body tagName:', body?.tagName, 'body className:', body?.className);
+
+  if (body && chevron) {
+    console.log('ENTRO AL IF');
+    const isOpen = chevron.classList.contains('open');
+    console.log('isOpen antes del cambio:', isOpen);
+    if (isOpen) {
+      body.style.display = 'none';
+      chevron.classList.remove('open');
+    } else {
+      body.style.display = 'block';
+      chevron.classList.add('open');
+    }
+    console.log('display DESPUES de asignar:', body.style.display);
+    console.log('mismo objeto?', body === header.nextElementSibling);
+  } else {
+    console.log('NO ENTRO AL IF');
+  }
+};
 
     headers.forEach(header => header.addEventListener('click', handleClick));
     return () => headers.forEach(header => header.removeEventListener('click', handleClick));
@@ -68,10 +90,10 @@ function CollapsibleContent({ html }) {
   if (!isClient) return <div className="text-stone-400">Cargando contenido...</div>;
 
   return (
-    <div ref={containerRef}>
-      <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(html) }} />
-    </div>
-  );
+  <div ref={containerRef} className="evento-card-ficha">
+    <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(html) }} />
+  </div>
+);
 }
 
 export function EventoCard({ evento }) {

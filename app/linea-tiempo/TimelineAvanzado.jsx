@@ -5,7 +5,14 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { DataSet, Timeline } from 'vis-timeline/standalone';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 import DOMPurify from 'dompurify';
-const sanitize = DOMPurify.default?.sanitize || DOMPurify.sanitize;
+
+// Agregamos { ADD_ATTR: ['target', 'rel'] } para permitir que los enlaces abran en otra pestaña
+const sanitize = (html) => {
+  if (!html) return '';
+  return DOMPurify.default 
+    ? DOMPurify.default.sanitize(html, { ADD_ATTR: ['target', 'rel'] })
+    : DOMPurify.sanitize(html, { ADD_ATTR: ['target', 'rel'] });
+};
 
 const toTimelineDate = (year) => {
   const d = new Date(0);
@@ -166,16 +173,17 @@ const parseBibleReferences = (references) => {
   };
 
   // Event delegation como respaldo
-  const handler = (e) => {
-    const h = e.target.closest('.ficha-header');
-    if (!h) return;
-    const b = h.nextElementSibling;
-    const c = h.querySelector('.ficha-chev');
-    if (!b) return;
-    const o = b.style.display === 'none';
-    b.style.display = o ? 'block' : 'none';
-    if (c) c.classList.toggle('open', o);
-  };
+const handler = (e) => {
+  const h = e.target.closest('.ficha-header');
+  if (!h) return;
+  if (h.closest('.evento-card-ficha')) return; // Ignorar clicks dentro de EventoCard (mobile)
+  const b = h.nextElementSibling;
+  const c = h.querySelector('.ficha-chev');
+  if (!b) return;
+  const o = b.style.display === 'none';
+  b.style.display = o ? 'block' : 'none';
+  if (c) c.classList.toggle('open', o);
+};
 
   document.addEventListener('click', handler);
   return () => document.removeEventListener('click', handler);
