@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import DOMPurify from 'dompurify';
+import { WikiModal } from './WikiModal';
 
 const CATEGORY_EMOJI = {
   'Patriarcas': '👴',
@@ -42,7 +43,7 @@ function sanitizeHTML(html) {
   }
 }
 
-function CollapsibleContent({ html }) {
+function CollapsibleContent({ html, onWikiClick }) {
   const containerRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -50,46 +51,44 @@ function CollapsibleContent({ html }) {
     setIsClient(true);
   }, []);
 
+  console.log('CollapsibleContent renderizando', Date.now());
+
   useLayoutEffect(() => {
-    if (!isClient || !containerRef.current) return;
-    const headers = containerRef.current.querySelectorAll('.ficha-header');
+  if (!isClient || !containerRef.current) return;
+  const container = containerRef.current;
 
-    const handleClick = (e) => {
-  const header = e.currentTarget;
-  console.log('CLICK EN HEADER:', header.querySelector('.ficha-label')?.textContent);
-
-  const body = header.nextElementSibling;
-  const chevron = header.querySelector('.ficha-chev');
-
-  console.log('body es null?', body === null);
-  console.log('chevron es null?', chevron === null);
-  console.log('body tagName:', body?.tagName, 'body className:', body?.className);
-
-  if (body && chevron) {
-    console.log('ENTRO AL IF');
-    const isOpen = chevron.classList.contains('open');
-    console.log('isOpen antes del cambio:', isOpen);
-    if (isOpen) {
-      body.style.display = 'none';
-      chevron.classList.remove('open');
-    } else {
-      body.style.display = 'block';
-      chevron.classList.add('open');
+  const handleContainerClick = (e) => {
+    const link = e.target.closest('a[href*="wikipedia.org"]');
+    if (link) {
+      e.preventDefault();
+      if (onWikiClick) onWikiClick(link.getAttribute('href'));
+      return;
     }
-    console.log('display DESPUES de asignar:', body.style.display);
-    console.log('mismo objeto?', body === header.nextElementSibling);
-  } else {
-    console.log('NO ENTRO AL IF');
-  }
-};
 
-    headers.forEach(header => header.addEventListener('click', handleClick));
-    return () => headers.forEach(header => header.removeEventListener('click', handleClick));
-  }, [isClient, html]);
+    const header = e.target.closest('.ficha-header');
+    if (header) {
+      const body = header.nextElementSibling;
+      const chevron = header.querySelector('.ficha-chev');
+      if (body && chevron) {
+        const isOpen = chevron.classList.contains('open');
+        if (isOpen) {
+          body.style.display = 'none';
+          chevron.classList.remove('open');
+        } else {
+          body.style.display = 'block';
+          chevron.classList.add('open');
+        }
+      }
+    }
+  };
 
-  if (!isClient) return <div className="text-stone-400">Cargando contenido...</div>;
+  container.addEventListener('click', handleContainerClick);
+  return () => container.removeEventListener('click', handleContainerClick);
+}, [isClient, html, onWikiClick]);
 
-  return (
+if (!isClient) return <div className="text-stone-400">Cargando contenido...</div>;
+
+return (
   <div ref={containerRef} className="evento-card-ficha">
     <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(html) }} />
   </div>
@@ -100,6 +99,7 @@ export function EventoCard({ evento }) {
   const [expandido, setExpandido] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [wikiUrl, setWikiUrl] = useState(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -158,7 +158,9 @@ export function EventoCard({ evento }) {
 
         {expandido && (
           <div className="mt-3 text-sm text-stone-600 leading-relaxed">
-            {evento.description && isClient && <CollapsibleContent html={evento.description} />}
+            {evento.description && isClient && (
+              <CollapsibleContent html={evento.description} onWikiClick={setWikiUrl} />
+            )}
             {!isClient && <div>Cargando detalles...</div>}
 
             {evento.related_book_slug && evento.related_chapter && (
@@ -185,6 +187,10 @@ export function EventoCard({ evento }) {
           {expandido ? '▲ Cerrar' : '▼ Ver contexto histórico'}
         </button>
       </div>
+
+      {wikiUrl && (
+        <WikiModal url={wikiUrl} onClose={() => setWikiUrl(null)} />
+      )}
     </div>
   );
 }
