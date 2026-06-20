@@ -4,6 +4,26 @@ import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { WikiModal } from './WikiModal';
 
+// Estado global del modal - vive fuera de los componentes para no causar re-renders
+let _setGlobalWikiUrl = null;
+
+function openWikiModal(url) {
+  if (_setGlobalWikiUrl) _setGlobalWikiUrl(url);
+}
+
+// Componente del modal global - se monta UNA sola vez en la pagina padre
+export function WikiModalGlobal() {
+  const [wikiUrl, setWikiUrl] = useState(null);
+
+  useEffect(() => {
+    _setGlobalWikiUrl = setWikiUrl;
+    return () => { _setGlobalWikiUrl = null; };
+  }, []);
+
+  if (!wikiUrl) return null;
+  return <WikiModal url={wikiUrl} onClose={() => setWikiUrl(null)} />;
+}
+
 const CATEGORY_EMOJI = {
   'Patriarcas': '👴',
   'Diluvio': '🌊',
@@ -32,7 +52,7 @@ function formatYear(year) {
 function sanitizeHTML(html) {
   if (!html) return '';
   try {
-    const clean = DOMPurify.sanitize(html, { 
+    const clean = DOMPurify.sanitize(html, {
       ADD_ATTR: ['target', 'rel'],
       ADD_TAGS: ['style']
     });
@@ -43,7 +63,7 @@ function sanitizeHTML(html) {
   }
 }
 
-function CollapsibleContent({ html, onWikiClick }) {
+function CollapsibleContent({ html }) {
   const containerRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -51,55 +71,54 @@ function CollapsibleContent({ html, onWikiClick }) {
     setIsClient(true);
   }, []);
 
-  console.log('CollapsibleContent renderizando', Date.now());
-
   useLayoutEffect(() => {
-  if (!isClient || !containerRef.current) return;
-  const container = containerRef.current;
+    if (!isClient || !containerRef.current) return;
+    const container = containerRef.current;
 
-  const handleContainerClick = (e) => {
-    const link = e.target.closest('a[href*="wikipedia.org"]');
-    if (link) {
-      e.preventDefault();
-      if (onWikiClick) onWikiClick(link.getAttribute('href'));
-      return;
-    }
+    const handleContainerClick = (e) => {
+      // Interceptar links de Wikipedia - abre modal sin re-render
+      const link = e.target.closest('a[href*="wikipedia.org"]');
+      if (link) {
+        e.preventDefault();
+        openWikiModal(link.getAttribute('href'));
+        return;
+      }
 
-    const header = e.target.closest('.ficha-header');
-    if (header) {
-      const body = header.nextElementSibling;
-      const chevron = header.querySelector('.ficha-chev');
-      if (body && chevron) {
-        const isOpen = chevron.classList.contains('open');
-        if (isOpen) {
-          body.style.display = 'none';
-          chevron.classList.remove('open');
-        } else {
-          body.style.display = 'block';
-          chevron.classList.add('open');
+      // Toggle de secciones colapsables
+      const header = e.target.closest('.ficha-header');
+      if (header) {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.ficha-chev');
+        if (body && chevron) {
+          const isOpen = chevron.classList.contains('open');
+          if (isOpen) {
+            body.style.display = 'none';
+            chevron.classList.remove('open');
+          } else {
+            body.style.display = 'block';
+            chevron.classList.add('open');
+          }
         }
       }
-    }
-  };
+    };
 
-  container.addEventListener('click', handleContainerClick);
-  return () => container.removeEventListener('click', handleContainerClick);
-}, [isClient, html, onWikiClick]);
+    container.addEventListener('click', handleContainerClick);
+    return () => container.removeEventListener('click', handleContainerClick);
+  }, [isClient, html]);
 
-if (!isClient) return <div className="text-stone-400">Cargando contenido...</div>;
+  if (!isClient) return <div className="text-stone-400">Cargando contenido...</div>;
 
-return (
-  <div ref={containerRef} className="evento-card-ficha">
-    <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(html) }} />
-  </div>
-);
+  return (
+    <div ref={containerRef} className="evento-card-ficha">
+      <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(html) }} />
+    </div>
+  );
 }
 
 export function EventoCard({ evento }) {
   const [expandido, setExpandido] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [wikiUrl, setWikiUrl] = useState(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -159,7 +178,7 @@ export function EventoCard({ evento }) {
         {expandido && (
           <div className="mt-3 text-sm text-stone-600 leading-relaxed">
             {evento.description && isClient && (
-              <CollapsibleContent html={evento.description} onWikiClick={setWikiUrl} />
+              <CollapsibleContent html={evento.description} />
             )}
             {!isClient && <div>Cargando detalles...</div>}
 
@@ -187,10 +206,6 @@ export function EventoCard({ evento }) {
           {expandido ? '▲ Cerrar' : '▼ Ver contexto histórico'}
         </button>
       </div>
-
-      {wikiUrl && (
-        <WikiModal url={wikiUrl} onClose={() => setWikiUrl(null)} />
-      )}
     </div>
   );
 }

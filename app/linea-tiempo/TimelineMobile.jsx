@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { EventoCard } from './EventoCard'
+import { EventoCard, WikiModalGlobal } from './EventoCard'
 
 const CATEGORIAS = [
   'Todos',
@@ -31,18 +31,15 @@ export default function TimelineMobile({ events, initialEventId = null }) {
     })
   }, [events, categoria, testamento, busqueda])
 
-  // Seleccionar automáticamente el evento cuando viene desde URL
   useEffect(() => {
     if (initialEventId && eventosFiltrados.length > 0) {
       const eventExists = eventosFiltrados.find(ev => ev.id === initialEventId)
       if (eventExists) {
         setSelectedEventId(initialEventId)
-        // Hacer scroll al elemento
         setTimeout(() => {
           const element = cardRefs.current[initialEventId]
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            // Resaltar visualmente (opcional)
             element.classList.add('ring-2', 'ring-amber-400', 'ring-offset-2')
             setTimeout(() => {
               element.classList.remove('ring-2', 'ring-amber-400', 'ring-offset-2')
@@ -53,10 +50,8 @@ export default function TimelineMobile({ events, initialEventId = null }) {
     }
   }, [initialEventId, eventosFiltrados])
 
-  // Limpiar selección cuando cambian filtros
   useEffect(() => {
     if (selectedEventId) {
-      // Verificar si el evento seleccionado sigue en los filtrados
       const stillExists = eventosFiltrados.find(ev => ev.id === selectedEventId)
       if (!stillExists) {
         setSelectedEventId(null)
@@ -152,6 +147,9 @@ export default function TimelineMobile({ events, initialEventId = null }) {
           </button>
         </div>
       )}
+
+      {/* Modal de Wikipedia global - se monta una sola vez */}
+      <WikiModalGlobal />
 
     </div>
   )
