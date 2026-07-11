@@ -22,13 +22,28 @@
 /* Fondo de pergamino con letras hebreas — Paleta Catedral */
 body {
   background-color: #fdfbf7;
-  background-image: url('https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/mahanaim_fondo_papiro_opt.jpg');
-  background-repeat: repeat;
-  background-position: top left;
   color: #3e2723;
   font-family: Georgia, 'Times New Roman', serif;
   min-height: 100vh;
 }
+
+/* El fondo de pergamino SOLO en pantallas horizontales o muy anchas */
+@media (min-width: 768px) and (orientation: landscape) {
+  body {
+    background-image: url('https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/mahanaim_fondo_papiro_opt.jpg');
+    background-repeat: repeat;
+    background-position: top left;
+  }
+}
+
+/* En vertical y pantallas pequeñas: sin fondo */
+@media (max-width: 767px), (orientation: portrait) {
+  body {
+    background-image: none !important;
+  }
+}
+
+
 
 /* Botones de salto rápido para la Línea de Tiempo */
 /* Botones de saltos rápidos para la línea de tiempo */
