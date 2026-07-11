@@ -155,3 +155,39 @@ body {
     background-color: #fef9e6;
   }
 }
+
+/* ============================================
+   MÓVIL - EXPANDIR CONTENEDORES A TODO EL ANCHO
+   ============================================ */
+@media (max-width: 767px) {
+  /* Contenedores principales */
+  .max-w-\[1200px\],
+  .max-w-4xl,
+  .max-w-3xl,
+  .max-w-2xl,
+  .max-w-xl,
+  .max-w-lg,
+  .container,
+  .mx-auto {
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Header y navegación */
+  header, .header, nav, .navegacion {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Eliminar márgenes laterales del body */
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+}
