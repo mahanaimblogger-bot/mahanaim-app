@@ -63,8 +63,8 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
-      <div className="w-full max-w-full mx-auto px-4 sm:max-w-[922px] sm:px-0">
-        <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8] rounded-xl">
+  <div className="w-full px-3 sm:max-w-[922px] sm:px-0 sm:mx-auto">
+    <div className="bg-[#fdfbf7] p-3 sm:p-5 border border-[#d4c4a8] rounded-xl">
           {/* Banner */}
           <div className="text-center mb-6">
             <Image
