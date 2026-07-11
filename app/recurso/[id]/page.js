@@ -152,8 +152,8 @@ export default async function RecursoPage({ params }) {
 
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
-      <div className="max-w-[922px] mx-auto px-0">
-        <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
+  <div className="w-full px-3 sm:max-w-[922px] sm:px-0 sm:mx-auto">
+    <div className="bg-[#fdfbf7] p-3 sm:p-5 border border-[#d4c4a8]">
           {/* Breadcrumb con schema */}
           <Breadcrumb items={[
             { name: 'Inicio', href: '/' },
@@ -174,7 +174,7 @@ export default async function RecursoPage({ params }) {
           )}
 
           {/* Contenido del recurso */}
-          <div className="bg-white p-8 rounded-xl shadow-md border border-[#d4c4a8]">
+          <div className="bg-white p-4 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
             {portadaUrl && (
               <div className="imagen-portada">
                 <img alt={titulo} src={portadaUrl} />
