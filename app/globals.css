@@ -19,7 +19,9 @@
   }
 }
 
-/* Fondo de pergamino con letras hebreas — Paleta Catedral */
+/* ============================================
+   FONDO DE PERGAMINO (SOLO EN PANTALLAS GRANDES)
+   ============================================ */
 body {
   background-color: #fdfbf7;
   color: #3e2723;
@@ -27,7 +29,6 @@ body {
   min-height: 100vh;
 }
 
-/* El fondo de pergamino SOLO en pantallas horizontales o muy anchas */
 @media (min-width: 768px) and (orientation: landscape) {
   body {
     background-image: url('https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/mahanaim_fondo_papiro_opt.jpg');
@@ -36,17 +37,15 @@ body {
   }
 }
 
-/* En vertical y pantallas pequeñas: sin fondo */
 @media (max-width: 767px), (orientation: portrait) {
   body {
     background-image: none !important;
   }
 }
 
-
-
-/* Botones de salto rápido para la Línea de Tiempo */
-/* Botones de saltos rápidos para la línea de tiempo */
+/* ============================================
+   BOTONES Y ESTILOS GENERALES
+   ============================================ */
 .jump-btn {
   background: #1a3a5c;
   border: none;
@@ -64,7 +63,6 @@ body {
   transform: scale(1.02);
 }
 
-/* Estilos para ficha de personaje */
 .caja-personaje {
   background: #fefbf6;
   border-left: 5px solid #d4ac0d;
@@ -109,10 +107,8 @@ body {
 }
 
 /* ============================================
-   LÍNEA DE TIEMPO - TABLAS RESPONSIVE
+   TABLAS RESPONSIVE EN LÍNEA DE TIEMPO
    ============================================ */
-
-/* Las tablas dentro de las fichas deben hacer scroll horizontal en móvil */
 .description-content .ftable,
 .ficha-body .ftable {
   display: block;
@@ -122,7 +118,6 @@ body {
   width: 100%;
 }
 
-/* En móvil, mejorar la legibilidad */
 @media (max-width: 768px) {
   .description-content .ftable td,
   .ficha-body .ftable td {
@@ -131,24 +126,19 @@ body {
     padding: 0.5rem;
     font-size: 0.8rem;
   }
-  
   .description-content .ftable th,
   .ficha-body .ftable th {
     padding: 0.5rem;
     font-size: 0.8rem;
   }
-  
   .ficha-body {
     font-size: 0.9rem;
   }
-  
   .pill {
     font-size: 0.7rem;
     padding: 0.2rem 0.5rem;
     white-space: nowrap;
   }
-  
-  /* Las celdas de la tabla que tienen mucho texto */
   .description-content .ftable td:first-child,
   .ficha-body .ftable td:first-child {
     font-weight: 600;
@@ -157,46 +147,17 @@ body {
 }
 
 /* ============================================
-   MÓVIL - EXPANDIR CONTENEDORES A TODO EL ANCHO
+   MÓVIL VERTICAL: ANCHO COMPLETO PARA TODO
    ============================================ */
 @media (max-width: 767px) {
-  /* Contenedores principales */
-  .max-w-\[1200px\],
-  .max-w-4xl,
-  .max-w-3xl,
-  .max-w-2xl,
-  .max-w-xl,
-  .max-w-lg,
-  .container,
-  .mx-auto {
-    max-width: 100% !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
-  /* Header y navegación */
-  header, .header, nav, .navegacion {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
-
-  /* Eliminar márgenes laterales del body */
-  body, html {
+  /* Eliminar márgenes y padding del body/html */
+  html, body {
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden !important;
   }
-}
 
-/* ============================================
-   FORZAR ANCHO COMPLETO EN MÓVIL (TODOS LOS CONTENEDORES)
-   ============================================ */
-@media (max-width: 767px) {
-  /* Cualquier elemento que tenga una clase con "max-w-" */
+  /* FORZAR a TODOS los contenedores con max-w-* a ocupar el 100% */
   [class*="max-w-"] {
     max-width: 100% !important;
     padding-left: 12px !important;
@@ -205,18 +166,14 @@ body {
     margin-right: 0 !important;
   }
 
-  /* Contenedores con mx-auto */
+  /* Clases específicas de contenedor */
+  .container,
   .mx-auto {
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-  }
-
-  /* El body, html y el contenedor principal de Next.js */
-  html, body, #__next, main, .main-content {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
   }
 
   /* Header y navegación */
@@ -228,8 +185,16 @@ body {
     margin: 0 !important;
   }
 
-  /* Cualquier elemento que tenga padding lateral excesivo */
-  .px-4, .px-6, .px-8 {
+  /* Contenedor principal de Next.js */
+  #__next, main, .main-content {
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin: 0 !important;
+  }
+
+  /* Forzar padding en elementos comunes de Tailwind */
+  .px-4, .px-6, .px-8, .px-3, .px-5 {
     padding-left: 12px !important;
     padding-right: 12px !important;
   }
