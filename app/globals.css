@@ -191,3 +191,46 @@ body {
     overflow-x: hidden !important;
   }
 }
+
+/* ============================================
+   FORZAR ANCHO COMPLETO EN MÓVIL (TODOS LOS CONTENEDORES)
+   ============================================ */
+@media (max-width: 767px) {
+  /* Cualquier elemento que tenga una clase con "max-w-" */
+  [class*="max-w-"] {
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Contenedores con mx-auto */
+  .mx-auto {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* El body, html y el contenedor principal de Next.js */
+  html, body, #__next, main, .main-content {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Header y navegación */
+  header, .header, nav, .navbar, .menu {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin: 0 !important;
+  }
+
+  /* Cualquier elemento que tenga padding lateral excesivo */
+  .px-4, .px-6, .px-8 {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
