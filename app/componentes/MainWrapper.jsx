@@ -6,7 +6,7 @@ export default function MainWrapper({ children }) {
   const isAdmin = pathname.startsWith("/admin");
 
   return (
-    <main className={isAdmin ? "" : "max-w-[922px] mx-auto px-0"}>
+    <main className={isAdmin ? "" : "w-full px-3 sm:max-w-[922px] sm:mx-auto sm:px-0"}>
       {children}
     </main>
   );
