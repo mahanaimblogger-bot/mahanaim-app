@@ -11,7 +11,7 @@ export default function Header() {
   }
 
   return (
-    <header className="w-full px-3 sm:max-w-[922px] sm:mx-auto sm:px-0 pt-5">
+    <header className="w-full sm:max-w-[922px] sm:mx-auto sm:px-0 pt-5">
       <Image
   src="https://ngvfllkbdnmezikxxyzd.supabase.co/storage/v1/object/public/mahanaim-public/headerfinal.jpg"
   alt="Mahanaim — Campamento de Dios"
