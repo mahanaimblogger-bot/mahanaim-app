@@ -21,6 +21,11 @@ export const metadata = {
   description: "Estudios bíblicos profundos, sermones, videos y materiales para enseñar la Palabra de Dios.",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html
