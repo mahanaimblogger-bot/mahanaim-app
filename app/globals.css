@@ -199,3 +199,13 @@ body {
     padding-right: 12px !important;
   }
 }
+
+/* ============================================
+   SOLO VERTICAL (PORTRAIT): CONTENIDO A ANCHO COMPLETO
+   ============================================ */
+@media (orientation: portrait) and (max-width: 900px) {
+  .contenedor-blog {
+    max-width: 100% !important;
+    padding: 12px !important;
+  }
+}
