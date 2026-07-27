@@ -498,4 +498,35 @@ h1.titulo-entrada { font-size: 24px; }
 .i-arqueologia { background: #ede9fe; }
 .i-biblica { background: #fce7f3; }
 .i-conexiones { background: #f1f5f9; }
+/* ============================================
+   REDUCIR PADDING DE CAJAS EN MÓVIL VERTICAL
+   ============================================ */
+@media (orientation: portrait) and (max-width: 767px) {
+  .contenedor-blog {
+    padding: 8px !important;
+  }
 
+  .cita-versiculo,
+  .caja-contexto,
+  .caja-linguistica,
+  .caja-arqueologica,
+  .caja-geografica,
+  .caja-profetica,
+  .caja-historica,
+  .caja-simbolismo,
+  .caja-meditar,
+  .caja-aplicacion,
+  .caja-doctrinas,
+  .caja-apologetica,
+  .caja-cientifica,
+  .caja-teologica,
+  .caja-critica,
+  .caja-pactual,
+  .caja-estructura,
+  .caja-escatologica,
+  .caja-historia-interpretacion,
+  .caja-referencias {
+    padding: 12px !important;
+    margin: 15px 0 !important;
+  }
+}
