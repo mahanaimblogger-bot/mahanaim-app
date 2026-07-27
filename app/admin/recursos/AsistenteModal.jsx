@@ -929,7 +929,7 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
       .replace(/'/g, "&#39;");
   };
 
-  const formatQuizInteractivo = (json) => {
+ const formatQuizInteractivo = (json) => {
     const preguntas = json.preguntas || [];
     if (preguntas.length === 0) return `<div class="contenedor-blog"><p>No se encontraron preguntas.</p></div>`;
 
@@ -939,7 +939,7 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
 
     preguntas.forEach((p, i) => {
       const preguntaTexto = p.pregunta || "Pregunta sin texto";
-      html += `<div class="quiz-pregunta-card bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8] mb-4">`;
+      html += `<div class="quiz-pregunta-card bg-[#fdfbf7] p-4 rounded shadow-sm border border-[#d4c4a8] mb-4" data-pregunta-num="${i + 1}">`;
       html += `<p class="font-bold text-[#1a5276] mb-3">${i + 1}. ${escapeHtml(preguntaTexto)}</p>`;
       html += `<div class="space-y-2">`;
 
@@ -947,13 +947,13 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
       opciones.forEach((op, j) => {
         const opcionTexto = op.texto || op.text || "Opción sin texto";
         const esCorrecta = op.correcta || op.correcto || op.isCorrect || op.correct || false;
-        html += `<label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#fef9e6] rounded transition">`;
+        html += `<label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-[#fef9e6] rounded transition quiz-opcion-label">`;
         html += `<input type="radio" name="pregunta-${i}" value="${j}" data-correcta="${esCorrecta}" class="w-4 h-4 text-[#d4ac0d]">`;
         html += `<span class="text-gray-700">${escapeHtml(opcionTexto)}</span>`;
         html += `</label>`;
       });
 
-      html += `</div></div>`;
+      html += `</div><p class="quiz-feedback-individual text-sm mt-2 font-semibold"></p></div>`;
     });
 
     html += `<div class="text-center mt-6">`;
@@ -968,24 +968,65 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
         if (!btn || !resultado) return;
         btn.addEventListener('click', function() {
           let correctas = 0;
+          const aciertos = [];
+          const fallos = [];
           const preguntasCards = document.querySelectorAll('.quiz-pregunta-card');
-          preguntasCards.forEach((card, idx) => {
+
+          preguntasCards.forEach((card) => {
+            const numPregunta = card.getAttribute('data-pregunta-num');
             const seleccionada = card.querySelector('input[type="radio"]:checked');
-            if (seleccionada && seleccionada.getAttribute('data-correcta') === 'true') {
+            const feedback = card.querySelector('.quiz-feedback-individual');
+            const labels = card.querySelectorAll('.quiz-opcion-label');
+
+            labels.forEach((label) => {
+              label.style.backgroundColor = '';
+              label.style.borderRadius = '6px';
+            });
+
+            const esCorrectaRespuesta = seleccionada && seleccionada.getAttribute('data-correcta') === 'true';
+
+            if (esCorrectaRespuesta) {
               correctas++;
+              aciertos.push(numPregunta);
+              if (feedback) {
+                feedback.textContent = '✅ Correcto';
+                feedback.style.color = '#2d6a4f';
+              }
+              if (seleccionada) seleccionada.closest('.quiz-opcion-label').style.backgroundColor = '#d4f4dd';
+            } else {
+              fallos.push(numPregunta);
+              if (feedback) {
+                feedback.textContent = seleccionada ? '❌ Incorrecto' : '⚠️ Sin responder';
+                feedback.style.color = '#c0392b';
+              }
+              if (seleccionada) seleccionada.closest('.quiz-opcion-label').style.backgroundColor = '#fbdcdc';
+              const correctaLabel = card.querySelector('input[data-correcta="true"]');
+              if (correctaLabel) correctaLabel.closest('.quiz-opcion-label').style.backgroundColor = '#d4f4dd';
             }
           });
+
           const total = preguntasCards.length;
           const porcentaje = Math.round((correctas / total) * 100);
-          
+
           let mensaje = '';
           if (porcentaje === 100) mensaje = '🎉 ¡Excelente! Has comprendido muy bien este pasaje. Sigue así profundizando en la Palabra.';
           else if (porcentaje >= 80) mensaje = '🙌 Muy bien. Has captado lo esencial. Revisa las preguntas que fallaste para seguir creciendo.';
           else if (porcentaje >= 50) mensaje = '📖 Buen intento. Te recomiendo volver a leer el capítulo y luego intentarlo de nuevo.';
           else mensaje = '💪 No te desanimes. Este es un buen momento para estudiar el capítulo con más calma. ¡Tú puedes!';
-          
-          resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span class="text-sm block mt-2">' + mensaje + '</span>';
+
+          let detalleTexto = '';
+          if (aciertos.length === total) {
+            detalleTexto = 'Respuestas correctas: todas';
+          } else if (fallos.length === total) {
+            detalleTexto = 'Respuestas correctas: ninguna';
+          } else {
+            detalleTexto = 'Correctas: ' + aciertos.join(', ') + ' — Incorrectas: ' + fallos.join(', ');
+          }
+
+          resultado.innerHTML = correctas + ' de ' + total + ' correctas (' + porcentaje + '%)<br><span class=\"text-sm block mt-2\">' + detalleTexto + '</span><br><span class=\"text-sm block mt-2\">' + mensaje + '</span>';
           resultado.style.color = porcentaje === 100 ? '#2d6a4f' : porcentaje >= 50 ? '#b7950b' : '#c0392b';
+
+          resultado.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
       })();
     </script>`;
@@ -993,7 +1034,7 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
     html += `</div>`;
     return html;
   };
-
+  
   const guardarRecurso = async () => {
     if (!generado) return;
     setGuardando(true);
