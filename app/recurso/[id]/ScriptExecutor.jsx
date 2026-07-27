@@ -21,6 +21,8 @@ export default function ScriptExecutor({ htmlContent }) {
         "width", "height", "frameborder", "allowfullscreen", "name", "value",
         "disabled", "checked", "target", "rel"
       ],
+      ADD_TAGS: ["script"],
+      FORCE_BODY: true,
     });
 
     containerRef.current.innerHTML = cleanHtml;
