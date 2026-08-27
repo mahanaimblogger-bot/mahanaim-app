@@ -45,10 +45,11 @@ async function getRecursos(slug, numero) {
 
   if (errorCapitulo || !capitulo) return null;
 
-  const { data: recursos, error: errorRecursos } = await supabase
+    const { data: recursos, error: errorRecursos } = await supabase
     .from('resources')
     .select('*')
     .eq('chapter_id', capitulo.id)
+    .or('tipo.neq.estudio,publicado.eq.true')
     .order('orden', { ascending: true });
 
   return { libro, capitulo, recursos: recursos || [] };
