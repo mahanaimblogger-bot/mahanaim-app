@@ -41,7 +41,7 @@ async function getLibroYCapitulos(slug) {
   const { data: recursos } = await supabase
     .from('resources')
     .select('chapter_id, tipo')
-    .eq('publicado', true)
+    .or('tipo.neq.estudio,publicado.eq.true')
     .in('chapter_id', chapterIds);
 
   const recursosPorCapitulo = {};
@@ -67,7 +67,7 @@ async function getLibroYCapitulos(slug) {
 function ChapterCard({ capitulo, libroSlug }) {
   const { numero, tiposRecursos, totalRecursos, resumen } = capitulo;
   
-  const iconosMostrar = tiposRecursos.slice(0, 6).map(tipo => ICONS[tipo] || '📄');
+  const iconosMostrar = tiposRecursos.slice(0, 6).map(tipo => ICONS[tipo] || '');
   const hayMas = tiposRecursos.length > 6;
 
   return (
@@ -133,7 +133,7 @@ export default async function LibroPage({ params }) {
           </Link>
 
           <div className="flex items-center gap-2.5 mb-6 pb-3 border-b-2 border-[#d4ac0d]">
-            <span className="text-2xl">📑</span>
+            <span className="text-2xl"></span>
             <h2 className="text-[#1a5276] text-xl font-bold font-['Georgia',serif] m-0">
               {libro.nombre} — Capítulos
             </h2>
