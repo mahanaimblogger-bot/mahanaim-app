@@ -1,152 +1,235 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import CharacterDetector from './CharacterDetector';
-import { ICONS, LABELS } from '@/lib/tiposRecursos';
+import '../../estudios.css';
+import ScriptExecutor from './ScriptExecutor';
+import AudioPlayer from '@/app/componentes/AudioPlayer';
+import ShareButtons from '@/app/componentes/ShareButtons';
 import Breadcrumb from '@/app/componentes/Breadcrumb';
+import PrintButton from '@/app/componentes/PrintButton';
 
-export async function generateMetadata({ params }) {
-  const { slug, numero } = await params;
-  const { data: libro } = await supabase
-    .from('books')
-    .select('nombre')
-    .eq('slug', slug)
-    .single();
+// ============================================================
+// Función para extraer ID de YouTube y generar iframe
+// ============================================================
+function renderVideoEmbed(url) {
+  if (!url) return null;
+  
+  let videoId = '';
+  const lowerUrl = url.toLowerCase();
+  
+  if (lowerUrl.includes('youtu.be/')) {
+    videoId = url.split('youtu.be/')[1]?.split(/[?#]/)[0];
+  } else if (lowerUrl.includes('youtube.com/watch')) {
+    const urlParams = new URLSearchParams(url.split('?')[1]);
+    videoId = urlParams.get('v');
+  } else if (lowerUrl.includes('youtube.com/embed/')) {
+    videoId = url.split('embed/')[1]?.split(/[?#]/)[0];
+  }
 
-  const titulo = libro 
-    ? `${libro.nombre} capítulo ${numero} – Recursos | Mahanaim` 
-    : `Capítulo ${numero} | Mahanaim`;
-  const descripcion = libro 
-    ? `Estudios, sermones, videos y materiales del capítulo ${numero} de ${libro.nombre}.` 
-    : `Recursos bíblicos del capítulo ${numero}.`;
-
-  return {
-    title: titulo,
-    description: descripcion,
-    openGraph: { title: titulo, description: descripcion, type: 'website' },
-  };
-}
-
-async function getRecursos(slug, numero) {
-  const { data: libro, error: errorLibro } = await supabase
-    .from('books')
-    .select('*')
-    .eq('slug', slug)
-    .single();
-
-  if (errorLibro || !libro) return null;
-
-  const { data: capitulo, error: errorCapitulo } = await supabase
-    .from('chapters')
-    .select('*')
-    .eq('book_id', libro.id)
-    .eq('numero', numero)
-    .single();
-
-  if (errorCapitulo || !capitulo) return null;
-
-    const { data: recursos, error: errorRecursos } = await supabase
-    .from('resources')
-    .select('*')
-    .eq('chapter_id', capitulo.id)
-    .or('tipo.neq.estudio,publicado.eq.true')
-    .order('orden', { ascending: true });
-
-  return { libro, capitulo, recursos: recursos || [] };
-}
-
-function ResourceCard({ recurso }) {
-  const tipo = recurso.tipo || 'estudio';
-  const icon = ICONS[tipo] || '📄';
-  const label = LABELS[tipo] || tipo;
-  const titulo = recurso.titulo || label;
-
+  if (videoId) {
+    return (
+      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute top-0 left-0 w-full h-full rounded-xl shadow-lg"
+        ></iframe>
+      </div>
+    );
+  }
+  
+  // Fallback si no se puede extraer el ID
   return (
-    <Link
-      href={`/recurso/${recurso.id}`}
-      className="bg-white border-2 border-[#e8e8e8] rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:border-[#d4ac0d] hover:shadow-[0_10px_30px_rgba(26,58,92,0.15)] hover:-translate-y-1 flex flex-col items-center gap-3"
-    >
-      <span className="text-5xl">{icon}</span>
-      <p className="text-lg font-bold text-[#1a5276] font-['Georgia',serif] leading-tight">
-        {titulo}
+    <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+      <p className="text-sm text-yellow-800">
+        ⚠️ No se pudo cargar el video. 
+        <a href={url} target="_blank" rel="noopener noreferrer" className="underline ml-1">
+          Ver en YouTube directamente
+        </a>
       </p>
-      <span className="text-xs text-white bg-[#1a3a5c] px-3 py-1 rounded-full uppercase tracking-wide">
-        {label}
-      </span>
-    </Link>
+    </div>
   );
 }
 
-export default async function RecursosPage({ params }) {
-  const { slug, numero } = await params;
-  const data = await getRecursos(slug, numero);
+// ============================================================
+// Función para generar HTML automático a partir de una URL según el tipo
+// ============================================================
+function generarHtmlDesdeUrl(url, tipo, titulo) {
+  if (!url || url.trim() === '') return '';
 
-  if (!data) notFound();
+  const trimmedUrl = url.trim();
+  const lowerUrl = trimmedUrl.toLowerCase();
 
-  const { libro, capitulo, recursos } = data;
+  // ---------------- Video / YouTube ----------------
+  if (tipo === 'video' || lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be/')) {
+    const embed = renderVideoEmbed(trimmedUrl);
+    // Convertimos el JSX a string para ScriptExecutor o lo manejamos aparte
+    // En este caso, como usamos ScriptExecutor para otros tipos, 
+    // devolveremos un div contenedor que ScriptExecutor pueda manejar o lo trataremos especial
+    return `<div class="video-container"><iframe src="https://www.youtube.com/embed/${lowerUrl.includes('youtu.be/') ? trimmedUrl.split('youtu.be/')[1].split(/[?#]/)[0] : new URLSearchParams(trimmedUrl.split('?')[1]).get('v')}" frameborder="0" allowfullscreen style="width:100%; aspect-ratio:16/9; border-radius:12px;"></iframe></div>`;
+  }
 
-  const ordenPrioridad = [
-    'estudio', 'cronologia', 'bosquejo', 'personaje', 'exegesis',
-    'contexto_arqueologico', 'paralelos', 'palabras_clave', 'profecias',
-    'citas_teologos', 'citas_libros', 'glosario', 'infografia',
-    'diagrama_estructura', 'devocional', 'hoja', 'reflexion',
-    'sermon', 'quiz', 'plan', 'imagen', 'video', 'audio',
-    'diapositiva', 'pdf', 'mapa', 'himno', 'testimonio', 'enlace'
-  ];
+  // ---------------- Audio ----------------
+  if (tipo === 'audio' || /\.(mp3|wav|ogg|m4a|flac)(\?.*)?$/i.test(trimmedUrl)) {
+    return `<audio controls style="width:100%; margin:1rem 0; border-radius:12px;">
+      <source src="${trimmedUrl}" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>`;
+  }
 
-  const recursosOrdenados = [...recursos].sort((a, b) => {
-    const prioridadA = ordenPrioridad.indexOf(a.tipo) !== -1 ? ordenPrioridad.indexOf(a.tipo) : 999;
-    const prioridadB = ordenPrioridad.indexOf(b.tipo) !== -1 ? ordenPrioridad.indexOf(b.tipo) : 999;
-    return prioridadA - prioridadB;
-  });
+  // ---------------- Imagen ----------------
+  if (tipo === 'imagen' || /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(trimmedUrl)) {
+    return `<img src="${trimmedUrl}" alt="${titulo}" style="max-width:100%; border-radius:12px; margin:1rem 0; box-shadow:0 4px 12px rgba(0,0,0,0.1);" />`;
+  }
 
-  const recursosSinPersonajes = recursosOrdenados.filter(rec => rec.tipo !== 'personaje');
+  // ---------------- PDF ----------------
+  if (lowerUrl.endsWith('.pdf')) {
+    return `<embed src="${trimmedUrl}" type="application/pdf" width="100%" height="600px" style="border-radius:12px; margin:1rem 0;" />`;
+  }
+
+  // ---------------- Por defecto: enlace ----------------
+  return `<div style="margin:1rem 0; padding:1rem; background:#f5f2eb; border-left:4px solid #d4ac0d; border-radius:8px;">
+    <p>🔗 <strong>Recurso externo:</strong> <a href="${trimmedUrl}" target="_blank" rel="noopener noreferrer" style="color:#1a5276; text-decoration:underline;">${trimmedUrl}</a></p>
+  </div>`;
+}
+
+// ============================================================
+// Obtener recurso completo desde Supabase
+// ============================================================
+async function getRecursoCompleto(id) {
+  const { data: recurso, error } = await supabase
+    .from('resources')
+    .select('*, chapters(*, books(*))')
+    .eq('id', id)
+    .single();
+
+  if (error || !recurso) return null;
+  return recurso;
+}
+
+// ============================================================
+// Componente principal
+// ============================================================
+export default async function RecursoPage({ params }) {
+  const { id } = await params;
+  const recurso = await getRecursoCompleto(id);
+
+  if (!recurso) {
+    notFound();
+  }
+
+  const libro = recurso.chapters?.books;
+  const capitulo = recurso.chapters;
+  const titulo = recurso.titulo || 'Sin título';
+  const tipo = recurso.tipo || 'estudio';
+
+  let portadaUrl = null;
+  let contenidoSinPortada = recurso.contenido_html || '';
+
+  // Extraer portada si es markdown
+  if (recurso.modo === 'markdown') {
+    const match = contenidoSinPortada.match(
+      /<div class="imagen-portada"><img alt=".*?" src="(.*?)" \/><\/div>/
+    );
+    if (match) {
+      portadaUrl = match[1];
+      contenidoSinPortada = contenidoSinPortada.replace(
+        /<div class="imagen-portada">.*?<\/div>\n?/,
+        ''
+      );
+    }
+  }
+
+  // Determinar qué mostrar
+  let esAudio = false;
+  let esVideo = false;
+  let audioUrl = '';
+  let videoUrl = '';
+  let contenidoMostrar = contenidoSinPortada;
+
+  if (tipo === 'audio' && recurso.recurso_url) {
+    esAudio = true;
+    audioUrl = recurso.recurso_url;
+  } else if (tipo === 'video' && recurso.recurso_url) {
+    esVideo = true;
+    videoUrl = recurso.recurso_url;
+  } else if ((!contenidoMostrar || contenidoMostrar.trim() === '') && recurso.recurso_url) {
+    // Para otros tipos sin contenido HTML, generar fallback
+    contenidoMostrar = generarHtmlDesdeUrl(recurso.recurso_url, tipo, titulo);
+  }
 
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
-      <div className="max-w-[922px] mx-auto px-0">
-        <div className="bg-[#fdfbf7] p-5 border border-[#d4c4a8]">
+      <div className="w-full px-0 sm:max-w-[922px] sm:px-0 sm:mx-auto">
+        <div className="bg-[#fdfbf7] p-2 sm:p-5 border border-[#d4c4a8]">
+          
+          {/* Breadcrumb */}
           <Breadcrumb items={[
             { name: 'Inicio', href: '/' },
             { name: 'Recursos Bíblicos', href: '/recursos-biblicos' },
-            { name: libro.nombre, href: `/libro/${libro.slug}` },
-            { name: `Capítulo ${capitulo.numero}`, href: null }
+            ...(libro ? [{ name: libro.nombre, href: `/libro/${libro.slug}` }] : []),
+            ...(capitulo ? [{ name: `Capítulo ${capitulo.numero}`, href: `/libro/${libro.slug}/capitulo/${capitulo.numero}` }] : []),
+            { name: titulo, href: null }
           ]} />
 
-          <div className="flex justify-between items-center gap-4 mb-5">
-            <Link
-              href={`/libro/${libro.slug}`}
-              className="inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
-            >
-              ← Volver a capítulos
-            </Link>
-            <Link
-              href={`/lector/${slug}/${capitulo.numero}`}
-              className="inline-flex items-center gap-1.5 bg-[#d4ac0d] text-[#1a3a5c] border border-[#d4ac0d] px-4 py-2 rounded-md text-sm font-bold transition-all hover:bg-[#e0b820]"
-            >
-              📖 Ir a la lectura bíblica
-            </Link>
+          {/* Botones de acción */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+            {capitulo && libro && (
+              <Link
+                href={`/libro/${libro.slug}/capitulo/${capitulo.numero}`}
+                className="no-print inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
+              >
+                ← Volver a recursos del capítulo
+              </Link>
+            )}
+            
+            <div className="no-print">
+              <PrintButton />
+            </div>
           </div>
 
-          <h2 className="text-2xl text-[#1a5276] text-center mb-2 pb-4 border-b-2 border-[#d4ac0d] font-['Georgia',serif]">
-            {libro.nombre} — Capítulo {capitulo.numero}
-          </h2>
-          <p className="text-center text-[#757575] mb-6">Elige qué recurso querés ver:</p>
+          {/* Área de impresión */}
+          <div id="area-impresion" className="bg-white p-3 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
+            {portadaUrl && (
+              <div className="imagen-portada mb-6">
+                <img alt={titulo} src={portadaUrl} className="w-full rounded-lg" />
+              </div>
+            )}
 
-          {recursosSinPersonajes.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-[#757575] text-lg">Aún no hay recursos para este capítulo.</p>
-              <p className="text-[#9e9e9e] text-sm mt-2">Estamos preparando contenido.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-              {recursosSinPersonajes.map((rec) => (
-                <ResourceCard key={rec.id} recurso={rec} />
-              ))}
-            </div>
-          )}
+            {/* Renderizado condicional según tipo */}
+            {esAudio ? (
+              <AudioPlayer
+                url={audioUrl}
+                titulo={titulo}
+                libroNombre={libro?.nombre || 'Libro'}
+                capituloNumero={capitulo?.numero || ''}
+              />
+            ) : esVideo ? (
+              renderVideoEmbed(videoUrl)
+            ) : (
+              <ScriptExecutor htmlContent={contenidoMostrar} />
+            )}
 
-          <CharacterDetector bookId={libro.id} chapterNum={parseInt(numero)} />
+            {/* Botones de compartir */}
+            <div className="no-print mt-6">
+              <ShareButtons title={titulo} />  
+            </div>
+
+            {/* Pie del estudio */}
+            <div className="mt-8 pt-6 border-t border-[#d4ac0d] text-center text-sm text-[#8d6e63] font-['Georgia',serif]">
+              <p className="mb-1">Estudio bíblico de Mahanaim — Recursos Bíblicos</p>
+              <p className="text-xs text-[#9e9e9e]">
+                © {new Date().getFullYear()} Mahanaim &quot;Campamento de Dios&quot;. Todos los derechos reservados.
+              </p>
+              <p className="text-xs text-[#9e9e9e] mt-1">
+                Este material puede ser compartido libremente citando la fuente.
+              </p>
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>
