@@ -6,6 +6,7 @@ import ScriptExecutor from './ScriptExecutor';
 import AudioPlayer from '@/app/componentes/AudioPlayer';
 import ShareButtons from '@/app/componentes/ShareButtons';
 import Breadcrumb from '@/app/componentes/Breadcrumb';
+import PrintButton from '@/app/componentes/PrintButton'; // <-- 1. IMPORTACIÓN AGREGADA
 
 // ============================================================
 // Función para generar HTML automático a partir de una URL según el tipo
@@ -63,7 +64,6 @@ function generarHtmlDesdeUrl(url, tipo, titulo) {
         <iframe src="${trimmedUrl}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0; border-radius:12px;" allowfullscreen></iframe>
       </div>`;
     }
-    // Intentar extraer coordenadas del formato @lat,lng,zoom
     const coordsMatch = trimmedUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+),(\d+)z/);
     if (coordsMatch) {
       const lat = coordsMatch[1];
@@ -141,19 +141,18 @@ export default async function RecursoPage({ params }) {
   let esAudio = false;
   let audioUrl = '';
 
-  // Si el recurso es de tipo 'audio' y tiene URL, preparamos el reproductor especial
   if (recurso.tipo === 'audio' && recurso.recurso_url) {
     esAudio = true;
     audioUrl = recurso.recurso_url;
   } else if ((!contenidoMostrar || contenidoMostrar.trim() === '') && recurso.recurso_url) {
-    // Para otros tipos, generar HTML de fallback
     contenidoMostrar = generarHtmlDesdeUrl(recurso.recurso_url, recurso.tipo, recurso.titulo);
   }
 
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
-  <div className="w-full px-0 sm:max-w-[922px] sm:px-0 sm:mx-auto">
-    <div className="bg-[#fdfbf7] p-2 sm:p-5 border border-[#d4c4a8]">
+      <div className="w-full px-0 sm:max-w-[922px] sm:px-0 sm:mx-auto">
+        <div className="bg-[#fdfbf7] p-2 sm:p-5 border border-[#d4c4a8]">
+          
           {/* Breadcrumb con schema */}
           <Breadcrumb items={[
             { name: 'Inicio', href: '/' },
@@ -163,18 +162,25 @@ export default async function RecursoPage({ params }) {
             { name: titulo, href: null }
           ]} />
 
-          {/* Botón volver */}
-          {capitulo && libro && (
-            <Link
-              href={`/libro/${libro.slug}/capitulo/${capitulo.numero}`}
-              className="inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm mb-5 transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
-            >
-              ← Volver a recursos del capítulo
-            </Link>
-          )}
+          {/* Botones de acción (Volver y Descargar PDF) */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+            {capitulo && libro && (
+              <Link
+                href={`/libro/${libro.slug}/capitulo/${capitulo.numero}`}
+                className="no-print inline-flex items-center gap-1.5 bg-white/85 border border-[#ccc] text-[#1a5276] px-4 py-2 rounded-md text-sm transition-all hover:border-[#d4ac0d] hover:text-[#d4ac0d]"
+              >
+                ← Volver a recursos del capítulo
+              </Link>
+            )}
+            
+            {/* 2. BOTÓN DE IMPRESIÓN AGREGADO (se oculta al imprimir gracias a la clase no-print) */}
+            <div className="no-print">
+              <PrintButton />
+            </div>
+          </div>
 
-          {/* Contenido del recurso */}
-          <div className="bg-white p-3 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
+          {/* 3. CONTENIDO DEL RECURSO (Área de impresión identificada con id="area-impresion") */}
+          <div id="area-impresion" className="bg-white p-3 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
             {portadaUrl && (
               <div className="imagen-portada">
                 <img alt={titulo} src={portadaUrl} />
@@ -192,8 +198,10 @@ export default async function RecursoPage({ params }) {
               <ScriptExecutor htmlContent={contenidoMostrar} />
             )}
 
-            {/* Botones de compartir */}
-            <ShareButtons title={titulo} />  
+            {/* Botones de compartir (también se ocultarán en PDF por las reglas CSS de botones) */}
+            <div className="no-print mt-6">
+              <ShareButtons title={titulo} />  
+            </div>
 
             {/* Pie del estudio */}
             <div className="mt-8 pt-6 border-t border-[#d4ac0d] text-center text-sm text-[#8d6e63] font-['Georgia',serif]">
@@ -209,6 +217,7 @@ export default async function RecursoPage({ params }) {
               </p>
             </div>
           </div>
+          
         </div>
       </div>
     </div>
