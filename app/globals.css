@@ -192,6 +192,51 @@ body {
   .page-bg {
     background-image: url('https://blogger.googleusercontent.com/img/a/AVvXsEh8_05dG7sOWU0iLgSFju4bHHCBSfEwjnGYu9TqTqYqGmj1eL8je-oh1lSVwMle4GW1fxTOgY59unrm2t-vgIyT0lA8uZLwiqKzuZ6DUc_rlWkHok-Ayw5Ov-f5vQ1Q_qHv1pJ68lzXCxf-mhhUIlaOc-WKivI-rp9bTwQlsW7BUic6578UGPWupnRwn_s=s1600');
   }
+}  
+
+/* ==========================================
+   REGLAS PARA IMPRESIÓN / EXPORTACIÓN A PDF
+   ========================================== */
+@media print {
+  /* 1. Ocultar TODO el sitio web por defecto */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 2. Hacer visible SOLO el contenedor del recurso y su contenido */
+  #area-impresion, #area-impresion * {
+    visibility: visible;
+  }
+
+  /* 3. Posicionar el área de impresión como una hoja A4 limpia */
+  #area-impresion {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 15mm 20mm;
+    background: white !important;
+    color: #000 !important;
+    font-family: 'Georgia', serif !important;
+  }
+
+  /* 4. Forzar la impresión de colores de fondo (para las tarjetas y tablas) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 5. Ocultar explícitamente elementos de navegación y el propio botón */
+  header, footer, nav, .no-print, button {
+    display: none !important;
+  }
+
+  /* 6. Evitar que las tarjetas o tablas se corten entre dos páginas */
+  .mah-card, .quiz-pregunta-card, .tabla-comparativa, tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 }
 
 @media (max-width: 767px), (orientation: portrait) {
