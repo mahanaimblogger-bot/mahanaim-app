@@ -17,7 +17,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
   const [audioReady, setAudioReady] = useState(false);
   const [error, setError] = useState(null);
 
-  // Configurar Web Audio API (una sola vez)
   const setupAudioContext = () => {
     if (audioContextRef.current) return;
 
@@ -25,7 +24,7 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       const ctx = new AudioCtx();
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 128; // 64 barras de frecuencia
+      analyser.fftSize = 128;
       analyser.smoothingTimeConstant = 0.8;
 
       const source = ctx.createMediaElementSource(audioRef.current);
@@ -40,13 +39,12 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     }
   };
 
-  // Dibujar visualizador con frecuencias REALES
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth * 2; // Retina
+      canvas.width = canvas.offsetWidth * 2;
       canvas.height = canvas.offsetHeight * 2;
     };
     resizeCanvas();
@@ -66,14 +64,12 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(dataArray);
 
-        // Mapear las 64 frecuencias del analyser a 48 barras
         const step = Math.floor(dataArray.length / barCount);
 
         for (let i = 0; i < barCount; i++) {
           const value = dataArray[i * step] || 0;
           const barHeight = (value / 255) * height * 0.95;
 
-          // Degradado dorado con intensidad según volumen
           const intensity = value / 255;
           const gradient = ctx.createLinearGradient(0, height, 0, height - barHeight);
           gradient.addColorStop(0, '#8b6914');
@@ -87,7 +83,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
           ctx.shadowBlur = 0;
         }
       } else {
-        // Estado de reposo: barras tenues y uniformes
         for (let i = 0; i < barCount; i++) {
           const barHeight = height * 0.08;
           ctx.fillStyle = 'rgba(212, 172, 13, 0.25)';
@@ -106,7 +101,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     };
   }, [isPlaying]);
 
-  // Eventos del audio
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -137,10 +131,8 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     const audio = audioRef.current;
     if (!audio) return;
 
-    // Configurar AudioContext en la primera interacción (requerido por navegadores)
     setupAudioContext();
 
-    // Reanudar AudioContext si estaba suspendido
     if (audioContextRef.current?.state === 'suspended') {
       await audioContextRef.current.resume();
     }
@@ -184,13 +176,13 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     <div className="w-full max-w-3xl mx-auto my-6">
       <div className="bg-[#fdfbf7] rounded-xl border-2 border-[#d4c4a8] shadow-lg overflow-hidden">
         
-        {/* Header con disco animado */}
         <div className="bg-gradient-to-r from-[#1a3a5c] to-[#2d4a6c] p-5 flex items-center gap-4">
-          {/* Disco giratorio */}
           <div className="relative flex-shrink-0">
-            <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-[#0f2440] to-[#1a3a5c] border-4 border-[#d4ac0d] shadow-lg flex items-center justify-center ${isPlaying ? 'animate-spin-slow' : ''}`}>
+            <div 
+              className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0f2440] to-[#1a3a5c] border-4 border-[#d4ac0d] shadow-lg flex items-center justify-center"
+              style={{ animation: isPlaying ? 'spin 4s linear infinite' : 'none' }}
+            >
               <div className="w-5 h-5 rounded-full bg-[#d4ac0d]"></div>
-              {/* Surcos del disco */}
               <div className="absolute inset-2 rounded-full border border-[#d4ac0d]/20"></div>
               <div className="absolute inset-4 rounded-full border border-[#d4ac0d]/20"></div>
             </div>
@@ -199,7 +191,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
             )}
           </div>
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               {isPlaying && (
@@ -217,7 +208,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
           </div>
         </div>
 
-        {/* Visualizador */}
         <div className="bg-[#0a1929] px-4 py-3 border-b border-[#d4c4a8]/30">
           <canvas 
             ref={canvasRef} 
@@ -225,10 +215,8 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
           />
         </div>
 
-        {/* Controles */}
         <div className="p-5 space-y-4">
           
-          {/* Barra de progreso */}
           <div className="space-y-2">
             <div className="relative w-full h-2 bg-[#e8e8e8] rounded-full overflow-hidden group cursor-pointer">
               <div 
@@ -251,10 +239,8 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
             </div>
           </div>
 
-          {/* Controles principales */}
           <div className="flex items-center justify-between">
             
-            {/* Volumen */}
             <div className="flex items-center gap-2 group">
               <svg className="w-5 h-5 text-[#1a3a5c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -283,7 +269,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               />
             </div>
 
-            {/* Botón Play/Pause grande */}
             <button 
               onClick={togglePlay}
               disabled={!audioReady && !isPlaying}
@@ -301,7 +286,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               )}
             </button>
 
-            {/* Velocidad (placeholder visual) */}
             <div className="w-20 text-right">
               <span className="text-xs font-bold text-[#1a3a5c] bg-[#e8e8e8] px-2 py-1 rounded">
                 1.0×
@@ -311,22 +295,18 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
 
           {error && (
             <div className="mt-3 p-3 bg-red-50 border-l-4 border-red-400 rounded text-sm text-red-800">
-              ️ {error}
+              ⚠️ {error}
             </div>
           )}
         </div>
       </div>
 
-      {/* CSS para animación lenta del disco */}
-      <style jsx>{`
-        @keyframes spin-slow {
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        .animate-spin-slow {
-          animation: spin-slow 4s linear infinite;
-        }
-      `}</style>
+      `}} />
     </div>
   );
 }
