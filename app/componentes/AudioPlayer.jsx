@@ -9,11 +9,10 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
-  const [audioReady, setAudioReady] = useState(false);
   const [error, setError] = useState(null);
   const animationRef = useRef(null);
 
-  // Visualizador animado (fake pero bonito, sin Web Audio API)
+  // Visualizador animado (estilo Mahanaim)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -63,20 +62,17 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     };
   }, [isPlaying]);
 
-  // Eventos del audio (simple, sin Web Audio API)
+  // Eventos del audio
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const setAudioData = () => {
-      setDuration(audio.duration);
-      setAudioReady(true);
-    };
+    const setAudioData = () => setDuration(audio.duration);
     const setAudioTime = () => setCurrentTime(audio.currentTime);
     const handleEnd = () => setIsPlaying(false);
     const handleError = () => {
       setError('No se pudo cargar el audio. Verifica la URL.');
-      setAudioReady(false);
+      setIsPlaying(false);
     };
 
     audio.volume = volume;
@@ -91,14 +87,30 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
       audio.removeEventListener('ended', handleEnd);
       audio.removeEventListener('error', handleError);
     };
-  }, []);
+  }, [url]);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (isPlaying) audio.pause();
-    else audio.play();
-    setIsPlaying(!isPlaying);
+
+    if (error) {
+      setError(null);
+      audio.load();
+    }
+
+    try {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        await audio.play();
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error("Error al reproducir:", err);
+      setError("No se pudo reproducir. Intenta de nuevo.");
+      setIsPlaying(false);
+    }
   };
 
   const handleSeek = (e) => {
@@ -126,6 +138,14 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
 
   return (
     <div className="w-full max-w-3xl mx-auto my-6">
+      {/* ✅ AQUÍ ESTÁ LA ETIQUETA AUDIO QUE FALTABA (Oculta pero funcional) */}
+      <audio 
+        ref={audioRef} 
+        src={url} 
+        preload="auto" 
+        className="hidden" 
+      />
+
       <div className="bg-[#fdfbf7] rounded-xl border-2 border-[#d4c4a8] shadow-lg overflow-hidden">
         
         {/* Header con disco animado */}
