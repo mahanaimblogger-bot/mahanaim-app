@@ -176,6 +176,7 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     <div className="w-full max-w-3xl mx-auto my-6">
       <div className="bg-[#fdfbf7] rounded-xl border-2 border-[#d4c4a8] shadow-lg overflow-hidden">
         
+        {/* Header con disco animado */}
         <div className="bg-gradient-to-r from-[#1a3a5c] to-[#2d4a6c] p-5 flex items-center gap-4">
           <div className="relative flex-shrink-0">
             <div 
@@ -208,6 +209,7 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
           </div>
         </div>
 
+        {/* Visualizador */}
         <div className="bg-[#0a1929] px-4 py-3 border-b border-[#d4c4a8]/30">
           <canvas 
             ref={canvasRef} 
@@ -215,8 +217,10 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
           />
         </div>
 
+        {/* Controles */}
         <div className="p-5 space-y-4">
           
+          {/* Barra de progreso */}
           <div className="space-y-2">
             <div className="relative w-full h-2 bg-[#e8e8e8] rounded-full overflow-hidden group cursor-pointer">
               <div 
@@ -239,8 +243,17 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
             </div>
           </div>
 
+          {/* Indicador de carga */}
+          {!audioReady && !isPlaying && (
+            <div className="text-center py-2">
+              <p className="text-xs text-[#1a3a5c] animate-pulse"> Cargando audio...</p>
+            </div>
+          )}
+
+          {/* Controles principales */}
           <div className="flex items-center justify-between">
             
+            {/* Volumen */}
             <div className="flex items-center gap-2 group">
               <svg className="w-5 h-5 text-[#1a3a5c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -269,10 +282,14 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               />
             </div>
 
+            {/* Botón Play/Pause - SIEMPRE ACTIVO */}
             <button 
               onClick={togglePlay}
-              disabled={!audioReady && !isPlaying}
-              className="w-14 h-14 rounded-full bg-[#1a3a5c] hover:bg-[#2d4a6c] text-[#d4ac0d] shadow-lg border-2 border-[#d4ac0d] transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className={`w-14 h-14 rounded-full shadow-lg border-2 border-[#d4ac0d] transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center ${
+                !audioReady && !isPlaying 
+                  ? 'bg-[#4a5568] cursor-wait' 
+                  : 'bg-[#1a3a5c] hover:bg-[#2d4a6c] text-[#d4ac0d]'
+              }`}
               aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
             >
               {isPlaying ? (
@@ -286,6 +303,7 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               )}
             </button>
 
+            {/* Velocidad */}
             <div className="w-20 text-right">
               <span className="text-xs font-bold text-[#1a3a5c] bg-[#e8e8e8] px-2 py-1 rounded">
                 1.0×
