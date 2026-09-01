@@ -16,6 +16,8 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
   const [volume, setVolume] = useState(0.8);
   const [audioReady, setAudioReady] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadAttempts, setLoadAttempts] = useState(0);
 
   const setupAudioContext = () => {
     if (audioContextRef.current) return;
@@ -105,31 +107,75 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     const audio = audioRef.current;
     if (!audio) return;
 
+    let loadTimeout;
+
     const setAudioData = () => {
       setDuration(audio.duration);
       setAudioReady(true);
+      setLoading(false);
+      setError(null);
+      clearTimeout(loadTimeout);
     };
+
     const setAudioTime = () => setCurrentTime(audio.currentTime);
-    const handleEnd = () => setIsPlaying(false);
-    const handleError = () => setError('No se pudo cargar el audio.');
+    
+    const handleEnd = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    const handleError = (e) => {
+      console.error('Error de audio:', e);
+      setLoading(false);
+      setError('No se pudo cargar el audio. Verifica la URL o intenta de nuevo.');
+      setAudioReady(false);
+    };
+
+    const handleCanPlay = () => {
+      setLoading(false);
+      setAudioReady(true);
+      clearTimeout(loadTimeout);
+    };
+
+    // Timeout de 10 segundos
+    loadTimeout = setTimeout(() => {
+      if (!audioReady) {
+        setLoading(false);
+        setError('El audio está tardando demasiado en cargar. Intenta de nuevo.');
+      }
+    }, 10000);
 
     audio.volume = volume;
     audio.addEventListener('loadedmetadata', setAudioData);
     audio.addEventListener('timeupdate', setAudioTime);
     audio.addEventListener('ended', handleEnd);
     audio.addEventListener('error', handleError);
+    audio.addEventListener('canplay', handleCanPlay);
+
+    // Intentar cargar el audio
+    audio.load();
 
     return () => {
       audio.removeEventListener('loadedmetadata', setAudioData);
       audio.removeEventListener('timeupdate', setAudioTime);
       audio.removeEventListener('ended', handleEnd);
       audio.removeEventListener('error', handleError);
+      audio.removeEventListener('canplay', handleCanPlay);
+      clearTimeout(loadTimeout);
     };
-  }, []);
+  }, [url]);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    if (error) {
+      // Si hay error, reintentar
+      setError(null);
+      setLoading(true);
+      audio.load();
+      return;
+    }
 
     setupAudioContext();
 
@@ -143,10 +189,21 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
       try {
         await audio.play();
       } catch (err) {
-        setError('No se pudo reproducir. Verifica la URL.');
+        console.error('Error al reproducir:', err);
+        setError('No se pudo reproducir. Haz clic en el botón de nuevo.');
       }
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setLoading(true);
+    setAudioReady(false);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.load();
+    }
   };
 
   const handleSeek = (e) => {
@@ -243,10 +300,24 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
             </div>
           </div>
 
-          {/* Indicador de carga */}
-          {!audioReady && !isPlaying && (
-            <div className="text-center py-2">
-              <p className="text-xs text-[#1a3a5c] animate-pulse"> Cargando audio...</p>
+          {/* Mensajes de estado */}
+          {loading && !error && (
+            <div className="text-center py-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800 font-medium">⏳ Cargando audio...</p>
+              <p className="text-xs text-blue-600 mt-1">Esto puede tomar unos segundos</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-center py-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-800 font-medium mb-2">️ {error}</p>
+              <button
+                onClick={handleRetry}
+                className="px-4 py-2 bg-[#1a3a5c] text-[#d4ac0d] rounded-lg text-sm font-bold hover:bg-[#2d4a6c] transition-colors"
+              >
+                🔄 Reintentar
+              </button>
+              <p className="text-xs text-gray-500 mt-2 break-all">URL: {url}</p>
             </div>
           )}
 
@@ -282,17 +353,23 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               />
             </div>
 
-            {/* Botón Play/Pause - SIEMPRE ACTIVO */}
+            {/* Botón Play/Pause */}
             <button 
               onClick={togglePlay}
               className={`w-14 h-14 rounded-full shadow-lg border-2 border-[#d4ac0d] transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center ${
-                !audioReady && !isPlaying 
+                loading 
                   ? 'bg-[#4a5568] cursor-wait' 
+                  : error
+                  ? 'bg-red-600 hover:bg-red-700 text-white'
                   : 'bg-[#1a3a5c] hover:bg-[#2d4a6c] text-[#d4ac0d]'
               }`}
-              aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+              aria-label={isPlaying ? 'Pausar' : error ? 'Reintentar' : 'Reproducir'}
             >
-              {isPlaying ? (
+              {error ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              ) : isPlaying ? (
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                 </svg>
@@ -310,12 +387,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               </span>
             </div>
           </div>
-
-          {error && (
-            <div className="mt-3 p-3 bg-red-50 border-l-4 border-red-400 rounded text-sm text-red-800">
-              ⚠️ {error}
-            </div>
-          )}
         </div>
       </div>
 
