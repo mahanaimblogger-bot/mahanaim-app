@@ -10,9 +10,13 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [error, setError] = useState(null);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const animationRef = useRef(null);
 
-  // Visualizador animado (estilo Mahanaim)
+  const speedOptions = [0.75, 1.0, 1.25, 1.5, 2.0];
+
+  // Visualizador animado
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -76,6 +80,7 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     };
 
     audio.volume = volume;
+    audio.playbackRate = playbackRate;
     audio.addEventListener('loadedmetadata', setAudioData);
     audio.addEventListener('timeupdate', setAudioTime);
     audio.addEventListener('ended', handleEnd);
@@ -88,6 +93,13 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
       audio.removeEventListener('error', handleError);
     };
   }, [url]);
+
+  // Aplicar velocidad cuando cambie
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackRate;
+    }
+  }, [playbackRate]);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
@@ -127,6 +139,11 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
     if (audioRef.current) audioRef.current.volume = vol;
   };
 
+  const handleSpeedChange = (speed) => {
+    setPlaybackRate(speed);
+    setShowSpeedMenu(false);
+  };
+
   const formatTime = (time) => {
     if (isNaN(time)) return '0:00';
     const mins = Math.floor(time / 60);
@@ -138,7 +155,6 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
 
   return (
     <div className="w-full max-w-3xl mx-auto my-6">
-      {/* ✅ AQUÍ ESTÁ LA ETIQUETA AUDIO QUE FALTABA (Oculta pero funcional) */}
       <audio 
         ref={audioRef} 
         src={url} 
@@ -270,11 +286,39 @@ export default function AudioPlayer({ url, titulo, libroNombre, capituloNumero }
               )}
             </button>
 
-            {/* Velocidad */}
-            <div className="w-20 text-right">
-              <span className="text-xs font-bold text-[#1a3a5c] bg-[#e8e8e8] px-2 py-1 rounded">
-                1.0×
-              </span>
+            {/* Botón de Velocidad con menú desplegable */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${
+                  playbackRate !== 1.0 
+                    ? 'bg-[#d4ac0d] text-[#1a3a5c]' 
+                    : 'bg-[#e8e8e8] text-[#1a3a5c] hover:bg-[#d4c4a8]'
+                }`}
+                aria-label="Velocidad de reproducción"
+              >
+                {playbackRate}×
+              </button>
+
+              {showSpeedMenu && (
+                <div className="absolute bottom-full right-0 mb-2 bg-white border-2 border-[#d4c4a8] rounded-lg shadow-xl overflow-hidden z-10">
+                  {speedOptions.map((speed) => (
+                    <button
+                      key={speed}
+                      onClick={() => handleSpeedChange(speed)}
+                      className={`block w-full px-4 py-2 text-sm font-bold text-left transition-colors ${
+                        playbackRate === speed
+                          ? 'bg-[#d4ac0d] text-[#1a3a5c]'
+                          : 'text-[#1a3a5c] hover:bg-[#fdfbf7]'
+                      }`}
+                    >
+                      {speed}× {speed === 1.0 && '(Normal)'}
+                      {speed < 1.0 && '(Lento)'}
+                      {speed > 1.0 && '(Rápido)'}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
