@@ -23,11 +23,18 @@ export default function PrintButton({
       return;
     }
 
+    // 1. CORRECCIÓN DEL ESPACIO EN BLANCO SUPERIOR:
+    // Forzamos al navegador a ir al inicio de la página antes de capturar
+    window.scrollTo(0, 0);
+    
+    // Pequeña pausa para asegurar que el scroll se aplicó antes de la captura
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Detectar flipcards (solo mostrar mensaje si las hay)
     const tieneFlipcards = document.querySelectorAll('.flipcard, .flip-container').length > 0;
     
     if (tieneFlipcards && window.innerWidth < 768) {
-      const rotar = window.confirm(' Para mejor resultado, rota tu dispositivo a horizontal. ¿Continuar?');
+      const rotar = window.confirm('📱 Para mejor resultado, rota tu dispositivo a horizontal. ¿Continuar?');
       if (!rotar) {
         setGenerando(false);
         return;
@@ -46,11 +53,10 @@ export default function PrintButton({
         });
       }
 
-      // Generar nombre automático del archivo
       const nombreArchivo = `Estudio-${libro || 'biblico'}-${capitulo || 'capitulo'}-Mahanaim.pdf`;
 
       const opciones = {
-        margin: [10, 10, 10, 10],
+        margin: [5, 5, 5, 5], // Márgenes mínimos para aprovechar la hoja
         filename: nombreArchivo,
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
@@ -58,7 +64,10 @@ export default function PrintButton({
           useCORS: true,
           logging: false,
           letterRendering: true,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          // 2. CORRECCIÓN CRÍTICA PARA HTML2CANVAS:
+          scrollY: -window.scrollY,
+          windowHeight: document.documentElement.offsetHeight
         },
         jsPDF: { 
           unit: 'mm', 
@@ -71,7 +80,10 @@ export default function PrintButton({
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
             '.caja-nota', '.caja-arqueologia', '.caja-versiculo',
             '.caja-linguistica', '.caja-contexto', '.timeline-container',
-            '.tabla-comparativa', 'table', 'img', 'ul', 'ol'
+            '.tabla-comparativa', 'table', 'img', 'ul', 'ol', 'p',
+            '[style*="border-left"]', '[style*="background:"]',
+            '[style*="padding: 1"]', '[style*="padding: 1.5"]',
+            '[style*="padding: 2"]', '[class*="caja"]'
           ]
         }
       };
@@ -89,7 +101,7 @@ export default function PrintButton({
       console.log('✅ PDF generado exitosamente:', nombreArchivo);
       
     } catch (error) {
-      console.error(' Error al generar PDF:', error);
+      console.error('❌ Error al generar PDF:', error);
       setError(`Error al generar el PDF: ${error.message}. Intenta de nuevo.`);
     } finally {
       setGenerando(false);
