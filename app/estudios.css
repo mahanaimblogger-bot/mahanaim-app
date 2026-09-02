@@ -530,3 +530,34 @@ h1.titulo-entrada { font-size: 24px; }
     margin: 15px 0 !important;
   }
 }
+
+/* Estilos para impresión y generación de PDF */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  #area-impresion {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Evitar que las imágenes se corten entre páginas */
+  img {
+    page-break-inside: avoid;
+    max-width: 100% !important;
+  }
+  
+  /* Evitar que las tablas se corten */
+  table {
+    page-break-inside: avoid;
+  }
+  
+  /* Forzar saltos de página en secciones principales */
+  h2, h3 {
+    page-break-after: avoid;
+  }
+}
