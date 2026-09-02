@@ -561,3 +561,72 @@ h1.titulo-entrada { font-size: 24px; }
     page-break-after: avoid;
   }
 }
+
+/* ============================================
+   ANTI-CORTE PARA PDF
+   Evita que el contenido se parta entre páginas
+   ============================================ */
+
+/* Evitar que las cajas de énfasis se corten */
+.caja-nota,
+.caja-arqueologia, 
+.caja-versiculo,
+.caja-linguistica,
+[style*="border-left"],
+[style*="border-radius"] {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Evitar que los títulos queden solos al final de página */
+h1, h2, h3, h4 {
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Forzar que los títulos principales empiecen en página nueva si es necesario */
+h2 {
+  page-break-before: auto !important;
+  break-before: auto !important;
+}
+
+/* Evitar que las tablas se corten */
+table {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Evitar que las imágenes se corten */
+img {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  max-width: 100% !important;
+}
+
+/* Evitar que las listas se corten */
+ul, ol {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Los párrafos no deben cortarse */
+p {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  orphans: 3 !important;
+  widows: 3 !important;
+}
+
+/* Clase utilitaria para forzar salto de página antes */
+.page-break-before {
+  page-break-before: always !important;
+  break-before: page !important;
+}
+
+/* Clase utilitaria para forzar salto de página después */
+.page-break-after {
+  page-break-after: always !important;
+  break-after: page !important;
+}
