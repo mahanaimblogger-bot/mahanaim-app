@@ -96,7 +96,7 @@ export default async function RecursoPage({ params }) {
   
   let contenidoPrincipal;
 
-  // 1. AUDIO (Usa tu excelente componente AudioPlayer)
+  // 1. AUDIO
   if (tipo === 'audio' && urlRecurso) {
     contenidoPrincipal = (
       <AudioPlayer
@@ -115,9 +115,8 @@ export default async function RecursoPage({ params }) {
       </div>
     );
   }
-  // 3. PDF o DIAPOSITIVAS (PPT/PPTX) -> LA SOLUCIÓN PARA ARCHIVE.ORG
+  // 3. PDF o DIAPOSITIVAS (PPT/PPTX)
   else if (tipo === 'pdf' || tipo === 'diapositiva' || tipo === 'ppt' || lowerUrl.match(/\.(pdf|ppt|pptx)$/)) {
-    // Usamos Google Docs Viewer, que es el más compatible con enlaces de Archive.org
     const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(urlRecurso)}&embedded=true`;
     
     contenidoPrincipal = (
@@ -142,13 +141,35 @@ export default async function RecursoPage({ params }) {
       </div>
     );
   }
-  // 4. TEXTO / HTML / ESTUDIO / IMÁGENES / MAPAS (Fallback a tu lógica original)
+  // 4. 🗺️ MAPA INTERACTIVO (NUEVO: Detecta y renderiza Google Maps automáticamente)
+  else if (tipo === 'mapa' && urlRecurso.includes('google.com/maps')) {
+    contenidoPrincipal = (
+      <div className="w-full border border-[#d4c4a8] rounded-xl overflow-hidden bg-white shadow-sm">
+        <iframe 
+          src={urlRecurso} 
+          width="100%" 
+          height="450" 
+          style={{ border: 0 }} 
+          allowFullScreen 
+          loading="lazy" 
+          referrerPolicy="strict-origin-when-cross-origin"
+          title="Mapa Interactivo Bíblico"
+          className="w-full"
+        ></iframe>
+        
+        {/* Si hay contenido HTML adicional (texto explicativo), lo mostramos debajo del mapa */}
+        {contenidoSinPortada && contenidoSinPortada.trim() !== '' && (
+          <div className="p-6 bg-[#fdfbf7] border-t border-[#d4c4a8]">
+            <ScriptExecutor htmlContent={contenidoSinPortada} />
+          </div>
+        )}
+      </div>
+    );
+  }
+  // 5. TEXTO / HTML / ESTUDIO / IMÁGENES (Fallback)
   else {
     let contenidoMostrar = contenidoSinPortada;
-    // Si no hay contenido HTML pero sí una URL (ej. una imagen o mapa externo), la procesamos
     if ((!contenidoMostrar || contenidoMostrar.trim() === '') && urlRecurso) {
-       // Aquí podrías reutilizar tu función generarHtmlDesdeUrl si la necesitas para mapas/imagenes, 
-       // pero ScriptExecutor ya maneja bien el HTML guardado en la BD.
        contenidoMostrar = `<div style="margin:1rem 0; padding:1rem; background:#f5f2eb; border-left:4px solid #d4ac0d; border-radius:8px;">
         <p>🔗 <strong>Recurso externo:</strong> <a href="${urlRecurso}" target="_blank" rel="noopener noreferrer" style="color:#1a5276; text-decoration:underline;">${urlRecurso}</a></p>
       </div>`;
@@ -164,7 +185,6 @@ export default async function RecursoPage({ params }) {
       <div className="w-full px-0 sm:max-w-[922px] sm:px-0 sm:mx-auto">
         <div className="bg-[#fdfbf7] p-2 sm:p-5 border border-[#d4c4a8]">
           
-          {/* Breadcrumb */}
           <Breadcrumb items={[
             { name: 'Inicio', href: '/' },
             { name: 'Recursos Bíblicos', href: '/recursos-biblicos' },
@@ -173,7 +193,6 @@ export default async function RecursoPage({ params }) {
             { name: titulo, href: null }
           ]} />
 
-          {/* Botones de acción */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
             {capitulo && libro && (
               <Link
@@ -183,14 +202,11 @@ export default async function RecursoPage({ params }) {
                 ← Volver a recursos del capítulo
               </Link>
             )}
-            
-            {/* Botón de Impresión */}
             <div className="no-print">
               <PrintButton />
             </div>
           </div>
 
-          {/* Área de impresión */}
           <div id="area-impresion" className="bg-white p-3 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
             {portadaUrl && (
               <div className="imagen-portada mb-6">
@@ -198,15 +214,12 @@ export default async function RecursoPage({ params }) {
               </div>
             )}
 
-            {/* Aquí se inyecta el contenido dinámico */}
             {contenidoPrincipal}
 
-            {/* Botones de compartir */}
             <div className="no-print mt-6">
               <ShareButtons title={titulo} />  
             </div>
 
-            {/* Pie del estudio */}
             <div className="mt-8 pt-6 border-t border-[#d4ac0d] text-center text-sm text-[#8d6e63] font-['Georgia',serif]">
               <p className="mb-1">Estudio bíblico de Mahanaim — Recursos Bíblicos</p>
               <p className="text-xs text-[#9e9e9e]">
