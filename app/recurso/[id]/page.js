@@ -96,7 +96,7 @@ export default async function RecursoPage({ params }) {
   
   let contenidoPrincipal;
 
-  // 1. AUDIO
+  // 1. AUDIO (Intacto)
   if (tipo === 'audio' && urlRecurso) {
     contenidoPrincipal = (
       <AudioPlayer
@@ -107,15 +107,15 @@ export default async function RecursoPage({ params }) {
       />
     );
   } 
-  // 2. VIDEO (YouTube)
+  // 2. VIDEO (YouTube) (Intacto)
   else if (tipo === 'video' && urlRecurso) {
     contenidoPrincipal = renderVideoEmbed(urlRecurso) || (
       <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-        <p className="text-sm text-yellow-800">⚠️ URL de video no válida. <a href={urlRecurso} target="_blank" className="underline font-bold">Ver en YouTube</a></p>
+        <p className="text-sm text-yellow-800">️ URL de video no válida. <a href={urlRecurso} target="_blank" className="underline font-bold">Ver en YouTube</a></p>
       </div>
     );
   }
-  // 3. PDF o DIAPOSITIVAS (PPT/PPTX)
+  // 3. PDF o DIAPOSITIVAS (PPT/PPTX) (Intacto)
   else if (tipo === 'pdf' || tipo === 'diapositiva' || tipo === 'ppt' || lowerUrl.match(/\.(pdf|ppt|pptx)$/)) {
     const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(urlRecurso)}&embedded=true`;
     
@@ -141,7 +141,7 @@ export default async function RecursoPage({ params }) {
       </div>
     );
   }
-  // 4. 🗺️ MAPA INTERACTIVO (NUEVO: Detecta y renderiza Google Maps automáticamente)
+  // 4. MAPA INTERACTIVO (Intacto)
   else if (tipo === 'mapa' && urlRecurso.includes('google.com/maps')) {
     contenidoPrincipal = (
       <div className="w-full border border-[#d4c4a8] rounded-xl overflow-hidden bg-white shadow-sm">
@@ -157,7 +157,6 @@ export default async function RecursoPage({ params }) {
           className="w-full"
         ></iframe>
         
-        {/* Si hay contenido HTML adicional (texto explicativo), lo mostramos debajo del mapa */}
         {contenidoSinPortada && contenidoSinPortada.trim() !== '' && (
           <div className="p-6 bg-[#fdfbf7] border-t border-[#d4c4a8]">
             <ScriptExecutor htmlContent={contenidoSinPortada} />
@@ -166,7 +165,29 @@ export default async function RecursoPage({ params }) {
       </div>
     );
   }
-  // 5. TEXTO / HTML / ESTUDIO / IMÁGENES (Fallback)
+  // 5. IMAGEN (ÚNICO CAMBIO: Se agrega esta sección específica para imágenes)
+  else if (tipo === 'imagen' && urlRecurso) {
+    contenidoPrincipal = (
+      <div className="w-full flex flex-col items-center">
+        <div className="border-2 border-[#d4c4a8] rounded-xl overflow-hidden bg-white shadow-lg w-full">
+          <img 
+            src={urlRecurso} 
+            alt={titulo}
+            className="w-full h-auto object-contain"
+            loading="lazy"
+          />
+        </div>
+        
+        {/* Si hay contenido HTML adicional (descripción, contexto, etc.), lo mostramos debajo */}
+        {contenidoSinPortada && contenidoSinPortada.trim() !== '' && (
+          <div className="mt-6 p-6 bg-[#fdfbf7] border border-[#d4c4a8] rounded-xl w-full">
+            <ScriptExecutor htmlContent={contenidoSinPortada} />
+          </div>
+        )}
+      </div>
+    );
+  }
+  // 6. TEXTO / HTML / ESTUDIO (Fallback - Intacto)
   else {
     let contenidoMostrar = contenidoSinPortada;
     if ((!contenidoMostrar || contenidoMostrar.trim() === '') && urlRecurso) {
@@ -178,7 +199,7 @@ export default async function RecursoPage({ params }) {
   }
 
   // ============================================================
-  // RENDERIZADO DE LA PÁGINA
+  // RENDERIZADO DE LA PÁGINA (Intacto)
   // ============================================================
   return (
     <div className="min-h-screen font-['Georgia',serif] text-[#3e2723]">
