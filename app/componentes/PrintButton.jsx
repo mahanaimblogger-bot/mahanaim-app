@@ -67,9 +67,12 @@ export default function PrintButton({
         },
         pagebreak: { 
           mode: ['avoid-all', 'css', 'legacy'],
-          before: '.page-break-before',
-          after: '.page-break-after',
-          avoid: ['.caja-nota', '.caja-arqueologia', '.caja-versiculo', '.timeline-container', '.tabla-comparativa', 'h2', 'h3', 'h4', '.seccion-completa']
+          avoid: [
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            '.caja-nota', '.caja-arqueologia', '.caja-versiculo',
+            '.caja-linguistica', '.caja-contexto', '.timeline-container',
+            '.tabla-comparativa', 'table', 'img', 'ul', 'ol'
+          ]
         }
       };
 
