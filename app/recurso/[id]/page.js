@@ -223,9 +223,14 @@ export default async function RecursoPage({ params }) {
                 ← Volver a recursos del capítulo
               </Link>
             )}
-            <div className="no-print">
-              <PrintButton />
-            </div>
+           <div className="no-print">
+            <PrintButton 
+              titulo={titulo}
+              libro={libro?.nombre || ''}
+              capitulo={capitulo?.numero || ''}
+              tipo={tipo}
+           />
+</div>
           </div>
 
           <div id="area-impresion" className="bg-white p-3 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
