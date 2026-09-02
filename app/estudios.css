@@ -532,101 +532,82 @@ h1.titulo-entrada { font-size: 24px; }
 }
 
 /* ============================================
-   CONTROL TOTAL DE SALTOS DE PÁGINA PARA PDF
-   (ÚNICO BLOQUE DE IMPRESIÓN)
+   ESTILOS DE IMPRESIÓN / PDF (MOTOR NATIVO)
+   Diseñado para flujo continuo sin cortes
    ============================================ */
 
 @media print {
-  .no-print {
+  /* 1. Ocultar todo lo que no sea el estudio */
+  .no-print, header, footer, nav, .breadcrumb, .share-buttons {
     display: none !important;
   }
-  
+
+  /* 2. Resetear el contenedor principal para que ocupe toda la hoja */
   #area-impresion {
     width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    background: white !important;
     box-shadow: none !important;
     border: none !important;
   }
 
-  /* Forzar que el primer elemento no tenga margen superior que empuje el contenido */
+  /* 3. Forzar que el primer elemento no tenga margen superior (evita el espacio en blanco) */
   #area-impresion > *:first-child {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
-}
 
-/* REGLAS GLOBALES ANTI-CORTE (Aplican a html2pdf.js y window.print) */
+  /* 4. REGLA DE ORO: Evitar cortes dentro de CUALQUIER elemento de bloque importante */
+  p, h1, h2, h3, h4, h5, h6, ul, ol, li, table, img {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-/* TÍTULOS: Nunca dejar solos al final de página */
-h1, h2, h3, h4, h5, h6 {
-  page-break-after: avoid !important;
-  break-after: avoid !important;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  orphans: 3 !important;
-  widows: 3 !important;
-}
+  /* 5. Nunca dejar un título solo al final de la página */
+  h1, h2, h3, h4 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-/* PÁRRAFOS: No cortar, mínimo 2 líneas juntas */
-p {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  orphans: 2 !important;
-  widows: 2 !important;
-}
+  /* 6. PROTECCIÓN ESPECÍFICA PARA LAS CAJAS DE MAHANAIM (Estilos en línea) */
+  div[style*="border-left"],
+  div[style*="background:"],
+  div[style*="border-radius"],
+  div[style*="box-shadow"],
+  div[style*="padding: 1"],
+  div[style*="padding: 1.5"],
+  div[style*="padding: 2"],
+  .caja-nota,
+  .caja-arqueologia,
+  .caja-versiculo,
+  .timeline-container,
+  .tabla-comparativa {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    display: block !important; /* Forzar a que sea tratado como bloque sólido */
+  }
 
-/* IMÁGENES Y TABLAS: Mantener enteras */
-img, table {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  max-width: 100% !important;
-}
+  /* 7. Asegurar que las tablas no se partan */
+  table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-/* LISTAS: Mantener enteras */
-ul, ol {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
+  /* 8. Evitar que los separadores decorativos queden solos */
+  div[style*="text-align: center"] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-/* CAJAS DE CONTENIDO: Nunca cortar (Clases específicas) */
-.caja-nota,
-.caja-arqueologia, 
-.caja-versiculo,
-.caja-linguistica,
-.caja-contexto,
-.timeline-container,
-.tabla-comparativa {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  page-break-after: avoid !important;
-  break-after: avoid !important;
-}
-
-/* CAJAS DE CONTENIDO: Nunca cortar (Estilos en línea que genera la IA) */
-div[style*="border-left"],
-div[style*="background:"],
-div[style*="border-radius"],
-div[style*="box-shadow"],
-div[style*="padding: 1"],
-div[style*="padding: 1.5"],
-div[style*="padding: 2"] {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  page-break-after: avoid !important;
-  break-after: avoid !important;
-}
-
-/* SEPARADORES DECORATIVOS: No dejar solos */
-div[style*="text-align: center"] {
-  page-break-after: avoid !important;
-  break-after: avoid !important;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
-
-/* ELEMENTOS COMPLEJOS (Timelines, etc.) */
-div[style*="position: relative"] {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
+  /* 9. Configuración de la hoja para que se vea limpia */
+  @page {
+    margin: 1.5cm; /* Margen profesional para impresión */
+    size: A4 portrait;
+  }
 }
