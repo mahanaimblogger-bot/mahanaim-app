@@ -533,7 +533,7 @@ h1.titulo-entrada { font-size: 24px; }
 
 /* ============================================
    CONTROL TOTAL DE SALTOS DE PÁGINA PARA PDF
-   Reemplaza todo el bloque anterior de impresión
+   (ÚNICO BLOQUE DE IMPRESIÓN)
    ============================================ */
 
 @media print {
@@ -548,11 +548,15 @@ h1.titulo-entrada { font-size: 24px; }
     box-shadow: none !important;
     border: none !important;
   }
+
+  /* Forzar que el primer elemento no tenga margen superior que empuje el contenido */
+  #area-impresion > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 }
 
-/* ============================================
-   REGLAS GLOBALES ANTI-CORTE (PDF y Print)
-   ============================================ */
+/* REGLAS GLOBALES ANTI-CORTE (Aplican a html2pdf.js y window.print) */
 
 /* TÍTULOS: Nunca dejar solos al final de página */
 h1, h2, h3, h4, h5, h6 {
@@ -564,31 +568,19 @@ h1, h2, h3, h4, h5, h6 {
   widows: 3 !important;
 }
 
-/* Títulos principales: permitir salto antes si es necesario */
-h2 {
-  page-break-before: auto !important;
-  break-before: auto !important;
-}
-
-/* PÁRRAFOS: No cortar, mínimo 3 líneas juntas */
+/* PÁRRAFOS: No cortar, mínimo 2 líneas juntas */
 p {
   page-break-inside: avoid !important;
   break-inside: avoid !important;
-  orphans: 3 !important;
-  widows: 3 !important;
+  orphans: 2 !important;
+  widows: 2 !important;
 }
 
-/* IMÁGENES: Mantener enteras */
-img {
+/* IMÁGENES Y TABLAS: Mantener enteras */
+img, table {
   page-break-inside: avoid !important;
   break-inside: avoid !important;
   max-width: 100% !important;
-}
-
-/* TABLAS: Mantener enteras */
-table {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
 }
 
 /* LISTAS: Mantener enteras */
@@ -597,12 +589,7 @@ ul, ol {
   break-inside: avoid !important;
 }
 
-/* ============================================
-   CAJAS DE CONTENIDO: Nunca cortar
-   Captura tanto clases como estilos inline
-   ============================================ */
-
-/* Cajas con clases específicas */
+/* CAJAS DE CONTENIDO: Nunca cortar (Clases específicas) */
 .caja-nota,
 .caja-arqueologia, 
 .caja-versiculo,
@@ -616,7 +603,7 @@ ul, ol {
   break-after: avoid !important;
 }
 
-/* Cajas con estilos inline (las que genera la IA) */
+/* CAJAS DE CONTENIDO: Nunca cortar (Estilos en línea que genera la IA) */
 div[style*="border-left"],
 div[style*="background:"],
 div[style*="border-radius"],
@@ -630,10 +617,7 @@ div[style*="padding: 2"] {
   break-after: avoid !important;
 }
 
-/* ============================================
-   SEPARADORES DECORATIVOS: No dejar solos
-   ============================================ */
-
+/* SEPARADORES DECORATIVOS: No dejar solos */
 div[style*="text-align: center"] {
   page-break-after: avoid !important;
   break-after: avoid !important;
@@ -641,30 +625,8 @@ div[style*="text-align: center"] {
   break-inside: avoid !important;
 }
 
-/* ============================================
-   LÍNEAS DE TIEMPO Y ELEMENTOS COMPLEJOS
-   ============================================ */
-
+/* ELEMENTOS COMPLEJOS (Timelines, etc.) */
 div[style*="position: relative"] {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
-
-/* ============================================
-   CLASES UTILITARIAS PARA SALTOS EXPLÍCITOS
-   ============================================ */
-
-.page-break-before {
-  page-break-before: always !important;
-  break-before: page !important;
-}
-
-.page-break-after {
-  page-break-after: always !important;
-  break-after: page !important;
-}
-
-.avoid-break {
   page-break-inside: avoid !important;
   break-inside: avoid !important;
 }
