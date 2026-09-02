@@ -65,7 +65,12 @@ export default function PrintButton({
           format: 'a4', 
           orientation: 'portrait' 
         },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak: { 
+          mode: ['avoid-all', 'css', 'legacy'],
+          before: '.page-break-before',
+          after: '.page-break-after',
+          avoid: ['.caja-nota', '.caja-arqueologia', '.caja-versiculo', '.timeline-container', '.tabla-comparativa', 'h2', 'h3', 'h4', '.seccion-completa']
+        }
       };
 
       // Ocultar elementos no imprimibles durante la generación
