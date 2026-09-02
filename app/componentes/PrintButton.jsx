@@ -2,85 +2,119 @@
 
 import { useState } from 'react';
 
-export default function PrintButton() {
-  const [showModal, setShowModal] = useState(false);
+export default function PrintButton({ 
+  titulo = 'Estudio', 
+  libro = '', 
+  capitulo = '',
+  tipo = 'estudio'
+}) {
+  const [generando, setGenerando] = useState(false);
+  const [error, setError] = useState('');
 
-  const handlePrint = () => {
-    // Verificar si está en móvil (pantalla ≤ 768px)
-    const isMobile = window.innerWidth <= 768;
+  const generarPDF = async () => {
+    setGenerando(true);
+    setError('');
+
+    const elemento = document.getElementById('area-impresion');
     
-    if (isMobile) {
-      // Si está en móvil, mostrar advertencia
-      setShowModal(true);
-    } else {
-      // Si está en PC, imprimir directamente
-      window.print();
+    if (!elemento) {
+      setError('No se encontró el contenido para imprimir');
+      setGenerando(false);
+      return;
+    }
+
+    // Detectar flipcards (solo mostrar mensaje si las hay)
+    const tieneFlipcards = document.querySelectorAll('.flipcard, .flip-container').length > 0;
+    
+    if (tieneFlipcards && window.innerWidth < 768) {
+      const rotar = window.confirm(' Para mejor resultado, rota tu dispositivo a horizontal. ¿Continuar?');
+      if (!rotar) {
+        setGenerando(false);
+        return;
+      }
+    }
+
+    try {
+      // Cargar html2pdf dinámicamente desde CDN
+      if (typeof window.html2pdf === 'undefined') {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('No se pudo cargar la librería de PDF'));
+          document.head.appendChild(script);
+        });
+      }
+
+      // Generar nombre automático del archivo
+      const nombreArchivo = `Estudio-${libro || 'biblico'}-${capitulo || 'capitulo'}-Mahanaim.pdf`;
+
+      const opciones = {
+        margin: [10, 10, 10, 10],
+        filename: nombreArchivo,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          logging: false,
+          letterRendering: true,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait' 
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      // Ocultar elementos no imprimibles durante la generación
+      const elementosOcultar = document.querySelectorAll('.no-print');
+      elementosOcultar.forEach(el => el.style.display = 'none');
+
+      // Generar y descargar el PDF
+      await window.html2pdf().set(opciones).from(elemento).save();
+
+      // Restaurar elementos
+      elementosOcultar.forEach(el => el.style.display = '');
+      
+      console.log('✅ PDF generado exitosamente:', nombreArchivo);
+      
+    } catch (error) {
+      console.error(' Error al generar PDF:', error);
+      setError(`Error al generar el PDF: ${error.message}. Intenta de nuevo.`);
+    } finally {
+      setGenerando(false);
     }
   };
 
-  const confirmPrint = () => {
-    setShowModal(false);
-    window.print();
-  };
-
   return (
-    <>
+    <div className="no-print">
       <button
-        onClick={handlePrint}
-        className="no-print inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] border-2 border-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition cursor-pointer shadow-sm font-['Georgia',serif]"
-        title="Descargar o imprimir este recurso en PDF"
+        onClick={generarPDF}
+        disabled={generando}
+        className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition disabled:opacity-50 cursor-pointer"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clipRule="evenodd" />
-        </svg>
-        Descargar PDF
+        {generando ? (
+          <>
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Generando PDF...
+          </>
+        ) : (
+          <>
+            🖨️ Descargar PDF
+          </>
+        )}
       </button>
-
-      {/* Modal de advertencia para móvil */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-[#d4ac0d]">
-            <div className="text-center mb-4">
-              <div className="text-5xl mb-3">📱</div>
-              <h3 className="text-xl font-bold text-[#1a5276] mb-2">
-                Modo Vertical Detectado
-              </h3>
-            </div>
-
-            <div className="bg-[#fdfbf7] border border-[#d4c4a8] rounded-lg p-4 mb-4">
-              <p className="text-[#3e2723] text-sm leading-relaxed mb-3">
-                Para descargar el PDF con <strong>TODO el contenido completo</strong> de las tarjetas:
-              </p>
-              <ol className="text-[#3e2723] text-sm space-y-2 text-left list-decimal list-inside">
-                <li>Rota tu dispositivo a <strong>modo horizontal</strong></li>
-                <li>Todas las fichas se desplegarán automáticamente</li>
-                <li>Vuelve a presionar "Descargar PDF"</li>
-              </ol>
-            </div>
-
-            <div className="bg-[#fff3cd] border border-[#ffc107] rounded-lg p-3 mb-4">
-              <p className="text-xs text-[#856404]">
-                <strong>⚠️ Nota:</strong> Si descargas ahora en modo vertical, el PDF solo incluirá la parte frontal de las tarjetas.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={confirmPrint}
-                className="flex-1 bg-[#1a3a5c] text-[#d4ac0d] border-2 border-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition"
-              >
-                Descargar igual (contenido parcial)
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 bg-gray-200 text-[#3e2723] px-4 py-2 rounded-lg font-bold hover:bg-gray-300 transition"
-              >
-                Entendido, rotaré el dispositivo
-              </button>
-            </div>
-          </div>
+      
+      {error && (
+        <div className="mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+          {error}
         </div>
       )}
-    </>
+    </div>
   );
 }
