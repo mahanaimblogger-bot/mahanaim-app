@@ -531,7 +531,11 @@ h1.titulo-entrada { font-size: 24px; }
   }
 }
 
-/* Estilos para impresión y generación de PDF */
+/* ============================================
+   CONTROL TOTAL DE SALTOS DE PÁGINA PARA PDF
+   Reemplaza todo el bloque anterior de impresión
+   ============================================ */
+
 @media print {
   .no-print {
     display: none !important;
@@ -544,74 +548,29 @@ h1.titulo-entrada { font-size: 24px; }
     box-shadow: none !important;
     border: none !important;
   }
-  
-  /* Evitar que las imágenes se corten entre páginas */
-  img {
-    page-break-inside: avoid;
-    max-width: 100% !important;
-  }
-  
-  /* Evitar que las tablas se corten */
-  table {
-    page-break-inside: avoid;
-  }
-  
-  /* Forzar saltos de página en secciones principales */
-  h2, h3 {
-    page-break-after: avoid;
-  }
 }
 
 /* ============================================
-   ANTI-CORTE PARA PDF
-   Evita que el contenido se parta entre páginas
+   REGLAS GLOBALES ANTI-CORTE (PDF y Print)
    ============================================ */
 
-/* Evitar que las cajas de énfasis se corten */
-.caja-nota,
-.caja-arqueologia, 
-.caja-versiculo,
-.caja-linguistica,
-[style*="border-left"],
-[style*="border-radius"] {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
-
-/* Evitar que los títulos queden solos al final de página */
-h1, h2, h3, h4 {
+/* TÍTULOS: Nunca dejar solos al final de página */
+h1, h2, h3, h4, h5, h6 {
   page-break-after: avoid !important;
   break-after: avoid !important;
   page-break-inside: avoid !important;
   break-inside: avoid !important;
+  orphans: 3 !important;
+  widows: 3 !important;
 }
 
-/* Forzar que los títulos principales empiecen en página nueva si es necesario */
+/* Títulos principales: permitir salto antes si es necesario */
 h2 {
   page-break-before: auto !important;
   break-before: auto !important;
 }
 
-/* Evitar que las tablas se corten */
-table {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
-
-/* Evitar que las imágenes se corten */
-img {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  max-width: 100% !important;
-}
-
-/* Evitar que las listas se corten */
-ul, ol {
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
-
-/* Los párrafos no deben cortarse */
+/* PÁRRAFOS: No cortar, mínimo 3 líneas juntas */
 p {
   page-break-inside: avoid !important;
   break-inside: avoid !important;
@@ -619,14 +578,93 @@ p {
   widows: 3 !important;
 }
 
-/* Clase utilitaria para forzar salto de página antes */
+/* IMÁGENES: Mantener enteras */
+img {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  max-width: 100% !important;
+}
+
+/* TABLAS: Mantener enteras */
+table {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* LISTAS: Mantener enteras */
+ul, ol {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* ============================================
+   CAJAS DE CONTENIDO: Nunca cortar
+   Captura tanto clases como estilos inline
+   ============================================ */
+
+/* Cajas con clases específicas */
+.caja-nota,
+.caja-arqueologia, 
+.caja-versiculo,
+.caja-linguistica,
+.caja-contexto,
+.timeline-container,
+.tabla-comparativa {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+/* Cajas con estilos inline (las que genera la IA) */
+div[style*="border-left"],
+div[style*="background:"],
+div[style*="border-radius"],
+div[style*="box-shadow"],
+div[style*="padding: 1"],
+div[style*="padding: 1.5"],
+div[style*="padding: 2"] {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+/* ============================================
+   SEPARADORES DECORATIVOS: No dejar solos
+   ============================================ */
+
+div[style*="text-align: center"] {
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* ============================================
+   LÍNEAS DE TIEMPO Y ELEMENTOS COMPLEJOS
+   ============================================ */
+
+div[style*="position: relative"] {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* ============================================
+   CLASES UTILITARIAS PARA SALTOS EXPLÍCITOS
+   ============================================ */
+
 .page-break-before {
   page-break-before: always !important;
   break-before: page !important;
 }
 
-/* Clase utilitaria para forzar salto de página después */
 .page-break-after {
   page-break-after: always !important;
   break-after: page !important;
+}
+
+.avoid-break {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
 }
