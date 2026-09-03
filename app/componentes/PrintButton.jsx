@@ -2,6 +2,16 @@
 
 import { useState } from 'react';
 
+// Lista exacta de recursos que tienen información solapada en modo vertical
+// (Nombres tal como están en la tabla 'resources' de Supabase)
+const RECURSOS_SOLAPADOS = [
+  'profecias',
+  'paralelos',
+  'infografia',
+  'conexion_nt',
+  'conexion_at' // Agregado por si lo creas en el futuro
+];
+
 export default function PrintButton({ 
   titulo = 'Estudio', 
   libro = '', 
@@ -20,13 +30,35 @@ export default function PrintButton({
         return;
       }
 
-      // AGREGAR clase para estilos de impresión limpia (NO modifica el HTML, solo agrega una clase)
-      areaImpresion.classList.add('pdf-limpio');
+      // 1. DETECCIÓN DE DISPOSITIVO Y ORIENTACIÓN
+      const esMovil = window.innerWidth < 768;
+      const esVertical = window.innerHeight > window.innerWidth;
+      
+      // Normalizamos el tipo para comparación segura
+      const tipoNormalizado = tipo.toLowerCase().trim();
 
-      // Imprimir
+      // 2. VERIFICAR SI EL RECURSO REQUIERE ADVERTENCIA
+      const requiereAdvertencia = RECURSOS_SOLAPADOS.includes(tipoNormalizado);
+
+      // 3. MOSTRAR MENSAJE SOLO SI CUMPLE TODAS LAS CONDICIONES
+      if (requiereAdvertencia && esMovil && esVertical) {
+        const continuar = window.confirm(
+          ' Para que la información de este recurso salga completa en el PDF, ' +
+          'por favor rota tu dispositivo a horizontal (apaisado) antes de continuar. ' +
+          '¿Deseas continuar de todos modos?'
+        );
+        
+        if (!continuar) {
+          setGenerando(false);
+          return; // Cancela la impresión
+        }
+      }
+
+      // 4. APLICAR ESTILOS LIMPIOS Y GENERAR PDF
+      areaImpresion.classList.add('pdf-limpio');
       window.print();
 
-      // REMOVER la clase inmediatamente después (el HTML original está intacto)
+      // 5. RESTAURAR EL DISEÑO ORIGINAL
       setTimeout(() => {
         areaImpresion.classList.remove('pdf-limpio');
         setGenerando(false);
@@ -51,7 +83,7 @@ export default function PrintButton({
           </>
         ) : (
           <>
-            🖨️ Descargar PDF
+            ️ Descargar PDF
           </>
         )}
       </button>
