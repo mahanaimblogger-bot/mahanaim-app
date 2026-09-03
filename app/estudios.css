@@ -532,82 +532,132 @@ h1.titulo-entrada { font-size: 24px; }
 }
 
 /* ============================================
-   ESTILOS DE IMPRESIÓN / PDF (MOTOR NATIVO)
-   Diseñado para flujo continuo sin cortes
+   ESTILOS PARA PDF LIMPIO (100% SEGURO)
+   Solo se aplican durante la impresión
+   El HTML original NUNCA se modifica
    ============================================ */
 
 @media print {
-  /* 1. Ocultar todo lo que no sea el estudio */
-  .no-print, header, footer, nav, .breadcrumb, .share-buttons {
+  /* Ocultar todo lo que no sea el estudio */
+  .no-print, header, footer, nav, .breadcrumb, .share-buttons, button {
     display: none !important;
   }
 
-  /* 2. Resetear el contenedor principal para que ocupe toda la hoja */
-  #area-impresion {
+  /* Cuando el contenedor tiene la clase 'pdf-limpio', aplicar estilos minimalistas */
+  #area-impresion.pdf-limpio,
+  #area-impresion.pdf-limpio * {
+    /* Resetear TODOS los estilos inline y de clases */
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: #000 !important;
+    font-family: 'Georgia', serif !important;
+  }
+
+  /* Contenedor principal */
+  #area-impresion.pdf-limpio {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: white !important;
-    box-shadow: none !important;
-    border: none !important;
   }
 
-  /* 3. Forzar que el primer elemento no tenga margen superior (evita el espacio en blanco) */
-  #area-impresion > *:first-child {
+  /* Títulos con espaciado profesional */
+  #area-impresion.pdf-limpio h1 {
+    font-size: 24pt !important;
+    font-weight: bold !important;
     margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-
-  /* 4. REGLA DE ORO: Evitar cortes dentro de CUALQUIER elemento de bloque importante */
-  p, h1, h2, h3, h4, h5, h6, ul, ol, li, table, img {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  /* 5. Nunca dejar un título solo al final de la página */
-  h1, h2, h3, h4 {
+    margin-bottom: 20pt !important;
+    text-align: center !important;
     page-break-after: avoid !important;
-    break-after: avoid !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
-  /* 6. PROTECCIÓN ESPECÍFICA PARA LAS CAJAS DE MAHANAIM (Estilos en línea) */
-  div[style*="border-left"],
-  div[style*="background:"],
-  div[style*="border-radius"],
-  div[style*="box-shadow"],
-  div[style*="padding: 1"],
-  div[style*="padding: 1.5"],
-  div[style*="padding: 2"],
-  .caja-nota,
-  .caja-arqueologia,
-  .caja-versiculo,
-  .timeline-container,
-  .tabla-comparativa {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+  #area-impresion.pdf-limpio h2 {
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    margin-top: 24pt !important;
+    margin-bottom: 12pt !important;
     page-break-after: avoid !important;
-    break-after: avoid !important;
-    display: block !important; /* Forzar a que sea tratado como bloque sólido */
   }
 
-  /* 7. Asegurar que las tablas no se partan */
-  table {
+  #area-impresion.pdf-limpio h3 {
+    font-size: 14pt !important;
+    font-weight: bold !important;
+    margin-top: 18pt !important;
+    margin-bottom: 10pt !important;
+    page-break-after: avoid !important;
+  }
+
+  #area-impresion.pdf-limpio h4 {
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    margin-top: 14pt !important;
+    margin-bottom: 8pt !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Párrafos limpios */
+  #area-impresion.pdf-limpio p {
+    font-size: 11pt !important;
+    margin-bottom: 10pt !important;
+    text-align: justify !important;
+    orphans: 3 !important;
+    widows: 3 !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Listas */
+  #area-impresion.pdf-limpio ul,
+  #area-impresion.pdf-limpio ol {
+    margin-left: 20pt !important;
+    margin-bottom: 10pt !important;
     page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
-  /* 8. Evitar que los separadores decorativos queden solos */
-  div[style*="text-align: center"] {
+  #area-impresion.pdf-limpio li {
+    font-size: 11pt !important;
+    margin-bottom: 6pt !important;
+  }
+
+  /* Tablas simples */
+  #area-impresion.pdf-limpio table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 15pt 0 !important;
     page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
-  /* 9. Configuración de la hoja para que se vea limpia */
+  #area-impresion.pdf-limpio th,
+  #area-impresion.pdf-limpio td {
+    border: 1pt solid #ccc !important;
+    padding: 6pt !important;
+    font-size: 10pt !important;
+    text-align: left !important;
+  }
+
+  #area-impresion.pdf-limpio th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Imágenes */
+  #area-impresion.pdf-limpio img {
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 10pt 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Separadores simples */
+  #area-impresion.pdf-limpio hr {
+    border: none !important;
+    border-top: 1pt solid #ccc !important;
+    margin: 20pt 0 !important;
+  }
+
+  /* Configuración de página */
   @page {
-    margin: 1.5cm; /* Margen profesional para impresión */
+    margin: 2cm;
     size: A4 portrait;
   }
 }
