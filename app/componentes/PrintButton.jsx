@@ -18,7 +18,8 @@ const RECURSOS_SIN_PDF = [
   'diapositiva',
   'imagen',
   'quiz',
-  'mapa'
+  'mapa',
+  'video' // <--- ¡Agregado!
 ];
 
 export default function PrintButton({ 
