@@ -105,7 +105,7 @@ export default function LectorCapituloPage() {
       const { data: eventosDelLibro, error: errorEventos } = await supabase
         .from('timeline_events')
         .select('id, title, start_year, category, image_url, related_chapter')
-        .ilike('related_book_slug', timelineSlug) 
+        .eq('related_book_slug', timelineSlug) 
         .order('related_chapter', { ascending: true, nullsLast: true });
 
       console.log('📚 Eventos del libro (todos):', eventosDelLibro);
