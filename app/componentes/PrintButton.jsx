@@ -3,13 +3,21 @@
 import { useState } from 'react';
 
 // Lista exacta de recursos que tienen información solapada en modo vertical
-// (Nombres tal como están en la tabla 'resources' de Supabase)
 const RECURSOS_SOLAPADOS = [
   'profecias',
   'paralelos',
   'infografia',
   'conexion_nt',
   'conexion_at'
+];
+
+// Lista de recursos que NO deben mostrar el botón de descarga PDF
+const RECURSOS_SIN_PDF = [
+  'ilustracion',
+  'audio',
+  'diapositivas',
+  'mapa',
+  'cuestionario'
 ];
 
 export default function PrintButton({ 
@@ -20,6 +28,14 @@ export default function PrintButton({
 }) {
   const [generando, setGenerando] = useState(false);
   const [mostrarModalRotacion, setMostrarModalRotacion] = useState(false);
+
+  // Normalizamos el tipo para comparación segura
+  const tipoNormalizado = tipo.toLowerCase().trim().replace(/\s+/g, '_');
+
+  // Si el recurso está en la lista de excluidos, no renderizamos nada
+  if (RECURSOS_SIN_PDF.includes(tipoNormalizado)) {
+    return null;
+  }
 
   const manejarImpresion = () => {
     setGenerando(true);
@@ -34,9 +50,6 @@ export default function PrintButton({
       // 1. DETECCIÓN DE DISPOSITIVO Y ORIENTACIÓN
       const esMovil = window.innerWidth < 768;
       const esVertical = window.innerHeight > window.innerWidth;
-      
-      // Normalizamos el tipo a minúsculas y sin espacios para evitar errores de coincidencia
-      const tipoNormalizado = tipo.toLowerCase().trim().replace(/\s+/g, '_');
 
       // 2. VERIFICAR SI EL RECURSO REQUIERE ADVERTENCIA
       const requiereAdvertencia = RECURSOS_SOLAPADOS.includes(tipoNormalizado);
@@ -44,16 +57,15 @@ export default function PrintButton({
       // 3. MOSTRAR MODAL SOLO SI CUMPLE TODAS LAS CONDICIONES
       if (requiereAdvertencia && esMovil && esVertical) {
         setMostrarModalRotacion(true);
-        setGenerando(false); // Pausamos el estado de "generando" hasta que el usuario decida
+        setGenerando(false);
         return; 
       }
 
-      // 4. SI NO REQUIERE ADVERTENCIA (O YA ESTÁ HORIZONTAL), GENERAMOS DIRECTO
+      // 4. SI NO REQUIERE ADVERTENCIA, GENERAMOS DIRECTO
       generarPDFLimpio(areaImpresion);
     }, 300);
   };
 
-  // Función para continuar después de que el usuario vea el modal
   const continuarImpresion = () => {
     setMostrarModalRotacion(false);
     setGenerando(true);
@@ -63,7 +75,6 @@ export default function PrintButton({
     }
   };
 
-  // Función interna que aplica los estilos y lanza la impresión
   const generarPDFLimpio = (areaImpresion) => {
     areaImpresion.classList.add('pdf-limpio');
     window.print();
@@ -99,21 +110,18 @@ export default function PrintButton({
         </button>
       </div>
 
-      {/* MODAL DE ADVERTENCIA DE ROTACIÓN (DISEÑO MAHANAIM) */}
+      {/* MODAL DE ADVERTENCIA DE ROTACIÓN */}
       {mostrarModalRotacion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="bg-[#fdfbf7] rounded-xl shadow-2xl max-w-sm w-full border-2 border-[#d4ac0d] overflow-hidden">
             
-            {/* Encabezado del Modal */}
             <div className="bg-[#1a3a5c] p-4 text-center border-b-4 border-[#d4ac0d]">
               <h3 className="text-[#d4ac0d] font-serif font-bold text-xl tracking-wide">
                 Optimiza tu Vista
               </h3>
             </div>
 
-            {/* Cuerpo del Modal */}
             <div className="p-6 text-center">
-              {/* Icono de Teléfono Rotando */}
               <div className="mb-4 flex justify-center">
                 <div className="bg-[#f5f2eb] p-4 rounded-full border border-[#d4c4a8]">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1a3a5c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -125,7 +133,6 @@ export default function PrintButton({
                 </div>
               </div>
 
-              {/* Mensaje Claro */}
               <p className="text-[#3e2723] font-serif text-lg leading-relaxed mb-2">
                 Este recurso contiene tablas y gráficos detallados.
               </p>
@@ -133,7 +140,6 @@ export default function PrintButton({
                 Para que la información se vea <strong>completa y legible</strong> en el PDF, por favor <strong className="text-[#1a3a5c]">rota tu dispositivo a posición horizontal</strong>.
               </p>
 
-              {/* Botones de Acción */}
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button 
                   onClick={() => setMostrarModalRotacion(false)}
