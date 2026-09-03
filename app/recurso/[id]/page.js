@@ -96,26 +96,38 @@ export default async function RecursoPage({ params }) {
   
   let contenidoPrincipal;
 
-  // 1. AUDIO (Intacto)
+  // 1. AUDIO (Con botón de descarga directa)
   if (tipo === 'audio' && urlRecurso) {
     contenidoPrincipal = (
-      <AudioPlayer
-        url={urlRecurso}
-        titulo={titulo}
-        libroNombre={libro?.nombre || 'Libro'}
-        capituloNumero={capitulo?.numero || ''}
-      />
+      <div className="w-full">
+        <AudioPlayer
+          url={urlRecurso}
+          titulo={titulo}
+          libroNombre={libro?.nombre || 'Libro'}
+          capituloNumero={capitulo?.numero || ''}
+        />
+        <div className="mt-4 p-4 bg-[#fdfbf7] text-center border border-[#d4c4a8] rounded-xl">
+          <a 
+            href={urlRecurso} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition"
+          >
+            📥 Descargar archivo directamente
+          </a>
+        </div>
+      </div>
     );
   } 
   // 2. VIDEO (YouTube) (Intacto)
   else if (tipo === 'video' && urlRecurso) {
     contenidoPrincipal = renderVideoEmbed(urlRecurso) || (
       <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-        <p className="text-sm text-yellow-800">️ URL de video no válida. <a href={urlRecurso} target="_blank" className="underline font-bold">Ver en YouTube</a></p>
+        <p className="text-sm text-yellow-800">⚠️ URL de video no válida. <a href={urlRecurso} target="_blank" className="underline font-bold">Ver en YouTube</a></p>
       </div>
     );
   }
-  // 3. PDF o DIAPOSITIVAS (PPT/PPTX) (Intacto)
+  // 3. PDF o DIAPOSITIVAS (PPT/PPTX) (SIN el mensaje molesto, solo el botón)
   else if (tipo === 'pdf' || tipo === 'diapositiva' || tipo === 'ppt' || lowerUrl.match(/\.(pdf|ppt|pptx)$/)) {
     const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(urlRecurso)}&embedded=true`;
     
@@ -128,7 +140,6 @@ export default async function RecursoPage({ params }) {
           allowFullScreen
         />
         <div className="p-4 bg-[#fdfbf7] text-center border-t border-[#d4c4a8]">
-          <p className="text-sm text-[#5d4037] mb-2">¿No se visualiza correctamente?</p>
           <a 
             href={urlRecurso} 
             target="_blank" 
@@ -165,7 +176,7 @@ export default async function RecursoPage({ params }) {
       </div>
     );
   }
-  // 5. IMAGEN (ÚNICO CAMBIO: Se agrega esta sección específica para imágenes)
+  // 5. IMAGEN / ILUSTRACIÓN (Con botón de descarga directa)
   else if (tipo === 'imagen' && urlRecurso) {
     contenidoPrincipal = (
       <div className="w-full flex flex-col items-center">
@@ -184,6 +195,18 @@ export default async function RecursoPage({ params }) {
             <ScriptExecutor htmlContent={contenidoSinPortada} />
           </div>
         )}
+
+        {/* Botón de descarga para imagen */}
+        <div className="mt-6 p-4 bg-[#fdfbf7] text-center border border-[#d4c4a8] rounded-xl w-full">
+          <a 
+            href={urlRecurso} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] px-4 py-2 rounded-lg font-bold hover:bg-[#2d4a6c] transition"
+          >
+            📥 Descargar archivo directamente
+          </a>
+        </div>
       </div>
     );
   }
@@ -230,7 +253,7 @@ export default async function RecursoPage({ params }) {
               capitulo={capitulo?.numero || ''}
               tipo={tipo}
            />
-</div>
+           </div>
           </div>
 
           <div id="area-impresion" className="bg-white p-3 sm:p-8 rounded-xl shadow-md border border-[#d4c4a8] w-full">
