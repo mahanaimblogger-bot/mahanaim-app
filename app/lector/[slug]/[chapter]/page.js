@@ -93,15 +93,19 @@ export default function LectorCapituloPage() {
       }
 
       // ============================================================
-      // 5. 🔍 BÚSQUEDA DEL EVENTO (versión robusta con todos los eventos)
+      // 5. 🔍 BÚSQUEDA DEL EVENTO (versión robusta corregida)
       // ============================================================
       console.log('🔍 Buscando evento para:', { cleanSlug, chapterNum });
 
-      // 📥 Traer TODOS los eventos del libro (sin filtrar por capítulo)
+      // 🔧 NORMALIZAR SLUG: Quita acentos para que 'génesis' coincida con 'genesis' en la BD
+      const timelineSlug = cleanSlug.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      console.log(`🔧 Slug normalizado para timeline: "${timelineSlug}"`);
+
+      // 📥 Traer TODOS los eventos del libro usando el slug sin acentos
       const { data: eventosDelLibro, error: errorEventos } = await supabase
         .from('timeline_events')
         .select('id, title, start_year, category, image_url, related_chapter')
-        .ilike('related_book_slug', cleanSlug)
+        .ilike('related_book_slug', timelineSlug) 
         .order('related_chapter', { ascending: true, nullsLast: true });
 
       console.log('📚 Eventos del libro (todos):', eventosDelLibro);
@@ -112,13 +116,13 @@ export default function LectorCapituloPage() {
       if (eventosDelLibro && eventosDelLibro.length > 0) {
         console.log(`✅ Se encontraron ${eventosDelLibro.length} eventos para el libro`);
         
-        // Buscar el capítulo exacto
+        // 1. Buscar el capítulo exacto
         const exacto = eventosDelLibro.find(e => e.related_chapter === chapterNum);
         if (exacto) {
           console.log('🎯 Evento exacto encontrado:', exacto);
           encontrado = exacto;
         } else {
-          // Buscar el más cercano anterior (menor que el capítulo actual)
+          // 2. Buscar el más cercano anterior (menor que el capítulo actual)
           const anteriores = eventosDelLibro
             .filter(e => e.related_chapter !== null && e.related_chapter < chapterNum)
             .sort((a, b) => b.related_chapter - a.related_chapter);
@@ -127,7 +131,7 @@ export default function LectorCapituloPage() {
             console.log('🔄 Evento cercano anterior encontrado:', anteriores[0]);
             encontrado = { ...anteriores[0], esCercano: true };
           } else {
-            // Si no hay anterior, usar el primero de la lista (el más antiguo del libro)
+            // 3. Si no hay anterior, usar el primero de la lista (el más antiguo del libro)
             console.log('📌 Usando el primer evento del libro:', eventosDelLibro[0]);
             encontrado = { ...eventosDelLibro[0], esCercano: true };
           }
@@ -135,11 +139,13 @@ export default function LectorCapituloPage() {
       } else {
         console.log('💔 No hay eventos para este libro. Buscando por testamento...');
         
-        // Fallback: buscar por testamento
+        // Fallback: asegurar que el testamento sea 'AT' o 'NT' como está en la BD
+        const testamentoCorto = libroData.testamento?.includes('Antiguo') ? 'AT' : 'NT';
+        
         const { data: eventoTestamento, error: testamentoError } = await supabase
           .from('timeline_events')
-          .select('id, title, start_year, category, image_url')
-          .eq('testament', libroData.testamento)
+          .select('id, title, start_year, category, image_url, related_book_slug, related_chapter')
+          .eq('testament', testamentoCorto)
           .order('start_year', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -148,7 +154,7 @@ export default function LectorCapituloPage() {
         if (testamentoError) console.error('❌ testamentoError:', testamentoError);
 
         if (eventoTestamento) {
-          console.log('📌 Evento por testamento encontrado (el más reciente)');
+          console.log('📌 Evento por testamento encontrado:', eventoTestamento);
           encontrado = { ...eventoTestamento, esCercano: true, esTestamento: true };
         } else {
           console.log('❌ No hay eventos para este testamento');
@@ -159,12 +165,15 @@ export default function LectorCapituloPage() {
       setTimelineEvent(encontrado);
       setDebugInfo({ 
         slug: cleanSlug, 
+        timelineSlug, // Agregado para verificar en el debug
         chapterNum, 
         totalEventosLibro: eventosDelLibro?.length || 0,
         encontrado 
       });
 
       setCargando(false);
+      
+      
     })();
   }, [slug, chapterNum]);
 
