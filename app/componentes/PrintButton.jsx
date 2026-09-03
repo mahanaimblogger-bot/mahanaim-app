@@ -11,13 +11,14 @@ const RECURSOS_SOLAPADOS = [
   'conexion_at'
 ];
 
-// Lista de recursos que NO deben mostrar el botón de descarga PDF
+// Lista exacta de recursos que NO deben mostrar el botón de descarga PDF
+// (Nombres tal como están en la tabla 'resources' de Supabase)
 const RECURSOS_SIN_PDF = [
-  'ilustracion',
   'audio',
-  'diapositivas',
-  'mapa',
-  'cuestionario'
+  'diapositiva',
+  'imagen',
+  'quiz',
+  'mapa'
 ];
 
 export default function PrintButton({ 
@@ -57,7 +58,7 @@ export default function PrintButton({
       // 3. MOSTRAR MODAL SOLO SI CUMPLE TODAS LAS CONDICIONES
       if (requiereAdvertencia && esMovil && esVertical) {
         setMostrarModalRotacion(true);
-        setGenerando(false);
+        setGenerando(false); // Pausamos el estado de "generando" hasta que el usuario decida
         return; 
       }
 
