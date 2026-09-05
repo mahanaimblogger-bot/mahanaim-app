@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import ModalLayout from "./asistente/ModalLayout";
+import ResourceTypeStep from "./asistente/ResourceTypeStep";
 
 const TIPOS = [
   { id: "quiz", icon: "🧩", label: "Cuestionario" },
@@ -1187,22 +1188,14 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
   return (
     <ModalLayout context={ctx} onClose={onClose}>
         {step === 1 && (
-          <div>
-            <p style={{ fontSize: 13, color: C.gold, marginBottom: 12 }}>Seleccioná el tipo de recurso</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 18 }}>
-              {TIPOS.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => { setTipo(t.id); setStep(2); }}
-                  style={{ background: C.card, border: `2px solid ${C.border}`, borderRadius: 8, padding: "12px 10px", cursor: "pointer", textAlign: "center", color: C.text }}
-                >
-                  <span style={{ fontSize: 22, display: "block", marginBottom: 4 }}>{t.icon}</span>
-                  <span style={{ fontSize: 12 }}>{t.label}</span>
-                </button>
-              ))}
-            </div>
-            <button onClick={onClose} style={{ background: "transparent", color: C.muted, border: `1px solid ${C.border}`, borderRadius: 7, padding: "10px 20px", cursor: "pointer", fontSize: 14, fontFamily: "Georgia, serif" }}>Cancelar</button>
-          </div>
+          <ResourceTypeStep
+            types={TIPOS}
+            onSelectType={(selectedType) => {
+              setTipo(selectedType);
+              setStep(2);
+            }}
+            onClose={onClose}
+          />
         )}
 
         {step === 2 && (
