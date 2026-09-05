@@ -164,6 +164,7 @@ export default function LectorCapituloPage() {
     </div>
   );
   if (!libro) return null;
+  const testamentoCorto = libro.testamento?.toLowerCase().includes('antiguo') ? 'AT' : 'NT';
 
   const prevChapter = currentIndex > 0 ? capitulos[currentIndex - 1] : null;
   const nextChapter = currentIndex < capitulos.length - 1 ? capitulos[currentIndex + 1] : null;
@@ -214,7 +215,7 @@ export default function LectorCapituloPage() {
       <div className="mt-8 text-center">
         {timelineEvent ? (
           <>
-            
+            <a
               href={timelineEvent.id > 0 ? `/linea-tiempo?evento=${timelineEvent.id}` : '/linea-tiempo'}
               className="inline-flex items-center gap-2 bg-[#1a3a5c] text-[#d4ac0d] font-bold px-6 py-3 rounded-lg hover:bg-[#2d4a6c] transition"
             >

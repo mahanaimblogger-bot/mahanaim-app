@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import ModalLayout from "./asistente/ModalLayout";
 
 const TIPOS = [
   { id: "quiz", icon: "🧩", label: "Cuestionario" },
@@ -1184,40 +1185,7 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
   const selectStyle = { ...inputStyle };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: "rgba(0,0,0,0.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div
-        style={{
-          background: C.bg,
-          borderRadius: 12,
-          width: "90%",
-          maxWidth: 700,
-          maxHeight: "85vh",
-          overflowY: "auto",
-          padding: 24,
-          fontFamily: "Georgia, serif",
-          color: C.text,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-          <div>
-            <h2 style={{ color: C.gold, margin: 0, fontSize: 18 }}>✨ Asistente IA</h2>
-            <p style={{ color: C.muted, fontSize: 12, margin: "2px 0 0" }}>{ctx.libro} — Cap. {ctx.cap}</p>
-          </div>
-          <button onClick={onClose} style={{ background: "transparent", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, fontSize: 18, cursor: "pointer", padding: "4px 10px" }}>✕</button>
-        </div>
-
+    <ModalLayout context={ctx} onClose={onClose}>
         {step === 1 && (
           <div>
             <p style={{ fontSize: 13, color: C.gold, marginBottom: 12 }}>Seleccioná el tipo de recurso</p>
@@ -1339,7 +1307,6 @@ Devolvé SOLO un objeto JSON con esta estructura exacta:
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </ModalLayout>
   );
 }

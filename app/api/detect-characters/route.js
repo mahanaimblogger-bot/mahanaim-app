@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   const { text } = await request.json();
+  console.log('Longitud del texto recibido:', text?.length);
   if (!text) return NextResponse.json({ error: 'Falta el texto' }, { status: 400 });
 
   const prompt = `
@@ -29,9 +30,11 @@ export async function POST(request) {
     });
 
     const data = await response.json();
+  console.log('Respuesta cruda de OpenRouter:', data.choices?.[0]?.message?.content);
     let content = data.choices?.[0]?.message?.content || '[]';
     content = content.replace(/```json|```/g, '').trim();
     const characters = JSON.parse(content);
+  console.log('Array final de personajes:', characters);
     return NextResponse.json({ characters: Array.isArray(characters) ? characters : [] });
   } catch (error) {
     console.error(error);
