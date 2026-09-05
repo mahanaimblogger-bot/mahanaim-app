@@ -46,14 +46,6 @@ mahanaim-app/
 git clone https://github.com/mahanaimblogger-bot/mahanaim-app.git
 cd mahanaim-app
 
-nstalar dependencias:
-npm install
-
-Crear archivo .env.local en la raíz con estas variables:
-NEXT_PUBLIC_SUPABASE_URL=https://ngvfllkbdnmezikxxyzd.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_qAFVH9JgX4Nl5PiW27NUwA_qSWqizeD
-OPENROUTER_API_KEY=sk_live_...(buscar api q debe estar en google drive el archivo y de no conseguir en openrouter generar nueeva apikey).
-
 Iniciar servidor de desarrollo:
 npm run dev
 Abrir http://localhost:3000.
