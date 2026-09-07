@@ -529,7 +529,19 @@ h1.titulo-entrada { font-size: 24px; }
     padding: 12px !important;
     margin: 15px 0 !important;
   }
+
+  /* IMAGEN DE PORTADA: reducir marco azul y ocupar ancho completo en móvil */
+  .imagen-portada {
+    padding: 8px !important;
+    margin: 15px auto !important;
+  }
+  .imagen-portada img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
 }
+
 
 /* ============================================
    ESTILOS PARA PDF LIMPIO (100% SEGURO)
