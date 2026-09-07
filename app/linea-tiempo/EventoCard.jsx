@@ -75,6 +75,19 @@ function CollapsibleContent({ html }) {
     if (!isClient || !containerRef.current) return;
     const container = containerRef.current;
 
+        // Forzar que TODAS las fichas colapsables aparezcan CERRADAS al montar,
+    // sin importar si el HTML viene con estilos inline 'abiertos'.
+    const forceFichasClosed = () => {
+      const headers = container.querySelectorAll('.ficha-header');
+      headers.forEach((header) => {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.ficha-chev');
+        if (chevron) chevron.classList.remove('open');
+        if (body) body.style.display = 'none';
+      });
+    };
+    forceFichasClosed();
+
     const handleContainerClick = (e) => {
       // Interceptar links de Wikipedia - abre modal sin re-render
       const link = e.target.closest('a[href*="wikipedia.org"]');

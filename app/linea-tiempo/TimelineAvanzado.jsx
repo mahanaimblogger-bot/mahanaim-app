@@ -380,6 +380,22 @@ useEffect(() => {
   }
 }, [initialEventId, filteredEvents]);
 
+  // Forzar que TODAS las fichas colapsables del panel de detalles (desktop)
+  // aparezcan CERRADAS por defecto cada vez que se selecciona un evento.
+  useEffect(() => {
+    if (!selectedEvent) return;
+    // Ejecutar después de que React pinte el nuevo contenido
+    const t = setTimeout(() => {
+      document.querySelectorAll('.description-content .ficha-header').forEach((header) => {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.ficha-chev');
+        if (chevron) chevron.classList.remove('open');
+        if (body) body.style.display = 'none';
+      });
+    }, 0);
+    return () => clearTimeout(t);
+  }, [selectedEvent]);
+
   const clearFilters = () => {
     setFilterEra('');
     setFilterCategory('');
