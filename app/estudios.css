@@ -540,7 +540,21 @@ h1.titulo-entrada { font-size: 24px; }
     max-width: 100% !important;
     height: auto !important;
   }
+
+  /* RECURSO ESTUDIO (vista individual): aprovechar el ancho en movil,
+     manteniendo un margen pequeno solo para que sea estetico */
+  #area-impresion {
+    padding: 6px 5px !important;
+  }
+  #area-impresion .contenedor-blog {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
 }
+
 
 
 /* ============================================
