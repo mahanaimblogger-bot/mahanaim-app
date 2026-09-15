@@ -300,10 +300,26 @@ box-shadow: 0 10px 40px rgba(26, 58, 92, 0.3);
 .contenedor-apendice { max-width: 800px; margin: 0 auto; padding: 20px; }
 
 @media (max-width: 768px) {
-.contenedor-blog { padding: 15px; }
-h1.titulo-entrada { font-size: 24px; }
-.biblia-ref .tooltip-text { position: fixed; bottom: 20px; left: 15px; right: 15px; width: auto; }
+  .contenedor-blog { padding: 15px; }
+  h1.titulo-entrada { font-size: 24px; }
+
+  .biblia-ref .tooltip-text {
+    position: fixed;
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 340px;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  .biblia-ref .tooltip-text::after {
+    display: none;
+  }
 }
+
 /* ─── Tablas comparativas ─── */
 .tabla-comparativa {
   margin: 20px 0;
